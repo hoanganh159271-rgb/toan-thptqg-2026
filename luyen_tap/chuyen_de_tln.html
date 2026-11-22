@@ -16,6 +16,7 @@
       <div class="topbar-actions">
         <a class="btn btn-sm btn-primary" href="phong_thi_toan.html?mode=tln_de1">Làm Đề TLN 01</a>
         <a class="btn btn-sm" href="phong_thi_toan.html?mode=tln_de2">Làm Đề TLN 02</a>
+        <a class="btn btn-sm" href="phong_thi_toan.html?mode=tln_hot20">Thi 20 câu HOT</a>
         <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
       </div>
     </div>
@@ -29,6 +30,7 @@
       <button type="button" class="tab-btn" data-tln-tab="cd3">CĐ 3: Xác suất (C3-MHH2.2)</button>
       <button type="button" class="tab-btn" data-tln-tab="cd4">CĐ 4: Vectơ 3D (C4-MHH2.2)</button>
       <button type="button" class="tab-btn" data-tln-tab="cd56">Mở rộng Hiểu: C5 &amp; C6</button>
+      <button type="button" class="tab-btn" data-tln-tab="hot20">Tuyển tập 20 câu "HOT" 2026</button>
     </nav>
 
     <div id="tabPanel"></div>
@@ -56,20 +58,23 @@
 
   <script src="../assets/common.js"></script>
   <script src="data_tln_van_dung.js"></script>
+  <script src="data_tln_hot_2026.js"></script>
   <script>
     (function () {
       'use strict';
       var C = window.TOAN_COMMON;
       var D = window.TOAN_TLN_VANDUNG;
+      var HOT = window.TOAN_TLN_HOT_2026 || { meta: {}, danh_sach_cau: [] };
       C.initTheme();
 
-      var validTabs = ['tongquan', 'cd1', 'cd2', 'cd3', 'cd4', 'cd56'];
+      var validTabs = ['tongquan', 'cd1', 'cd2', 'cd3', 'cd4', 'cd56', 'hot20'];
       var params = new URLSearchParams(window.location.search);
       var activeTab = params.get('tab') || 'tongquan';
       if (validTabs.indexOf(activeTab) < 0) activeTab = 'tongquan';
 
       var panel = document.getElementById('tabPanel');
       var stateInputs = {};
+      var stateHotFilter = 'all';
       var stateModalTarget = null;
 
       function renderExampleCard(vd) {
@@ -95,7 +100,7 @@
               '<span class="badge">' + capLabel + '</span>' +
               '<span class="badge badge-info">' + vd.nang_luc + '</span>' +
             '</div>' +
-            '<span class="muted" style="font-size: 0.85rem;">Mục ' + vd.tieu_muc + '</span>' +
+            '<span class="muted" style="font-size: 0.85rem;">Mục ' + vd.tieu_muc + (vd.nguon ? ' • ' + vd.nguon : '') + '</span>' +
           '</div>' +
           '<div class="q-stem">' + vd.de_bai + '</div>' +
           '<div class="tln-box">' +
@@ -187,6 +192,20 @@
               '</div>' +
               '<div class="tag-row"><span class="btn btn-sm btn-primary">Bắt đầu Đề tự luyện 02</span></div>' +
             '</a>' +
+            '<a class="card card-link" href="phong_thi_toan.html?mode=tln_hot20">' +
+              '<div>' +
+                '<div class="card-title">Tuyển tập 20 câu TLN Đề "HOT" 2026 (20 câu • 90 phút)</div>' +
+                '<p class="muted">Đề chính thức TN THPT 2026 (Mã 101) &amp; đề Sở/Trường mới nhất (15 Vận dụng C1–C4 + 5 Hiểu C5–C6), chấm thang 10 chuẩn phiếu tô.</p>' +
+              '</div>' +
+              '<div class="tag-row"><span class="btn btn-sm btn-primary">Thi 20 câu HOT (Thang 10)</span></div>' +
+            '</a>' +
+            '<a class="card card-link" href="phong_thi_toan.html?mode=tln_hot_vd">' +
+              '<div>' +
+                '<div class="card-title">Luyện 15 câu Vận dụng "HOT" 2026 (C1–C4 • 75 phút)</div>' +
+                '<p class="muted">Chuyên sâu 15 câu phân hóa từ bộ Đề "HOT" 2026 thuộc 4 vị trí Vận dụng: GTLN–GTNN, Khảo sát hàm, Xác suất &amp; Vectơ 3D.</p>' +
+              '</div>' +
+              '<div class="tag-row"><span class="btn btn-sm btn-primary">Luyện 15 câu Vận dụng</span></div>' +
+            '</a>' +
           '</div>' +
         '</section>';
       }
@@ -213,6 +232,20 @@
         }).join('');
 
         var examplesHtml = vds.map(renderExampleCard).join('');
+        var hotItems = (HOT.danh_sach_cau || []).filter(function (q) { return q.chuyen_de_key === tabKey; });
+        var hotSectionHtml = '';
+        if (hotItems.length) {
+          hotSectionHtml = '<section class="section">' +
+            '<div class="section-head">' +
+              '<div>' +
+                '<h2>Bài tập trích Đề thi "HOT" 2026 thuộc chuyên đề này (' + hotItems.length + ' câu)</h2>' +
+                '<p>Tuyển chọn từ Đề chính thức TN THPT 2026 (Mã 101) và đề các Sở/Trường mới nhất.</p>' +
+              '</div>' +
+              '<a class="btn btn-sm" href="phong_thi_toan.html?mode=tln_hot20">Mở Phòng thi 20 câu HOT</a>' +
+            '</div>' +
+            hotItems.map(renderExampleCard).join('') +
+          '</section>';
+        }
 
         return '<section class="section">' +
           '<div class="card">' +
@@ -237,10 +270,68 @@
             '<a class="btn btn-sm" href="phong_thi_toan.html?mode=tln_vd">Thi thử cả 14 Ví dụ</a>' +
           '</div>' +
           examplesHtml +
+        '</section>' +
+        hotSectionHtml;
+      }
+
+      function renderHot20Tab() {
+        var allHot = HOT.danh_sach_cau || [];
+        var filtered = stateHotFilter === 'all'
+          ? allHot
+          : allHot.filter(function (q) { return q.ma_lenh === stateHotFilter; });
+
+        var filters = [
+          { key: 'all', label: 'Tất cả (' + allHot.length + ')' },
+          { key: 'C1-MHH2.2', label: 'C1-MHH2.2 (4)' },
+          { key: 'C2-GQ2.2', label: 'C2-GQ2.2 (3)' },
+          { key: 'C3-MHH2.2', label: 'C3-MHH2.2 (5)' },
+          { key: 'C4-MHH2.2', label: 'C4-MHH2.2 (3)' },
+          { key: 'C5-GQ2.2', label: 'C5-GQ2.2 (2)' },
+          { key: 'C6-GQ2.1', label: 'C6-GQ2.1 (3)' }
+        ];
+        var filterBar = '<div class="tag-row" style="margin-bottom: 20px;">' +
+          filters.map(function (f) {
+            var cls = stateHotFilter === f.key ? 'btn btn-sm btn-primary' : 'btn btn-sm';
+            return '<button type="button" class="' + cls + '" data-hot-filter="' + f.key + '">' + f.label + '</button>';
+          }).join('') +
+        '</div>';
+
+        return '<section class="section">' +
+          '<div class="card">' +
+            '<div class="section-head" style="margin-bottom: 10px;">' +
+              '<div><h2>' + (HOT.meta.tieu_de || 'Tuyển tập 20 câu Trả lời ngắn Đề "HOT" 2026') + '</h2></div>' +
+              '<div class="tag-row">' +
+                '<a class="btn btn-sm btn-primary" href="phong_thi_toan.html?mode=tln_hot20">Thi 20 câu (90\')</a>' +
+                '<a class="btn btn-sm" href="phong_thi_toan.html?mode=tln_hot_vd">Luyện 15 câu VD (75\')</a>' +
+                '<a class="btn btn-sm" href="phong_thi_toan.html?mode=tln_hot_h">Luyện 5 câu Hiểu (25\')</a>' +
+                '<a class="btn btn-sm" href="../tai_lieu.html?doc=luyen_tap/tuyen_tap_20_cau_tln_hot_2026.md">Bản đọc Markdown</a>' +
+              '</div>' +
+            '</div>' +
+            '<p><strong>Nguồn tuyển chọn:</strong> ' + (HOT.meta.nguon_tong_hop || '') + '</p>' +
+          '</div>' +
+        '</section>' +
+        '<section class="section">' +
+          '<div class="section-head">' +
+            '<div>' +
+              '<h2>Luyện tương tác từng câu (' + filtered.length + ' câu đang hiển thị)</h2>' +
+              '<p>Tự giải nháp, nhập đáp số tối đa 4 ký tự để đối chiếu tức thì trước khi mở lời giải 6 bước.</p>' +
+            '</div>' +
+          '</div>' +
+          filterBar +
+          filtered.map(renderExampleCard).join('') +
         '</section>';
       }
 
       function bindTabPanelEvents() {
+        var allPool = D.vi_du_chuyen_de.concat(HOT.danh_sach_cau || []);
+
+        panel.querySelectorAll('[data-hot-filter]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            stateHotFilter = btn.getAttribute('data-hot-filter') || 'all';
+            renderActiveTab('hot20');
+          });
+        });
+
         panel.querySelectorAll('[data-vd-input]').forEach(function (inp) {
           inp.addEventListener('input', function () {
             var id = inp.getAttribute('data-vd-input');
@@ -260,7 +351,7 @@
         panel.querySelectorAll('[data-vd-check]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var id = btn.getAttribute('data-vd-check');
-            var vd = D.vi_du_chuyen_de.filter(function (x) { return x.id === id; })[0];
+            var vd = allPool.filter(function (x) { return x.id === id; })[0];
             var inp = panel.querySelector('[data-vd-input="' + id + '"]');
             var resBadge = panel.querySelector('[data-vd-res="' + id + '"]');
             var logBtn = panel.querySelector('[data-vd-log="' + id + '"]');
@@ -302,7 +393,7 @@
         panel.querySelectorAll('[data-vd-log]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var id = btn.getAttribute('data-vd-log');
-            var vd = D.vi_du_chuyen_de.filter(function (x) { return x.id === id; })[0];
+            var vd = allPool.filter(function (x) { return x.id === id; })[0];
             if (!vd) return;
             openErrModal(vd);
           });
@@ -314,7 +405,9 @@
         document.querySelectorAll('[data-tln-tab]').forEach(function (b) {
           b.classList.toggle('active', b.getAttribute('data-tln-tab') === tabKey);
         });
-        panel.innerHTML = tabKey === 'tongquan' ? renderOverview() : renderTopicTab(tabKey);
+        panel.innerHTML = tabKey === 'tongquan'
+          ? renderOverview()
+          : (tabKey === 'hot20' ? renderHot20Tab() : renderTopicTab(tabKey));
         bindTabPanelEvents();
       }
 

@@ -1,5 +1,5 @@
 /* Service Worker — Hỗ trợ dùng offline sau lần tải đầu tiên qua Internet */
-const CACHE_NAME = 'toan-thptqg-2026-v4';
+const CACHE_NAME = 'toan-thptqg-2026-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   './assets/docs_data.js',
   './luyen_tap/data_de_mau.js',
   './luyen_tap/data_tln_van_dung.js',
+  './luyen_tap/data_tln_hot_2026.js',
   './luyen_tap/chuyen_de_tln.html',
   './luyen_tap/phong_thi_toan.html',
   './truc_quan/01_khao_sat_va_tuong_giao.html',
