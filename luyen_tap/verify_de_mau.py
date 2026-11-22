@@ -17,6 +17,7 @@ MATRIX_JSON_PATH = os.path.join(ROOT_DIR, "ma_tran_de_2026.json")
 COMMON_JS_PATH = os.path.join(ROOT_DIR, "assets", "common.js")
 DATA_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_de_mau.js")
 TLN_VD_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_tln_van_dung.js")
+TLN_HOT_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_tln_hot_2026.js")
 
 
 def load_js_runtime():
@@ -26,6 +27,7 @@ const vm = require('vm');
 const commonPath = process.argv[1];
 const dataPath = process.argv[2];
 const tlnVdPath = process.argv[3];
+const tlnHotPath = process.argv[4];
 
 const noop = () => {};
 const fakeEl = () => ({
@@ -71,6 +73,7 @@ sandbox.global = sandbox;
 vm.runInNewContext(fs.readFileSync(commonPath, 'utf8'), sandbox, { filename: commonPath });
 vm.runInNewContext(fs.readFileSync(dataPath, 'utf8'), sandbox, { filename: dataPath });
 vm.runInNewContext(fs.readFileSync(tlnVdPath, 'utf8'), sandbox, { filename: tlnVdPath });
+vm.runInNewContext(fs.readFileSync(tlnHotPath, 'utf8'), sandbox, { filename: tlnHotPath });
 
 const C = sandbox.TOAN_COMMON;
 const scoringTests = {
@@ -87,18 +90,20 @@ const scoringTests = {
   valid_unicode_minus: C.validateShortAnswer('\u22123').valid && C.validateShortAnswer('\u22123').normalized === '-3',
   invalid_5: C.validateShortAnswer('12,34').valid,
   cmp_comma_dot: C.compareShortAnswer('0.89', '0,89') && C.compareShortAnswer('37.5', '37,5'),
-  cmp_unicode_minus: C.compareShortAnswer('\u22123', '-3') && C.compareShortAnswer('-3', '\u22123')
+  cmp_unicode_minus: C.compareShortAnswer('\u22123', '-3') && C.compareShortAnswer('-3', '\u22123'),
+  cmp_49_zero: C.compareShortAnswer('49,0', '49')
 };
 
 console.log(JSON.stringify({
   matrix: sandbox.TOAN_MATRIX,
   de_mau: sandbox.TOAN_DE_MAU,
   tln_vd: sandbox.TOAN_TLN_VANDUNG,
+  tln_hot: sandbox.TOAN_TLN_HOT_2026,
   scoringTests
 }));
 """
     res = subprocess.run(
-        ["node", "-e", node_script, COMMON_JS_PATH, DATA_JS_PATH, TLN_VD_JS_PATH],
+        ["node", "-e", node_script, COMMON_JS_PATH, DATA_JS_PATH, TLN_VD_JS_PATH, TLN_HOT_JS_PATH],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -174,6 +179,7 @@ def check_matrix_alignment(matrix_json, runtime):
     assert st["valid_4"] is True and st["valid_unicode_minus"] is True
     assert st["invalid_5"] is False
     assert st["cmp_comma_dot"] is True and st["cmp_unicode_minus"] is True
+    assert st["cmp_49_zero"] is True
 
 
 def verify_tln_van_dung(tln):
@@ -299,6 +305,102 @@ def verify_tln_van_dung(tln):
     assert f"{d_d2c6:.2f}".replace(".", ",") == "4,24" and m_d2["TLN2-06"] == "4,24"
 
     return len(all_tln)
+
+
+def verify_tln_hot_2026(hot):
+    import itertools
+
+    qs = hot["danh_sach_cau"]
+    assert len(qs) == 20, f"Phải có 20 câu HOT 2026, hiện có {len(qs)}"
+
+    expected_meta = [
+        ("HOT-01", 1, "C1-MHH2.2", "VD", "MHH"),
+        ("HOT-02", 1, "C1-MHH2.2", "VD", "MHH"),
+        ("HOT-03", 1, "C1-MHH2.2", "VD", "MHH"),
+        ("HOT-04", 1, "C1-MHH2.2", "VD", "MHH"),
+        ("HOT-05", 1, "C2-GQ2.2", "VD", "GQ"),
+        ("HOT-06", 1, "C2-GQ2.2", "VD", "GQ"),
+        ("HOT-07", 1, "C2-GQ2.2", "VD", "GQ"),
+        ("HOT-08", 3, "C3-MHH2.2", "VD", "MHH"),
+        ("HOT-09", 3, "C3-MHH2.2", "VD", "MHH"),
+        ("HOT-10", 3, "C3-MHH2.2", "VD", "MHH"),
+        ("HOT-11", 3, "C3-MHH2.2", "VD", "MHH"),
+        ("HOT-12", 3, "C3-MHH2.2", "VD", "MHH"),
+        ("HOT-13", 4, "C4-MHH2.2", "VD", "MHH"),
+        ("HOT-14", 4, "C4-MHH2.2", "VD", "MHH"),
+        ("HOT-15", 4, "C4-MHH2.2", "VD", "MHH"),
+        ("HOT-16", 4, "C5-GQ2.2", "H", "GQ"),
+        ("HOT-17", 4, "C5-GQ2.2", "H", "GQ"),
+        ("HOT-18", 5, "C6-GQ2.1", "H", "GQ"),
+        ("HOT-19", 5, "C6-GQ2.1", "H", "GQ"),
+        ("HOT-20", 5, "C6-GQ2.1", "H", "GQ"),
+    ]
+    for idx, (q, exp) in enumerate(zip(qs, expected_meta), start=1):
+        assert q["so_cau"] == idx, f"{q['id']} sai so_cau"
+        assert (q["id"], q["chu_de"], q["ma_lenh"], q["cap_do"], q["nang_luc"]) == exp, f"{q['id']} lệch ma trận"
+        assert q.get("nguon"), f"{q['id']} thiếu nguon"
+        assert len(q["dap_an"]) <= 4, f"{q['id']} đáp án '{q['dap_an']}' quá 4 ký tự"
+        assert len(q.get("loi_giai", [])) == 6, f"{q['id']} phải có đủ 6 bước lời giải"
+        if q["nang_luc"] == "MHH":
+            assert len(q.get("mo_hinh_hoa", [])) == 5, f"{q['id']} (MHH) phải có đủ 5 bước mô hình hóa"
+
+    assert sum(1 for q in qs if q["cap_do"] == "VD") == 15
+    assert sum(1 for q in qs if q["cap_do"] == "H") == 5
+    assert sum(1 for q in qs if q["nang_luc"] == "MHH") == 12
+    assert sum(1 for q in qs if q["nang_luc"] == "GQ") == 8
+
+    m = {q["id"]: q["dap_an"] for q in qs}
+
+    # C1-C4 (C1-MHH2.2)
+    P1 = lambda x: -0.001 * x**3 + 30 * x - 10
+    assert abs(P1(100) - 1990) < 1e-9 and all(P1(100) >= P1(k) for k in range(1, 201)) and m["HOT-01"] == "1990"
+    L2 = lambda x: -x**3 + 3 * x**2 + 240 * x - 500
+    assert max(range(1, 19), key=L2) == 10 and m["HOT-02"] == "10"
+    L3 = lambda x: x * (1700 - 7 * x) - (16000 + 500 * x - 1.6 * x**2 + 0.004 * x**3)
+    assert max(range(1, 301), key=L3) == 100 and abs(L3(100) / 1000 - 46) < 1e-9 and m["HOT-03"] == "46"
+    f4 = lambda x: (25 + x * (x - 1)) / x
+    assert min(range(1, 11), key=f4) == 5 and m["HOT-04"] == "5"
+
+    # C5-C7 (C2-GQ2.2)
+    V5 = lambda t: (35 / 4) * (3 * t - t**2 + t**3) + 4
+    assert f"{V5(1 / 3):.1f}".replace(".", ",") == "12,1" and m["HOT-05"] == "12,1"
+    y6 = lambda x: (x**2 + x + 1) * math.exp(-x)
+    vals6 = [y6(-1 + k / 1000) for k in range(1001)]
+    assert f"{max(vals6) + min(vals6):.1f}".replace(".", ",") == "3,7" and m["HOT-06"] == "3,7"
+    min7 = next(x for x in range(1, 5001) if (-0.02 * x**2 + 320 * x) - (24000 + 180 * x) >= 120000)
+    assert min7 == 1253 and m["HOT-07"] == "1253"
+
+    # C8-C12 (C3-MHH2.2)
+    p8 = (3 * math.comb(4, 2) * 4 * 4) / math.comb(12, 4)
+    assert abs(3190 * p8 - 1856) < 1e-9 and m["HOT-08"] == "1856"
+    p9 = (1 / 3) ** 2 * 3 * (1 / 4) * (3 / 4) ** 2 + 2 * (1 / 3) * (2 / 3) * 3 * (1 / 4) ** 2 * (3 / 4) + (2 / 3) ** 2 * (1 / 4) ** 3
+    assert f"{p9:.2f}".replace(".", ",") == "0,12" and m["HOT-09"] == "0,12"
+    p10 = 3 / 8 + (5 / 8) * (math.comb(7, 2) / math.comb(8, 3))
+    assert f"{p10:.2f}".replace(".", ",") == "0,61" and m["HOT-10"] == "0,61"
+    c11 = sum(1 for comb in itertools.combinations(range(1, 10), 4) if sum(comb) == 15)
+    assert c11 == 6 and f"{c11 / math.comb(9, 4):.2f}".replace(".", ",") == "0,05" and m["HOT-11"] == "0,05"
+    is_ap = lambda s: s[1] - s[0] == s[2] - s[1] == s[3] - s[2]
+    c12 = sum(1 for comb in itertools.combinations(range(1, 10), 5) if is_ap(comb[:4]) or is_ap(comb[1:]))
+    assert c12 == 30 and abs((math.comb(9, 5) / c12) - 4.2) < 1e-9 and m["HOT-12"] == "4,2"
+
+    # C13-C15 (C4-MHH2.2)
+    dt13 = 2 * math.sqrt(4 - 1.4**2) / 5
+    assert f"{dt13:.2f}".replace(".", ",") == "0,57" and m["HOT-13"] == "0,57"
+    a14, b14, c14 = 1.08, 2.56, 5.0
+    assert abs(4 * a14 + 3 * b14 - 12) < 1e-9 and abs(3 * a14 - 4 * b14 + 7) < 1e-9 and m["HOT-14"] == "8,64"
+    p15 = math.sqrt(3 * 400 + 6 * 400 * 0.5)
+    assert round(p15) == 49 and m["HOT-15"] == "49"
+
+    # C16-C17 (C5-GQ2.2)
+    assert abs((18 / 8) * 6 - 13.5) < 1e-9 and m["HOT-16"] == "13,5"
+    assert 4 - 2 * (-5) == 14 and m["HOT-17"] == "14"
+
+    # C18-C20 (C6-GQ2.1)
+    assert f"{3 * math.sqrt(6):.2f}".replace(".", ",") == "7,35" and m["HOT-18"] == "7,35"
+    assert abs(1 / math.sqrt(1 / 1**2 + 1 / 3) - math.sqrt(3) / 2) < 1e-12 and m["HOT-19"] == "1"
+    assert f"{6 / 7:.2f}".replace(".", ",") == "0,86" and m["HOT-20"] == "0,86"
+
+    return len(qs)
 
 
 def verify_math_independently(de):
@@ -500,11 +602,13 @@ def main():
     check_matrix_alignment(matrix_json, runtime)
     verify_math_independently(runtime["de_mau"])
     tln_count = verify_tln_van_dung(runtime["tln_vd"])
+    hot_count = verify_tln_hot_2026(runtime["tln_hot"])
     scanned_files = check_zero_cdn_and_offline()
 
     print("PASS 22/22 câu (34/34 lệnh hỏi) khớp 100% ma_tran_de_2026.json!")
     print("PASS kiểm chứng toán học độc lập: 12 TN + 16 ý ĐS + 6 TLN (<= 4 ký tự).")
     print(f"PASS kiểm chứng độc lập {tln_count} câu TLN Vận dụng & Mở rộng (14 VD + Đề 01 + Đề 02).")
+    print(f"PASS kiểm chứng độc lập {hot_count} câu TLN Đề HOT 2026 (15 VD C1-C4 + 5 Hiểu C5-C6).")
     print("PASS thang chấm điểm JS: 0,25 TN | 0,10-0,25-0,50-1,00 ĐS | 0,50 TLN.")
     print(f"PASS 0 CDN violations across {scanned_files} web files (.html/.css/.js).")
 

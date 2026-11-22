@@ -35,6 +35,9 @@
             <option value="tln_de1">Đề tự luyện TLN số 01 — Chuẩn Ma trận (6 câu • 30')</option>
             <option value="tln_de2">Đề tự luyện TLN số 02 — Chuẩn Ma trận (6 câu • 30')</option>
             <option value="tln_vd">Luyện 14 Ví dụ TLN Vận dụng &amp; Mở rộng (14 câu • 60')</option>
+            <option value="tln_hot20">Tuyển tập 20 câu TLN Đề "HOT" 2026 (20 câu • 90' • Thang 10)</option>
+            <option value="tln_hot_vd">15 câu TLN Vận dụng Đề "HOT" 2026 (C1–C4 • 75')</option>
+            <option value="tln_hot_h">5 câu TLN Hiểu Đề "HOT" 2026 (C5–C6 • 25')</option>
             <option value="cd1">Chủ đề 1: Ứng dụng đạo hàm (8 câu)</option>
             <option value="cd2">Chủ đề 2: Lượng giác, Dãy số, Mũ-Log (3 câu)</option>
             <option value="cd3">Chủ đề 3: Tổ hợp – Xác suất (3 câu)</option>
@@ -168,6 +171,7 @@
   <script src="../assets/common.js"></script>
   <script src="data_de_mau.js"></script>
   <script src="data_tln_van_dung.js"></script>
+  <script src="data_tln_hot_2026.js"></script>
   <script>
     (function () {
       'use strict';
@@ -175,12 +179,13 @@
       var M = window.TOAN_MATRIX;
       var BANK = window.TOAN_DE_MAU;
       var TLN_BANK = window.TOAN_TLN_VANDUNG || {};
+      var HOT_BANK = window.TOAN_TLN_HOT_2026 || {};
       C.initTheme();
 
       var params = new URLSearchParams(window.location.search);
       var currentMode = params.get('mode') || 'full';
       var modeSelect = document.getElementById('modeSelect');
-      if (['full', 'mhh', 'tln_de1', 'tln_de2', 'tln_vd', 'cd1', 'cd2', 'cd3', 'cd4', 'cd5'].indexOf(currentMode) >= 0) {
+      if (['full', 'mhh', 'tln_de1', 'tln_de2', 'tln_vd', 'tln_hot20', 'tln_hot_vd', 'tln_hot_h', 'cd1', 'cd2', 'cd3', 'cd4', 'cd5'].indexOf(currentMode) >= 0) {
         modeSelect.value = currentMode;
       } else {
         currentMode = 'full';
@@ -210,6 +215,15 @@
         }
         if (mode === 'tln_vd') {
           return (TLN_BANK.vi_du_chuyen_de || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        }
+        if (mode === 'tln_hot20') {
+          return (HOT_BANK.danh_sach_cau || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        }
+        if (mode === 'tln_hot_vd') {
+          return (HOT_BANK.danh_sach_cau || []).filter(function (q) { return q.cap_do === 'VD'; }).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        }
+        if (mode === 'tln_hot_h') {
+          return (HOT_BANK.danh_sach_cau || []).filter(function (q) { return q.cap_do === 'H'; }).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
         }
 
         var all = [];
@@ -352,7 +366,7 @@
                 '<span class="badge">' + capBadge + '</span>' +
                 '<span class="badge badge-info">' + q.nang_luc + '</span>' +
               '</div>' +
-              '<span class="muted" style="font-size: 0.85rem;">' + getTopicName(q.chu_de) + ' (' + q.tieu_muc + ')</span>' +
+              '<span class="muted" style="font-size: 0.85rem;">' + getTopicName(q.chu_de) + ' (' + q.tieu_muc + ')' + (q.nguon ? ' • ' + q.nguon : '') + '</span>' +
               '</div>';
 
             html += '<div class="q-stem">' + q.de_bai + '</div>';
@@ -703,15 +717,21 @@
         document.getElementById('btnSubmitExam').textContent = 'Nộp bài thi & Chấm điểm';
 
         var minutes = mode === 'full' ? 90
+          : (mode === 'tln_hot20' ? 90
+          : (mode === 'tln_hot_vd' ? 75
           : (mode === 'tln_vd' ? 60
           : ((mode === 'tln_de1' || mode === 'tln_de2') ? 30
-          : Math.max(15, state.items.length * 5)));
+          : (mode === 'tln_hot_h' ? 25
+          : Math.max(15, state.items.length * 5))))));
         var titleMap = {
           full: 'Đề thi thử chuẩn Ma trận 2026 (22 câu | 34 lệnh | 90 phút)',
           mhh: 'Luyện tập chuyên sâu: 4 câu Mô hình hóa (MHH)',
           tln_de1: 'Đề tự luyện Trả lời ngắn số 01 (6 câu | 4 VD + 2 Hiểu | 30 phút)',
           tln_de2: 'Đề tự luyện Trả lời ngắn số 02 (6 câu | 4 VD + 2 Hiểu | 30 phút)',
           tln_vd: 'Luyện tập 14 Ví dụ Trả lời ngắn Vận dụng & Mở rộng (60 phút)',
+          tln_hot20: 'Tuyển tập 20 câu TLN Đề "HOT" 2026 (15 VD + 5 Hiểu • 90 phút • Thang 10)',
+          tln_hot_vd: '15 câu TLN Vận dụng Đề "HOT" 2026 (C1–C4 • 75 phút)',
+          tln_hot_h: '5 câu TLN Hiểu Đề "HOT" 2026 (C5–C6 • 25 phút)',
           cd1: 'Luyện theo Chủ đề 1: Ứng dụng đạo hàm',
           cd2: 'Luyện theo Chủ đề 2: Lượng giác – Dãy số – Mũ, Logarit',
           cd3: 'Luyện theo Chủ đề 3: Tổ hợp – Xác suất',
