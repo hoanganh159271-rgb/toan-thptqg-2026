@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng Thi Chuẩn Ma trận 2026 — Toán THPTQG</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        <a class="btn btn-sm" href="../index.html">← Dashboard</a>
+        <h1>Phòng Thi Chuẩn Ma trận THPTQG 2026</h1>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-accent num" id="timerBadge">90:00</span>
+        <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Thanh chọn chế độ luyện tập -->
+    <section class="card" style="margin-bottom: 24px;">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+        <div>
+          <h2 id="examTitle">Đề thi thử chuẩn Ma trận 2026 (22 câu | 34 lệnh | 90 phút)</h2>
+          <p class="muted" style="margin-top: 4px;" id="examRuleText">Phần I: 12 câu × 0,25đ | Phần II: 4 câu ĐS lũy tiến (0,10 – 0,25 – 0,50 – 1,00) | Phần III: 6 câu × 0,50đ (tối đa 4 ký tự).</p>
+        </div>
+        <div class="tag-row">
+          <select id="modeSelect" aria-label="Chọn chế độ luyện thi" style="width: auto; min-width: 240px;">
+            <option value="full">Đề chuẩn Ma trận 2026 (22 câu • 90')</option>
+            <option value="mhh">Chuyên đề 4 câu Mô hình hóa (MHH)</option>
+            <option value="cd1">Chủ đề 1: Ứng dụng đạo hàm (8 câu)</option>
+            <option value="cd2">Chủ đề 2: Lượng giác, Dãy số, Mũ-Log (3 câu)</option>
+            <option value="cd3">Chủ đề 3: Tổ hợp – Xác suất (3 câu)</option>
+            <option value="cd4">Chủ đề 4: Vectơ không gian &amp; Oxyz (6 câu)</option>
+            <option value="cd5">Chủ đề 5: Quan hệ vuông góc (1 câu)</option>
+          </select>
+          <button type="button" class="btn btn-sm" id="btnResetExam">Làm lại từ đầu</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kết quả & Bản đồ nhiệt Ma trận (hiện sau khi nộp bài) -->
+    <section id="resultSection" style="display: none; margin-bottom: 28px;">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h2>Kết quả &amp; Bản đồ nhiệt Ma trận</h2>
+            <p id="resultSummarySub">—</p>
+          </div>
+          <div class="tag-row">
+            <button type="button" class="btn btn-sm" id="btnExportErrMd">Xuất Markdown Nhật ký lỗi</button>
+          </div>
+        </div>
+
+        <div class="grid grid-4" style="margin-bottom: 20px;">
+          <div class="readout-item">
+            <div class="r-label">Tổng điểm đạt được</div>
+            <div class="r-val" id="scoreTotal" style="font-size: 1.5rem;">0,00 / 10</div>
+          </div>
+          <div class="readout-item">
+            <div class="r-label">Phần I (TN 0,25đ/câu)</div>
+            <div class="r-val" id="scoreP1">0,00</div>
+          </div>
+          <div class="readout-item">
+            <div class="r-label">Phần II (ĐS lũy tiến)</div>
+            <div class="r-val" id="scoreP2">0,00</div>
+          </div>
+          <div class="readout-item">
+            <div class="r-label">Phần III (TLN 0,50đ/câu)</div>
+            <div class="r-val" id="scoreP3">0,00</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <h3 style="margin-bottom: 10px;">Bản đồ nhiệt: 5 Chủ đề × 3 Cấp độ (Số lệnh đúng)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Chủ đề</th>
+                    <th class="num">Biết (B)</th>
+                    <th class="num">Hiểu (H)</th>
+                    <th class="num">Vận dụng (VD)</th>
+                    <th class="num">Tổng</th>
+                  </tr>
+                </thead>
+                <tbody id="heatTopicBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin-bottom: 10px;">Bản đồ Năng lực (TD / GQ / MHH)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Năng lực</th>
+                    <th class="num">Số lệnh đúng</th>
+                    <th class="num">Tỉ lệ</th>
+                    <th>Nhận định</th>
+                  </tr>
+                </thead>
+                <tbody id="heatCompBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Khu vực làm bài -->
+    <div class="exam-layout">
+      <div id="questionsContainer"></div>
+
+      <aside class="exam-sidebar card">
+        <h3>Bảng điều hướng</h3>
+        <p class="muted" style="font-size: 0.88rem; margin: 6px 0 12px;" id="progressCounter">Đã trả lời: 0 / 22 câu</p>
+        <div class="q-nav-grid" id="navGrid"></div>
+        <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 10px;">
+          <button type="button" class="btn btn-primary" id="btnSubmitExam">Nộp bài thi &amp; Chấm điểm</button>
+          <a class="btn btn-sm" href="../tai_lieu.html?doc=chan_doan/checklist_truoc_khi_thi.md">Mở Checklist trước khi thi</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Modal đẩy câu sai vào Nhật ký lỗi -->
+  <div class="modal-backdrop" id="errModal" role="dialog" aria-modal="true" aria-labelledby="errModalTitle">
+    <div class="modal-card">
+      <h3 id="errModalTitle">Đẩy câu sai vào Nhật ký lỗi</h3>
+      <p class="muted" style="margin: 6px 0 12px;" id="errModalMeta">—</p>
+      <div class="slider-group">
+        <label for="errGroupSelect">Chọn 1 trong 8 nhóm lỗi chẩn đoán</label>
+        <select id="errGroupSelect"></select>
+      </div>
+      <div class="slider-group">
+        <label for="errNoteInput">Nguyên nhân sai / Bước nhầm cần vá</label>
+        <textarea id="errNoteInput" placeholder="Ví dụ: Quên đổi dấu đạo hàm, gộp khoảng qua TCĐ x=1, làm tròn sớm bước trung gian..."></textarea>
+      </div>
+      <div class="tag-row" style="margin-top: 14px; justify-content: flex-end;">
+        <button type="button" class="btn btn-sm" id="btnCloseModal">Hủy</button>
+        <button type="button" class="btn btn-sm btn-primary" id="btnSaveErrLog">Lưu vào Nhật ký</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal xuất Markdown -->
+  <div class="modal-backdrop" id="mdModal" role="dialog" aria-modal="true" aria-labelledby="mdModalTitle">
+    <div class="modal-card">
+      <h3 id="mdModalTitle">Markdown Nhật ký lỗi (sẵn sàng dán vào chan_doan/nhat_ky_loi_sai.md)</h3>
+      <textarea id="mdOutputArea" readonly style="margin-top: 12px; min-height: 180px; font-family: var(--font-mono); font-size: 0.85rem;"></textarea>
+      <div class="tag-row" style="margin-top: 12px; justify-content: flex-end;">
+        <button type="button" class="btn btn-sm" id="btnCloseMdModal">Đóng</button>
+        <button type="button" class="btn btn-sm btn-primary" id="btnCopyMd">Sao chép</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/common.js"></script>
+  <script src="data_de_mau.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var C = window.TOAN_COMMON;
+      var M = window.TOAN_MATRIX;
+      var BANK = window.TOAN_DE_MAU;
+      C.initTheme();
+
+      var params = new URLSearchParams(window.location.search);
+      var currentMode = params.get('mode') || 'full';
+      var modeSelect = document.getElementById('modeSelect');
+      if (['full', 'mhh', 'cd1', 'cd2', 'cd3', 'cd4', 'cd5'].indexOf(currentMode) >= 0) {
+        modeSelect.value = currentMode;
+      } else {
+        currentMode = 'full';
+      }
+
+      var state = {
+        submitted: false,
+        answers: { p1: {}, p2: {}, p3: {} },
+        items: [],
+        timerSec: 5400,
+        elapsedSec: 0,
+        timerHandle: null,
+        modalTarget: null
+      };
+
+      function getTopicName(id) {
+        var found = M.chu_de.filter(function (c) { return c.id === id; })[0];
+        return found ? found.ngan : ('Chủ đề ' + id);
+      }
+
+      function buildItems(mode) {
+        var all = [];
+        BANK.phan_1.forEach(function (q) { all.push(Object.assign({ phan: 'TN' }, q)); });
+        BANK.phan_2.forEach(function (q) { all.push(Object.assign({ phan: 'DS' }, q)); });
+        BANK.phan_3.forEach(function (q) { all.push(Object.assign({ phan: 'TLN' }, q)); });
+
+        if (mode === 'full') return all;
+        if (mode === 'mhh') return all.filter(function (q) { return q.nang_luc === 'MHH'; });
+        if (mode.indexOf('cd') === 0) {
+          var cdNum = Number(mode.slice(2));
+          return all.filter(function (q) { return q.chu_de === cdNum; });
+        }
+        return all;
+      }
+
+      function formatClock(sec) {
+        var s = Math.max(0, sec);
+        var m = Math.floor(s / 60);
+        var r = s % 60;
+        return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r;
+      }
+
+      function startTimer(totalMinutes) {
+        if (state.timerHandle) clearInterval(state.timerHandle);
+        state.timerSec = totalMinutes * 60;
+        state.elapsedSec = 0;
+        document.getElementById('timerBadge').textContent = formatClock(state.timerSec);
+        state.timerHandle = setInterval(function () {
+          if (state.submitted) return;
+          state.elapsedSec += 1;
+          state.timerSec = Math.max(0, state.timerSec - 1);
+          document.getElementById('timerBadge').textContent = formatClock(state.timerSec);
+          if (state.timerSec === 0) {
+            submitExam(true);
+          }
+        }, 1000);
+      }
+
+      function countAnswered() {
+        var count = 0;
+        state.items.forEach(function (q) {
+          if (q.phan === 'TN' && state.answers.p1[q.id]) count++;
+          else if (q.phan === 'DS') {
+            var ans = state.answers.p2[q.id] || {};
+            if (q.cac_y.every(function (sub) { return typeof ans[sub.y] === 'boolean'; })) count++;
+          } else if (q.phan === 'TLN') {
+            var v = (state.answers.p3[q.id] || '').trim();
+            if (v) count++;
+          }
+        });
+        document.getElementById('progressCounter').textContent = 'Đã trả lời: ' + count + ' / ' + state.items.length + ' câu';
+      }
+
+      function renderNav() {
+        var grid = document.getElementById('navGrid');
+        grid.innerHTML = '';
+        state.items.forEach(function (q, idx) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'q-nav-btn';
+          btn.textContent = q.phan + q.so_cau;
+          btn.setAttribute('data-nav-id', q.id);
+          btn.addEventListener('click', function () {
+            var el = document.getElementById('card-' + q.id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+          grid.appendChild(btn);
+        });
+        updateNavStates();
+      }
+
+      function updateNavStates() {
+        state.items.forEach(function (q) {
+          var btn = document.querySelector('[data-nav-id="' + q.id + '"]');
+          if (!btn) return;
+          btn.className = 'q-nav-btn';
+          if (!state.submitted) {
+            var done = false;
+            if (q.phan === 'TN') done = Boolean(state.answers.p1[q.id]);
+            else if (q.phan === 'DS') {
+              var a = state.answers.p2[q.id] || {};
+              done = Object.keys(a).length === 4;
+            } else {
+              done = Boolean((state.answers.p3[q.id] || '').trim());
+            }
+            if (done) btn.classList.add('answered');
+          } else {
+            if (q.phan === 'TN') {
+              btn.classList.add(state.answers.p1[q.id] === q.dap_an ? 'q-ok' : 'q-err');
+            } else if (q.phan === 'DS') {
+              var subOk = countDSCorrect(q);
+              btn.classList.add(subOk === 4 ? 'q-ok' : (subOk === 0 ? 'q-err' : 'q-partial'));
+            } else {
+              btn.classList.add(C.compareShortAnswer(state.answers.p3[q.id] || '', q.dap_an) ? 'q-ok' : 'q-err');
+            }
+          }
+        });
+        countAnswered();
+      }
+
+      function countDSCorrect(q) {
+        var ans = state.answers.p2[q.id] || {};
+        var ok = 0;
+        q.cac_y.forEach(function (sub) {
+          if (ans[sub.y] === sub.dap_an) ok++;
+        });
+        return ok;
+      }
+
+      function renderQuestions() {
+        var container = document.getElementById('questionsContainer');
+        container.innerHTML = '';
+
+        var sections = [
+          { key: 'TN', title: 'Phần I: Trắc nghiệm nhiều lựa chọn (0,25 điểm / câu)' },
+          { key: 'DS', title: 'Phần II: Trắc nghiệm Đúng/Sai (Lũy tiến: 0,10 – 0,25 – 0,50 – 1,00)' },
+          { key: 'TLN', title: 'Phần III: Trắc nghiệm Trả lời ngắn (0,50 điểm / câu • Tối đa 4 ký tự)' }
+        ];
+
+        sections.forEach(function (sec) {
+          var list = state.items.filter(function (q) { return q.phan === sec.key; });
+          if (!list.length) return;
+
+          var head = document.createElement('h2');
+          head.style.margin = '24px 0 14px';
+          head.textContent = sec.title;
+          container.appendChild(head);
+
+          list.forEach(function (q) {
+            var card = document.createElement('article');
+            card.className = 'card question-card';
+            card.id = 'card-' + q.id;
+
+            var capBadge = q.cap_do === 'B' ? 'Biết' : (q.cap_do === 'H' ? 'Hiểu' : (q.cap_do === 'VD' ? 'Vận dụng' : 'B–H–VD'));
+            var html = '<div class="q-header">' +
+              '<div class="tag-row">' +
+                '<strong>' + (q.phan === 'TN' ? 'Câu ' + q.so_cau : (q.phan === 'DS' ? 'Câu ' + q.so_cau + ' (ĐS)' : 'Câu ' + q.so_cau + ' (TLN)')) + '</strong>' +
+                '<span class="badge badge-accent">' + q.ma_lenh + '</span>' +
+                '<span class="badge">' + capBadge + '</span>' +
+                '<span class="badge badge-info">' + q.nang_luc + '</span>' +
+              '</div>' +
+              '<span class="muted" style="font-size: 0.85rem;">' + getTopicName(q.chu_de) + ' (' + q.tieu_muc + ')</span>' +
+              '</div>';
+
+            html += '<div class="q-stem">' + q.de_bai + '</div>';
+            if (q.hinh_svg) {
+              html += '<div class="q-figure">' + q.hinh_svg + '</div>';
+            }
+
+            if (q.phan === 'TN') {
+              html += '<div class="option-list">';
+              ['A', 'B', 'C', 'D'].forEach(function (k) {
+                html += '<button type="button" class="option-btn" data-tn-q="' + q.id + '" data-tn-opt="' + k + '">' +
+                  '<span class="option-key">' + k + '</span>' +
+                  '<span>' + q.lua_chon[k] + '</span>' +
+                  '</button>';
+              });
+              html += '</div>';
+            } else if (q.phan === 'DS') {
+              q.cac_y.forEach(function (sub) {
+                html += '<div class="ds-row" data-ds-row="' + q.id + '_' + sub.y + '">' +
+                  '<div class="ds-text"><strong>' + sub.y + ')</strong> ' + sub.noi_dung + ' <span class="badge">' + sub.ma_lenh + ' (' + sub.cap_do + ')</span></div>' +
+                  '<div class="ds-controls">' +
+                    '<button type="button" class="ds-btn" data-ds-q="' + q.id + '" data-ds-sub="' + sub.y + '" data-ds-val="true">Đúng</button>' +
+                    '<button type="button" class="ds-btn" data-ds-q="' + q.id + '" data-ds-sub="' + sub.y + '" data-ds-val="false">Sai</button>' +
+                  '</div>' +
+                '</div>';
+              });
+            } else {
+              html += '<div class="tln-box">' +
+                '<input type="text" class="tln-input" maxlength="6" inputmode="decimal" data-tln-q="' + q.id + '" placeholder="Tối đa 4 ký tự" aria-label="Đáp án trả lời ngắn câu ' + q.so_cau + '">' +
+                '<span class="muted" style="font-size: 0.88rem;">' + q.quy_tac_lam_tron + '</span>' +
+                '<span class="badge badge-err" style="display: none;" data-tln-warn="' + q.id + '"></span>' +
+              '</div>';
+            }
+
+            html += '<div class="solution-box" id="sol-' + q.id + '" style="display: none;"></div>';
+            card.innerHTML = html;
+            container.appendChild(card);
+          });
+        });
+
+        bindInputs();
+      }
+
+      function bindInputs() {
+        document.querySelectorAll('[data-tn-q]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            if (state.submitted) return;
+            var qid = btn.getAttribute('data-tn-q');
+            var opt = btn.getAttribute('data-tn-opt');
+            state.answers.p1[qid] = opt;
+            document.querySelectorAll('[data-tn-q="' + qid + '"]').forEach(function (b) {
+              b.classList.toggle('selected', b === btn);
+            });
+            updateNavStates();
+          });
+        });
+
+        document.querySelectorAll('[data-ds-q]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            if (state.submitted) return;
+            var qid = btn.getAttribute('data-ds-q');
+            var sub = btn.getAttribute('data-ds-sub');
+            var val = btn.getAttribute('data-ds-val') === 'true';
+            if (!state.answers.p2[qid]) state.answers.p2[qid] = {};
+            state.answers.p2[qid][sub] = val;
+            document.querySelectorAll('[data-ds-q="' + qid + '"][data-ds-sub="' + sub + '"]').forEach(function (b) {
+              b.classList.toggle('active', b === btn);
+            });
+            updateNavStates();
+          });
+        });
+
+        document.querySelectorAll('[data-tln-q]').forEach(function (inp) {
+          inp.addEventListener('input', function () {
+            if (state.submitted) return;
+            var qid = inp.getAttribute('data-tln-q');
+            var warn = document.querySelector('[data-tln-warn="' + qid + '"]');
+            var v = C.validateShortAnswer(inp.value);
+            if (!v.valid) {
+              warn.style.display = 'inline-flex';
+              warn.textContent = v.reason;
+            } else {
+              warn.style.display = 'none';
+              warn.textContent = '';
+            }
+            state.answers.p3[qid] = inp.value;
+            updateNavStates();
+          });
+        });
+      }
+
+      function renderSolutionsAndHeatmaps() {
+        var p1Score = 0, p2Score = 0, p3Score = 0;
+        var p1Max = 0, p2Max = 0, p3Max = 0;
+
+        var byTopic = {};
+        for (var t = 1; t <= 5; t++) {
+          byTopic[t] = { B: { ok: 0, tot: 0 }, H: { ok: 0, tot: 0 }, VD: { ok: 0, tot: 0 }, ok: 0, tot: 0 };
+        }
+        var byComp = {
+          TD: { ok: 0, tot: 0, ten: 'Tư duy & Lập luận (TD)' },
+          GQ: { ok: 0, tot: 0, ten: 'Giải quyết vấn đề (GQ)' },
+          MHH: { ok: 0, tot: 0, ten: 'Mô hình hóa (MHH)' }
+        };
+
+        state.items.forEach(function (q) {
+          var solBox = document.getElementById('sol-' + q.id);
+          var isFullyCorrect = false;
+          var qScoreText = '';
+
+          if (q.phan === 'TN') {
+            p1Max += 0.25;
+            var chosen = state.answers.p1[q.id];
+            isFullyCorrect = chosen === q.dap_an;
+            if (isFullyCorrect) p1Score += 0.25;
+            qScoreText = isFullyCorrect ? 'Đúng (+0,25đ)' : 'Sai (0,00đ • Đáp án: ' + q.dap_an + ')';
+
+            byTopic[q.chu_de][q.cap_do].tot += 1;
+            byTopic[q.chu_de].tot += 1;
+            byComp[q.nang_luc].tot += 1;
+            if (isFullyCorrect) {
+              byTopic[q.chu_de][q.cap_do].ok += 1;
+              byTopic[q.chu_de].ok += 1;
+              byComp[q.nang_luc].ok += 1;
+            }
+
+            document.querySelectorAll('[data-tn-q="' + q.id + '"]').forEach(function (b) {
+              b.disabled = true;
+              var opt = b.getAttribute('data-tn-opt');
+              if (opt === q.dap_an) b.classList.add('opt-correct');
+              else if (opt === chosen && chosen !== q.dap_an) b.classList.add('opt-wrong');
+            });
+          } else if (q.phan === 'DS') {
+            p2Max += 1.0;
+            var subOk = countDSCorrect(q);
+            var pts = C.scorePart2Question(subOk);
+            p2Score += pts;
+            isFullyCorrect = subOk === 4;
+            qScoreText = 'Đúng ' + subOk + '/4 ý (+' + C.formatNum(pts, 2) + 'đ)';
+
+            var ans = state.answers.p2[q.id] || {};
+            q.cac_y.forEach(function (sub) {
+              var okSub = ans[sub.y] === sub.dap_an;
+              byTopic[q.chu_de][sub.cap_do].tot += 1;
+              byTopic[q.chu_de].tot += 1;
+              byComp[sub.nang_luc].tot += 1;
+              if (okSub) {
+                byTopic[q.chu_de][sub.cap_do].ok += 1;
+                byTopic[q.chu_de].ok += 1;
+                byComp[sub.nang_luc].ok += 1;
+              }
+              document.querySelectorAll('[data-ds-q="' + q.id + '"][data-ds-sub="' + sub.y + '"]').forEach(function (b) {
+                b.disabled = true;
+                var bVal = b.getAttribute('data-ds-val') === 'true';
+                if (bVal === sub.dap_an) b.classList.add('ds-ok');
+                else if (bVal === ans[sub.y] && ans[sub.y] !== sub.dap_an) b.classList.add('ds-err');
+              });
+            });
+          } else {
+            p3Max += 0.5;
+            var inp = document.querySelector('[data-tln-q="' + q.id + '"]');
+            if (inp) inp.disabled = true;
+            var rawVal = state.answers.p3[q.id] || '';
+            isFullyCorrect = C.compareShortAnswer(rawVal, q.dap_an);
+            if (isFullyCorrect) p3Score += 0.5;
+            qScoreText = isFullyCorrect ? 'Đúng (+0,50đ)' : 'Sai (0,00đ • Đáp án chuẩn: ' + q.dap_an + ')';
+
+            byTopic[q.chu_de][q.cap_do].tot += 1;
+            byTopic[q.chu_de].tot += 1;
+            byComp[q.nang_luc].tot += 1;
+            if (isFullyCorrect) {
+              byTopic[q.chu_de][q.cap_do].ok += 1;
+              byTopic[q.chu_de].ok += 1;
+              byComp[q.nang_luc].ok += 1;
+            }
+          }
+
+          var sHtml = '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">' +
+            '<span class="badge ' + (isFullyCorrect ? 'badge-ok' : 'badge-err') + '">' + qScoreText + '</span>' +
+            '<button type="button" class="btn btn-sm" data-log-err="' + q.id + '">Đẩy vào Nhật ký lỗi</button>' +
+            '</div>';
+
+          if (q.mo_hinh_hoa) {
+            sHtml += '<div class="mhh-box"><h4>5 bước Mô hình hóa (MHH)</h4><ol class="step-list">' +
+              q.mo_hinh_hoa.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
+              '</ol></div>';
+          }
+
+          sHtml += '<h4>Lời giải 6 bước tư duy</h4><ol class="step-list">' +
+            q.loi_giai.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
+            '</ol>';
+
+          solBox.innerHTML = sHtml;
+          solBox.style.display = 'block';
+        });
+
+        // Gắn sự kiện đẩy vào nhật ký lỗi
+        document.querySelectorAll('[data-log-err]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var qid = btn.getAttribute('data-log-err');
+            var q = state.items.filter(function (x) { return x.id === qid; })[0];
+            if (!q) return;
+            openErrModal(q);
+          });
+        });
+
+        var totalScore = p1Score + p2Score + p3Score;
+        var maxScore = p1Max + p2Max + p3Max;
+
+        document.getElementById('scoreTotal').textContent = C.formatNum(totalScore, 2) + ' / ' + C.formatNum(maxScore, 2);
+        document.getElementById('scoreP1').textContent = C.formatNum(p1Score, 2) + ' / ' + C.formatNum(p1Max, 2);
+        document.getElementById('scoreP2').textContent = C.formatNum(p2Score, 2) + ' / ' + C.formatNum(p2Max, 2);
+        document.getElementById('scoreP3').textContent = C.formatNum(p3Score, 2) + ' / ' + C.formatNum(p3Max, 2);
+        document.getElementById('resultSummarySub').textContent =
+          'Thời gian làm bài: ' + formatClock(state.elapsedSec) + ' • Dữ liệu đã lưu tự động vào localStorage.';
+
+        // Bản đồ nhiệt Chủ đề x Cấp độ
+        function heatClass(ok, tot) {
+          if (tot === 0) return '';
+          var r = ok / tot;
+          if (r >= 0.75) return 'heat-high';
+          if (r >= 0.4) return 'heat-mid';
+          return 'heat-low';
+        }
+        function cellTxt(obj) {
+          return obj.tot === 0 ? '—' : (obj.ok + '/' + obj.tot);
+        }
+
+        var tbTopic = document.getElementById('heatTopicBody');
+        tbTopic.innerHTML = M.chu_de.map(function (cd) {
+          var st = byTopic[cd.id];
+          return '<tr>' +
+            '<td>' + cd.ngan + '</td>' +
+            '<td class="heatmap-cell ' + heatClass(st.B.ok, st.B.tot) + '">' + cellTxt(st.B) + '</td>' +
+            '<td class="heatmap-cell ' + heatClass(st.H.ok, st.H.tot) + '">' + cellTxt(st.H) + '</td>' +
+            '<td class="heatmap-cell ' + heatClass(st.VD.ok, st.VD.tot) + '">' + cellTxt(st.VD) + '</td>' +
+            '<td class="heatmap-cell ' + heatClass(st.ok, st.tot) + '">' + cellTxt(st) + '</td>' +
+          '</tr>';
+        }).join('');
+
+        // Bản đồ Năng lực
+        var tbComp = document.getElementById('heatCompBody');
+        tbComp.innerHTML = ['TD', 'GQ', 'MHH'].map(function (k) {
+          var c = byComp[k];
+          var pct = c.tot > 0 ? Math.round((c.ok / c.tot) * 100) : 0;
+          var note = c.tot === 0 ? 'Không có trong chế độ này' : (pct >= 75 ? 'Vững' : (pct >= 50 ? 'Cần củng cố' : 'Điểm nghẽn cần vá ngay'));
+          return '<tr>' +
+            '<td><strong>' + c.ten + '</strong></td>' +
+            '<td class="num">' + c.ok + '/' + c.tot + '</td>' +
+            '<td class="heatmap-cell ' + heatClass(c.ok, c.tot) + '">' + (c.tot ? pct + '%' : '—') + '</td>' +
+            '<td>' + note + '</td>' +
+          '</tr>';
+        }).join('');
+
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        C.recordExamResult({
+          title: document.getElementById('examTitle').textContent,
+          mode: currentMode,
+          totalScore: Number(totalScore.toFixed(2)),
+          maxScore: Number(maxScore.toFixed(2)),
+          p1Score: Number(p1Score.toFixed(2)),
+          p2Score: Number(p2Score.toFixed(2)),
+          p3Score: Number(p3Score.toFixed(2)),
+          elapsedSec: state.elapsedSec,
+          byTopic: byTopic,
+          byCompetency: byComp
+        });
+      }
+
+      function submitExam(auto) {
+        if (state.submitted) return;
+        state.submitted = true;
+        if (state.timerHandle) clearInterval(state.timerHandle);
+        document.getElementById('btnSubmitExam').disabled = true;
+        document.getElementById('btnSubmitExam').textContent = auto ? 'Đã hết giờ — Đã nộp bài' : 'Đã nộp bài';
+        updateNavStates();
+        renderSolutionsAndHeatmaps();
+      }
+
+      /* Modal đẩy lỗi */
+      var errModal = document.getElementById('errModal');
+      var errGroupSelect = document.getElementById('errGroupSelect');
+      errGroupSelect.innerHTML = C.ERROR_GROUPS.map(function (g) {
+        return '<option value="' + g + '">' + g + '</option>';
+      }).join('');
+
+      function openErrModal(q) {
+        state.modalTarget = q;
+        document.getElementById('errModalMeta').textContent =
+          'Thẻ gắn tự động: [' + q.ma_lenh + '] + [Cấp độ: ' + q.cap_do + '] + [Năng lực: ' + q.nang_luc + ']';
+        document.getElementById('errNoteInput').value = '';
+        errModal.classList.add('open');
+      }
+
+      document.getElementById('btnCloseModal').addEventListener('click', function () {
+        errModal.classList.remove('open');
+      });
+
+      document.getElementById('btnSaveErrLog').addEventListener('click', function () {
+        var q = state.modalTarget;
+        if (!q) return;
+        C.addErrorLog({
+          chu_de: q.chu_de,
+          ma_lenh: q.ma_lenh,
+          cap_do: q.cap_do,
+          nang_luc: q.nang_luc,
+          tom_tat: q.phan + ' Câu ' + q.so_cau + ' (' + q.tieu_muc + ')',
+          nhom_loi: errGroupSelect.value,
+          ghi_chu: document.getElementById('errNoteInput').value
+        });
+        errModal.classList.remove('open');
+        var triggerBtn = document.querySelector('[data-log-err="' + q.id + '"]');
+        if (triggerBtn) {
+          triggerBtn.textContent = 'Đã lưu Nhật ký lỗi';
+          triggerBtn.classList.add('btn-ok');
+          triggerBtn.disabled = true;
+        }
+      });
+
+      /* Modal Markdown */
+      var mdModal = document.getElementById('mdModal');
+      document.getElementById('btnExportErrMd').addEventListener('click', function () {
+        document.getElementById('mdOutputArea').value = C.exportErrorLogsMarkdown();
+        mdModal.classList.add('open');
+      });
+      document.getElementById('btnCloseMdModal').addEventListener('click', function () {
+        mdModal.classList.remove('open');
+      });
+      document.getElementById('btnCopyMd').addEventListener('click', function () {
+        var area = document.getElementById('mdOutputArea');
+        area.select();
+        try {
+          if (navigator.clipboard) navigator.clipboard.writeText(area.value);
+          else document.execCommand('copy');
+          document.getElementById('btnCopyMd').textContent = 'Đã sao chép';
+        } catch (e) {}
+      });
+
+      function initExam(mode) {
+        currentMode = mode;
+        state.submitted = false;
+        state.answers = { p1: {}, p2: {}, p3: {} };
+        state.items = buildItems(mode);
+        document.getElementById('resultSection').style.display = 'none';
+        document.getElementById('btnSubmitExam').disabled = false;
+        document.getElementById('btnSubmitExam').textContent = 'Nộp bài thi & Chấm điểm';
+
+        var minutes = mode === 'full' ? 90 : Math.max(15, state.items.length * 5);
+        var titleMap = {
+          full: 'Đề thi thử chuẩn Ma trận 2026 (22 câu | 34 lệnh | 90 phút)',
+          mhh: 'Luyện tập chuyên sâu: 4 câu Mô hình hóa (MHH)',
+          cd1: 'Luyện theo Chủ đề 1: Ứng dụng đạo hàm',
+          cd2: 'Luyện theo Chủ đề 2: Lượng giác – Dãy số – Mũ, Logarit',
+          cd3: 'Luyện theo Chủ đề 3: Tổ hợp – Xác suất',
+          cd4: 'Luyện theo Chủ đề 4: Vectơ không gian & Oxyz',
+          cd5: 'Luyện theo Chủ đề 5: Quan hệ vuông góc 3D'
+        };
+        document.getElementById('examTitle').textContent = titleMap[mode] || titleMap.full;
+        renderQuestions();
+        renderNav();
+        startTimer(minutes);
+      }
+
+      modeSelect.addEventListener('change', function () {
+        initExam(modeSelect.value);
+      });
+      document.getElementById('btnResetExam').addEventListener('click', function () {
+        initExam(currentMode);
+      });
+      document.getElementById('btnSubmitExam').addEventListener('click', function () {
+        submitExam(false);
+      });
+
+      initExam(currentMode);
+    })();
+  </script>
+</body>
+</html>
