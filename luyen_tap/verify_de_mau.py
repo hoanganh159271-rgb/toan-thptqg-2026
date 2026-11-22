@@ -16,6 +16,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MATRIX_JSON_PATH = os.path.join(ROOT_DIR, "ma_tran_de_2026.json")
 COMMON_JS_PATH = os.path.join(ROOT_DIR, "assets", "common.js")
 DATA_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_de_mau.js")
+TLN_VD_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_tln_van_dung.js")
 
 
 def load_js_runtime():
@@ -24,6 +25,7 @@ const fs = require('fs');
 const vm = require('vm');
 const commonPath = process.argv[1];
 const dataPath = process.argv[2];
+const tlnVdPath = process.argv[3];
 
 const noop = () => {};
 const fakeEl = () => ({
@@ -68,6 +70,7 @@ sandbox.global = sandbox;
 
 vm.runInNewContext(fs.readFileSync(commonPath, 'utf8'), sandbox, { filename: commonPath });
 vm.runInNewContext(fs.readFileSync(dataPath, 'utf8'), sandbox, { filename: dataPath });
+vm.runInNewContext(fs.readFileSync(tlnVdPath, 'utf8'), sandbox, { filename: tlnVdPath });
 
 const C = sandbox.TOAN_COMMON;
 const scoringTests = {
@@ -81,18 +84,21 @@ const scoringTests = {
   p3_1: C.scorePart3(1),
   p3_6: C.scorePart3(6),
   valid_4: C.validateShortAnswer('0,89').valid && C.validateShortAnswer('37,5').valid && C.validateShortAnswer('-1,2').valid,
+  valid_unicode_minus: C.validateShortAnswer('\u22123').valid && C.validateShortAnswer('\u22123').normalized === '-3',
   invalid_5: C.validateShortAnswer('12,34').valid,
-  cmp_comma_dot: C.compareShortAnswer('0.89', '0,89') && C.compareShortAnswer('37.5', '37,5')
+  cmp_comma_dot: C.compareShortAnswer('0.89', '0,89') && C.compareShortAnswer('37.5', '37,5'),
+  cmp_unicode_minus: C.compareShortAnswer('\u22123', '-3') && C.compareShortAnswer('-3', '\u22123')
 };
 
 console.log(JSON.stringify({
   matrix: sandbox.TOAN_MATRIX,
   de_mau: sandbox.TOAN_DE_MAU,
+  tln_vd: sandbox.TOAN_TLN_VANDUNG,
   scoringTests
 }));
 """
     res = subprocess.run(
-        ["node", "-e", node_script, COMMON_JS_PATH, DATA_JS_PATH],
+        ["node", "-e", node_script, COMMON_JS_PATH, DATA_JS_PATH, TLN_VD_JS_PATH],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -165,7 +171,134 @@ def check_matrix_alignment(matrix_json, runtime):
     assert st["p2_0"] == 0.0 and st["p2_1"] == 0.1 and st["p2_2"] == 0.25 and st["p2_3"] == 0.5 and st["p2_4"] == 1.0
     assert abs(st["p3_1"] - 0.5) < 1e-9
     assert abs(st["p3_6"] - 3.0) < 1e-9
-    assert st["valid_4"] is True and st["invalid_5"] is False and st["cmp_comma_dot"] is True
+    assert st["valid_4"] is True and st["valid_unicode_minus"] is True
+    assert st["invalid_5"] is False
+    assert st["cmp_comma_dot"] is True and st["cmp_unicode_minus"] is True
+
+
+def verify_tln_van_dung(tln):
+    vds = tln["vi_du_chuyen_de"]
+    d1 = tln["de_tu_luyen_1"]
+    d2 = tln["de_tu_luyen_2"]
+    assert len(vds) == 14, f"Phải có 14 ví dụ minh họa, hiện có {len(vds)}"
+    assert len(d1) == 6, f"Đề tự luyện 1 phải có 6 câu, hiện có {len(d1)}"
+    assert len(d2) == 6, f"Đề tự luyện 2 phải có 6 câu, hiện có {len(d2)}"
+
+    expected_slots = [
+        (1, 1, "C1-MHH2.2", "VD", "MHH"),
+        (2, 1, "C2-GQ2.2", "VD", "GQ"),
+        (3, 3, "C3-MHH2.2", "VD", "MHH"),
+        (4, 4, "C4-MHH2.2", "VD", "MHH"),
+        (5, 4, "C5-GQ2.2", "H", "GQ"),
+        (6, 5, "C6-GQ2.1", "H", "GQ"),
+    ]
+    for deck in (d1, d2):
+        for q, exp in zip(deck, expected_slots):
+            assert (q["so_cau"], q["chu_de"], q["ma_lenh"], q["cap_do"], q["nang_luc"]) == exp, f"{q['id']} lệch ma trận TLN"
+
+    all_tln = vds + d1 + d2
+    assert len(all_tln) == 26
+    for q in all_tln:
+        assert len(q["dap_an"]) <= 4, f"{q['id']} đáp án '{q['dap_an']}' quá 4 ký tự"
+        assert len(q.get("loi_giai", [])) == 6, f"{q['id']} phải có đủ 6 bước lời giải"
+        if q["nang_luc"] == "MHH":
+            assert len(q.get("mo_hinh_hoa", [])) == 5, f"{q['id']} (MHH) phải có đủ 5 bước mô hình hóa"
+
+    m_vd = {q["id"]: q["dap_an"] for q in vds}
+    m_d1 = {q["id"]: q["dap_an"] for q in d1}
+    m_d2 = {q["id"]: q["dap_an"] for q in d2}
+
+    # --- 14 VÍ DỤ MINH HỌA ---
+    # VD-1.1: 100*(9-x) + 260*sqrt(x^2+36), min tai x=2.5 -> 2340
+    c_pipe = lambda x: 100 * (9 - x) + 260 * math.hypot(x, 6)
+    assert abs(c_pipe(2.5) - 2340) < 1e-9 and all(c_pipe(2.5) <= c_pipe(k / 20) for k in range(0, 181))
+    assert m_vd["VD-1.1"] == "2340"
+
+    # VD-1.2: L(x) = (80-x)(240+4x), max tai x=10 -> gia ban p=190
+    L_eco = lambda x: (80 - x) * (240 + 4 * x)
+    assert L_eco(10) == max(L_eco(k) for k in range(0, 80)) and 200 - 10 == 190
+    assert m_vd["VD-1.2"] == "190"
+
+    # VD-1.3: T(v) = 6*v^3/(v-6), min tai v=9
+    T_ship = lambda v: 6 * (v ** 3) / (v - 6)
+    assert abs(T_ship(9) - 1458) < 1e-9 and all(T_ship(9) <= T_ship(6 + k / 10) for k in range(1, 200))
+    assert m_vd["VD-1.3"] == "9"
+
+    # VD-2.1: y = x+2 + 4/(x-1) = (x^2+x+2)/(x-1) -> a=1,b=1,c=2,d=-1 -> T=13
+    assert 1 + 2 * 1 + 3 * 2 - 4 * (-1) == 13
+    assert m_vd["VD-2.1"] == "13"
+
+    # VD-2.2: m in [-20;30] nguyen sao cho m-27 < 0 < m+5
+    ms = [m for m in range(-20, 31) if (m - 27) < 0 < (m + 5)]
+    assert len(ms) == 31 and m_vd["VD-2.2"] == "31"
+
+    # VD-2.3: P = AB/(d1*d2) = sqrt(10) ~ 3,16
+    assert f"{math.sqrt(10):.2f}".replace(".", ",") == "3,16"
+    assert m_vd["VD-2.3"] == "3,16"
+
+    # VD-3.1: 5 nam, 3 nu, 8 ghe -> 5!*A(6,3)/8! = 5/14
+    p31 = (math.factorial(5) * math.perm(6, 3)) / math.factorial(8)
+    assert f"{p31:.2f}".replace(".", ",") == "0,36" and m_vd["VD-3.1"] == "0,36"
+
+    # VD-3.2: (1 - 0.1*0.2)*0.95 = 0.931
+    p32 = (1 - 0.1 * 0.2) * 0.95
+    assert f"{p32:.2f}".replace(".", ",") == "0,93" and m_vd["VD-3.2"] == "0,93"
+
+    # VD-3.3: (5/8)*(5/11) + (3/8)*(4/11) = 37/88
+    p33 = (5 / 8) * (5 / 11) + (3 / 8) * (4 / 11)
+    assert f"{p33:.2f}".replace(".", ",") == "0,42" and m_vd["VD-3.3"] == "0,42"
+
+    # VD-4.1: 4T cos 30 = 60 -> T = 10 sqrt(3) ~ 17,3
+    t41 = 60 / (4 * math.cos(math.radians(30)))
+    assert f"{t41:.1f}".replace(".", ",") == "17,3" and m_vd["VD-4.1"] == "17,3"
+
+    # VD-4.2: F1=20,F2=30 (60 deg), F3=40 perp
+    f42 = math.sqrt(20 ** 2 + 30 ** 2 + 40 ** 2 + 2 * 20 * 30 * math.cos(math.radians(60)))
+    assert f"{f42:.1f}".replace(".", ",") == "59,2" and m_vd["VD-4.2"] == "59,2"
+
+    # VD-4.3: cos = sqrt(3)/9 -> arccos ~ 78,9
+    phi43 = math.degrees(math.acos(math.sqrt(3) / 9))
+    assert f"{phi43:.1f}".replace(".", ",") == "78,9" and m_vd["VD-4.3"] == "78,9"
+
+    # VD-5: A(1,-2,3), B(5,6,11), AM = 3/4 AB -> M(4,4,9) -> 4+8-9 = 3
+    M5 = tuple(a + 0.75 * (b - a) for a, b in zip((1, -2, 3), (5, 6, 11)))
+    assert M5 == (4, 4, 9) and M5[0] + 2 * M5[1] - M5[2] == 3 and m_vd["VD-5"] == "3"
+
+    # VD-6: tan(SOA) = sqrt(6)/sqrt(2) = sqrt(3) -> 60 deg
+    ang6 = round(math.degrees(math.atan(math.sqrt(6) / math.sqrt(2))))
+    assert ang6 == 60 and m_vd["VD-6"] == "60"
+
+    # --- ĐỀ TỰ LUYỆN SỐ 01 ---
+    V_d1 = lambda x: x * (12 - 2 * x) ** 2
+    assert V_d1(2) == 128 and all(V_d1(2) >= V_d1(k / 20) for k in range(1, 120)) and m_d1["TLN1-01"] == "128"
+    f_d1c2 = lambda x: x ** 3 - 3 * x ** 2 + 5
+    assert f_d1c2(0) == 5 and f_d1c2(2) == 1 and f_d1c2(4) == 21 and m_d1["TLN1-02"] == "21"
+    p_d1c3 = math.comb(3, 2) * (0.7 ** 2) * 0.3 + 0.7 ** 3
+    assert f"{p_d1c3:.2f}".replace(".", ",") == "0,78" and m_d1["TLN1-03"] == "0,78"
+    t_d1c4 = 90 / (3 * math.cos(math.radians(30)))
+    assert f"{t_d1c4:.1f}".replace(".", ",") == "34,6" and m_d1["TLN1-04"] == "34,6"
+    D_d1c5 = tuple(a + c - b for a, b, c in zip((1, 2, -1), (3, 0, 2), (2, 4, 1)))
+    assert D_d1c5 == (0, 6, -2) and sum(D_d1c5) == 4 and m_d1["TLN1-05"] == "4"
+    d_d1c6 = (4 * 3) / math.hypot(4, 3)
+    assert f"{d_d1c6:.1f}".replace(".", ",") == "2,4" and m_d1["TLN1-06"] == "2,4"
+
+    # --- ĐỀ TỰ LUYỆN SỐ 02 ---
+    cbar = lambda x: 0.2 * x + 10 + 80 / x
+    assert abs(cbar(20) - 18) < 1e-12 and all(cbar(20) <= cbar(k) for k in range(1, 101)) and m_d2["TLN2-01"] == "20"
+    a2, c2 = 3, -2
+    b2 = 5 * (3 + c2) - a2 * 3
+    assert a2 + b2 + c2 == -3 and m_d2["TLN2-02"] == "-3"
+    p_d2c3 = 1 - math.comb(6, 3) / math.comb(10, 3)
+    assert f"{p_d2c3:.2f}".replace(".", ",") == "0,83" and m_d2["TLN2-03"] == "0,83"
+    f_d2c4 = math.sqrt(3 * (10 ** 2) + 6 * 10 * 10 * math.cos(math.radians(60)))
+    assert f"{f_d2c4:.1f}".replace(".", ",") == "24,5" and m_d2["TLN2-04"] == "24,5"
+    u_d2c5, v_d2c5 = (2, 1, 2), (1, 2, 2)
+    cos_d2c5 = sum(a * b for a, b in zip(u_d2c5, v_d2c5)) / (math.hypot(*u_d2c5) * math.hypot(*v_d2c5))
+    assert f"{cos_d2c5:.2f}".replace(".", ",") == "0,89" and m_d2["TLN2-05"] == "0,89"
+    d_d2c6 = 3 * math.sqrt(2)
+    assert f"{d_d2c6:.2f}".replace(".", ",") == "4,24" and m_d2["TLN2-06"] == "4,24"
+
+    return len(all_tln)
 
 
 def verify_math_independently(de):
@@ -366,10 +499,12 @@ def main():
     runtime = load_js_runtime()
     check_matrix_alignment(matrix_json, runtime)
     verify_math_independently(runtime["de_mau"])
+    tln_count = verify_tln_van_dung(runtime["tln_vd"])
     scanned_files = check_zero_cdn_and_offline()
 
     print("PASS 22/22 câu (34/34 lệnh hỏi) khớp 100% ma_tran_de_2026.json!")
     print("PASS kiểm chứng toán học độc lập: 12 TN + 16 ý ĐS + 6 TLN (<= 4 ký tự).")
+    print(f"PASS kiểm chứng độc lập {tln_count} câu TLN Vận dụng & Mở rộng (14 VD + Đề 01 + Đề 02).")
     print("PASS thang chấm điểm JS: 0,25 TN | 0,10-0,25-0,50-1,00 ĐS | 0,50 TLN.")
     print(f"PASS 0 CDN violations across {scanned_files} web files (.html/.css/.js).")
 
