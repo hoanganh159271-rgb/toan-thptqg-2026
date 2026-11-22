@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chuyên đề Trả lời ngắn Mức Vận dụng 2026 — Toán THPTQG</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        <a class="btn btn-sm" href="../index.html">← Dashboard</a>
+        <h1>Chuyên đề Trả lời ngắn Mức Vận dụng 2026</h1>
+      </div>
+      <div class="topbar-actions">
+        <a class="btn btn-sm btn-primary" href="phong_thi_toan.html?mode=tln_de1">Làm Đề TLN 01</a>
+        <a class="btn btn-sm" href="phong_thi_toan.html?mode=tln_de2">Làm Đề TLN 02</a>
+        <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="tab-bar" id="tlnTabBar" aria-label="Điều hướng Chuyên đề Trả lời ngắn" style="margin-bottom: 24px;">
+      <button type="button" class="tab-btn active" data-tln-tab="tongquan">Tổng quan &amp; Chiến lược</button>
+      <button type="button" class="tab-btn" data-tln-tab="cd1">CĐ 1: GTLN–GTNN (C1-MHH2.2)</button>
+      <button type="button" class="tab-btn" data-tln-tab="cd2">CĐ 2: Khảo sát &amp; Đồ thị (C2-GQ2.2)</button>
+      <button type="button" class="tab-btn" data-tln-tab="cd3">CĐ 3: Xác suất (C3-MHH2.2)</button>
+      <button type="button" class="tab-btn" data-tln-tab="cd4">CĐ 4: Vectơ 3D (C4-MHH2.2)</button>
+      <button type="button" class="tab-btn" data-tln-tab="cd56">Mở rộng Hiểu: C5 &amp; C6</button>
+    </nav>
+
+    <div id="tabPanel"></div>
+  </main>
+
+  <!-- Modal đẩy lỗi sai vào Nhật ký -->
+  <div class="modal-backdrop" id="errModal" role="dialog" aria-modal="true" aria-labelledby="errModalTitle">
+    <div class="modal-card">
+      <h3 id="errModalTitle">Đẩy câu sai vào Nhật ký lỗi</h3>
+      <p class="muted" style="margin: 6px 0 12px;" id="errModalMeta">—</p>
+      <div class="slider-group">
+        <label for="errGroupSelect">Chọn 1 trong 8 nhóm lỗi chẩn đoán</label>
+        <select id="errGroupSelect"></select>
+      </div>
+      <div class="slider-group">
+        <label for="errNoteInput">Nguyên nhân sai / Bước nhầm cần vá</label>
+        <textarea id="errNoteInput" placeholder="Ví dụ: Quên kiểm tra điều kiện nguyên, nhầm x₀ với f(x₀), sai dấu tích vô hướng..."></textarea>
+      </div>
+      <div class="tag-row" style="margin-top: 14px; justify-content: flex-end;">
+        <button type="button" class="btn btn-sm" id="btnCloseModal">Hủy</button>
+        <button type="button" class="btn btn-sm btn-primary" id="btnSaveErrLog">Lưu vào Nhật ký</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/common.js"></script>
+  <script src="data_tln_van_dung.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var C = window.TOAN_COMMON;
+      var D = window.TOAN_TLN_VANDUNG;
+      C.initTheme();
+
+      var validTabs = ['tongquan', 'cd1', 'cd2', 'cd3', 'cd4', 'cd56'];
+      var params = new URLSearchParams(window.location.search);
+      var activeTab = params.get('tab') || 'tongquan';
+      if (validTabs.indexOf(activeTab) < 0) activeTab = 'tongquan';
+
+      var panel = document.getElementById('tabPanel');
+      var stateInputs = {};
+      var stateModalTarget = null;
+
+      function renderExampleCard(vd) {
+        var capLabel = vd.cap_do === 'VD' ? 'Vận dụng' : 'Hiểu';
+        var mhhHtml = '';
+        if (vd.mo_hinh_hoa && vd.mo_hinh_hoa.length) {
+          mhhHtml = '<div class="mhh-box"><h4>5 bước Mô hình hóa (MHH)</h4><ol class="step-list">' +
+            vd.mo_hinh_hoa.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
+            '</ol></div>';
+        }
+        var solHtml = mhhHtml +
+          '<h4>Lời giải 6 bước tư duy</h4><ol class="step-list">' +
+          vd.loi_giai.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
+          '</ol>' +
+          '<p style="margin-top: 12px;"><strong>Đáp số điền phiếu:</strong> <span class="badge badge-ok mono">' + vd.dap_an + '</span></p>';
+
+        var savedVal = stateInputs[vd.id] || '';
+        return '<article class="card question-card" id="vd-' + vd.id + '">' +
+          '<div class="q-header">' +
+            '<div class="tag-row">' +
+              '<strong>' + vd.nhan + '</strong>' +
+              '<span class="badge badge-accent">' + vd.ma_lenh + '</span>' +
+              '<span class="badge">' + capLabel + '</span>' +
+              '<span class="badge badge-info">' + vd.nang_luc + '</span>' +
+            '</div>' +
+            '<span class="muted" style="font-size: 0.85rem;">Mục ' + vd.tieu_muc + '</span>' +
+          '</div>' +
+          '<div class="q-stem">' + vd.de_bai + '</div>' +
+          '<div class="tln-box">' +
+            '<input type="text" class="tln-input" maxlength="6" inputmode="decimal" value="' + savedVal.replace(/"/g, '&quot;') + '" data-vd-input="' + vd.id + '" placeholder="Tối đa 4 ký tự" aria-label="Đáp án ' + vd.nhan + '">' +
+            '<button type="button" class="btn btn-sm btn-primary" data-vd-check="' + vd.id + '">Kiểm tra đáp số</button>' +
+            '<button type="button" class="btn btn-sm" data-vd-sol-btn="' + vd.id + '">Xem phương pháp &amp; lời giải</button>' +
+            '<button type="button" class="btn btn-sm" style="display: none;" data-vd-log="' + vd.id + '">Đẩy vào Nhật ký lỗi</button>' +
+          '</div>' +
+          '<div style="margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">' +
+            '<span class="muted" style="font-size: 0.88rem;">' + vd.quy_tac_lam_tron + '</span>' +
+            '<span class="badge badge-err" style="display: none;" data-vd-warn="' + vd.id + '"></span>' +
+            '<span class="badge" style="display: none;" data-vd-res="' + vd.id + '"></span>' +
+          '</div>' +
+          '<div class="solution-box" id="vd-sol-' + vd.id + '" style="display: none;">' + solHtml + '</div>' +
+        '</article>';
+      }
+
+      function renderOverview() {
+        var rowsMaTran = D.ma_tran_tln.map(function (r) {
+          return '<tr>' +
+            '<td><strong>' + r.cau + '</strong></td>' +
+            '<td>' + r.chu_de + '</td>' +
+            '<td>' + r.noi_dung + '</td>' +
+            '<td><span class="badge badge-accent">' + r.ma_lenh + '</span></td>' +
+            '<td><span class="badge ' + (r.cap_do === 'Vận dụng' ? 'badge-warn' : 'badge-info') + '">' + r.cap_do + '</span></td>' +
+          '</tr>';
+        }).join('');
+
+        var rowsBay = D.chien_luoc_bay.map(function (b) {
+          return '<tr>' +
+            '<td><strong>' + b.ma_cau + '</strong></td>' +
+            '<td>' + b.cong_cu + '</td>' +
+            '<td>' + b.bay_can_tranh + '</td>' +
+          '</tr>';
+        }).join('');
+
+        var luuYList = D.pham_vi_luu_y.map(function (txt) {
+          return '<li>' + txt + '</li>';
+        }).join('');
+
+        return '<section class="section">' +
+          '<div class="section-head">' +
+            '<div>' +
+              '<h2>Phân tích Ma trận Dạng thức 3 (6 câu Trả lời ngắn • 3,00 điểm)</h2>' +
+              '<p>Gồm 0 câu Biết, 2 câu Hiểu (C5, C6) và 4 câu Vận dụng phân hóa (C1, C2, C3, C4).</p>' +
+            '</div>' +
+            '<a class="btn btn-sm" href="../tai_lieu.html?doc=luyen_tap/chuyen_de_tln_van_dung.md">Đọc bản Tài liệu đầy đủ</a>' +
+          '</div>' +
+          '<div class="table-wrap">' +
+            '<table><thead><tr><th>Câu</th><th>Chủ đề lớn</th><th>Nội dung kiến thức cụ thể</th><th>Mã năng lực</th><th>Cấp độ</th></tr></thead>' +
+            '<tbody>' + rowsMaTran + '</tbody></table>' +
+          '</div>' +
+          '<div class="notice" style="margin-top: 16px;">' +
+            '<strong>Lưu ý phạm vi ma trận &amp; Quy tắc phiếu tô 4 ký tự:</strong>' +
+            '<ul class="step-list" style="margin-top: 8px;">' + luuYList + '</ul>' +
+          '</div>' +
+        '</section>' +
+        '<section class="section">' +
+          '<div class="section-head">' +
+            '<div>' +
+              '<h2>Chiến lược giải nhanh &amp; Bẫy cần tránh ở 4 câu Vận dụng</h2>' +
+              '<p>Đối chiếu trực tiếp công cụ cốt lõi và các lỗi mất điểm phổ biến theo ma trận 2026.</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="table-wrap">' +
+            '<table><thead><tr><th>Mã câu</th><th>Công cụ giải nhanh cốt lõi</th><th>Bẫy sai lầm thường gặp cần tránh</th></tr></thead>' +
+            '<tbody>' + rowsBay + '</tbody></table>' +
+          '</div>' +
+        '</section>' +
+        '<section class="section">' +
+          '<div class="section-head">' +
+            '<div>' +
+              '<h2>Bộ đề tự luyện Trả lời ngắn chuẩn Ma trận 2026</h2>' +
+              '<p>Mỗi đề gồm đủ 6 câu (4 Vận dụng C1–C4 + 2 Hiểu C5–C6), chấm 0,50đ/câu và kiểm tra phiếu tô tối đa 4 ký tự.</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="grid grid-2">' +
+            '<a class="card card-link" href="phong_thi_toan.html?mode=tln_de1">' +
+              '<div>' +
+                '<div class="card-title">Đề tự luyện số 01 (6 câu • 30 phút)</div>' +
+                '<p class="muted">Gấp hộp bìa 12 cm, khôi phục hàm bậc 3, bắn 3 viên đạn, treo vật 3 dây nghiêng 30°, hình bình hành Oxyz, khoảng cách S.ABC.</p>' +
+              '</div>' +
+              '<div class="tag-row"><span class="btn btn-sm btn-primary">Bắt đầu Đề tự luyện 01</span></div>' +
+            '</a>' +
+            '<a class="card card-link" href="phong_thi_toan.html?mode=tln_de2">' +
+              '<div>' +
+                '<div class="card-title">Đề tự luyện số 02 (6 câu • 30 phút)</div>' +
+                '<p class="muted">Chi phí trung bình sp, hàm nhất biến (đáp số âm -3), bốc bi xanh, hợp lực 3 vectơ góc 60°, cos góc Oxyz, khoảng cách AA\' và BD.</p>' +
+              '</div>' +
+              '<div class="tag-row"><span class="btn btn-sm btn-primary">Bắt đầu Đề tự luyện 02</span></div>' +
+            '</a>' +
+          '</div>' +
+        '</section>';
+      }
+
+      function renderTopicTab(tabKey) {
+        var topic = D.chuyen_de.filter(function (c) { return c.key === tabKey; })[0];
+        if (!topic) return '';
+        var vds = D.vi_du_chuyen_de.filter(function (v) { return v.chuyen_de_key === tabKey; });
+
+        var quyTrinhHtml = '';
+        if (topic.quy_trinh && topic.quy_trinh.length) {
+          quyTrinhHtml = '<h3 style="margin: 18px 0 8px;">Quy trình giải chuẩn 4 bước</h3><ol class="step-list">' +
+            topic.quy_trinh.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
+            '</ol>';
+        }
+
+        var gridCls = topic.dang_bai.length >= 3 ? 'grid grid-3' : 'grid grid-2';
+        var dangHtml = topic.dang_bai.map(function (d) {
+          return '<article class="card">' +
+            '<h3 style="margin-bottom: 10px;">' + d.ten + '</h3>' +
+            '<p><strong>Nhận diện:</strong> ' + d.nhan_dien + '</p>' +
+            '<p><strong>Công thức / Phương pháp:</strong> ' + d.cong_thuc + '</p>' +
+          '</article>';
+        }).join('');
+
+        var examplesHtml = vds.map(renderExampleCard).join('');
+
+        return '<section class="section">' +
+          '<div class="card">' +
+            '<div class="section-head" style="margin-bottom: 8px;">' +
+              '<div><h2>' + topic.tieu_de + '</h2></div>' +
+              '<a class="btn btn-sm btn-primary" href="' + topic.truc_quan_link + '">' + topic.truc_quan_label + '</a>' +
+            '</div>' +
+            '<p>' + topic.dinh_huong + '</p>' +
+            quyTrinhHtml +
+          '</div>' +
+        '</section>' +
+        '<section class="section">' +
+          '<h2 style="margin-bottom: 16px;">Phân loại dạng bài trọng tâm</h2>' +
+          '<div class="' + gridCls + '">' + dangHtml + '</div>' +
+        '</section>' +
+        '<section class="section">' +
+          '<div class="section-head">' +
+            '<div>' +
+              '<h2>Ví dụ minh họa tương tác (' + vds.length + ' bài)</h2>' +
+              '<p>Tự nháp và nhập đáp số chuẩn phiếu tô (tối đa 4 ký tự) trước khi mở lời giải chi tiết.</p>' +
+            '</div>' +
+            '<a class="btn btn-sm" href="phong_thi_toan.html?mode=tln_vd">Thi thử cả 14 Ví dụ</a>' +
+          '</div>' +
+          examplesHtml +
+        '</section>';
+      }
+
+      function bindTabPanelEvents() {
+        panel.querySelectorAll('[data-vd-input]').forEach(function (inp) {
+          inp.addEventListener('input', function () {
+            var id = inp.getAttribute('data-vd-input');
+            stateInputs[id] = inp.value;
+            var warn = panel.querySelector('[data-vd-warn="' + id + '"]');
+            var v = C.validateShortAnswer(inp.value);
+            if (!v.valid) {
+              warn.style.display = 'inline-flex';
+              warn.textContent = v.reason;
+            } else {
+              warn.style.display = 'none';
+              warn.textContent = '';
+            }
+          });
+        });
+
+        panel.querySelectorAll('[data-vd-check]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var id = btn.getAttribute('data-vd-check');
+            var vd = D.vi_du_chuyen_de.filter(function (x) { return x.id === id; })[0];
+            var inp = panel.querySelector('[data-vd-input="' + id + '"]');
+            var resBadge = panel.querySelector('[data-vd-res="' + id + '"]');
+            var logBtn = panel.querySelector('[data-vd-log="' + id + '"]');
+            if (!vd || !inp || !resBadge) return;
+
+            var raw = inp.value;
+            var v = C.validateShortAnswer(raw);
+            if (!v.valid || v.empty) {
+              resBadge.className = 'badge badge-warn';
+              resBadge.style.display = 'inline-flex';
+              resBadge.textContent = v.empty ? 'Hãy nhập đáp số trước khi kiểm tra.' : v.reason;
+              return;
+            }
+            var ok = C.compareShortAnswer(raw, vd.dap_an);
+            resBadge.style.display = 'inline-flex';
+            if (ok) {
+              resBadge.className = 'badge badge-ok';
+              resBadge.textContent = 'Chính xác! Đáp số chuẩn phiếu tô: ' + vd.dap_an;
+              if (logBtn) logBtn.style.display = 'none';
+            } else {
+              resBadge.className = 'badge badge-err';
+              resBadge.textContent = 'Chưa đúng — hãy rà lại điều kiện, đơn vị hoặc quy tắc làm tròn rồi thử lại.';
+              if (logBtn) logBtn.style.display = 'inline-flex';
+            }
+          });
+        });
+
+        panel.querySelectorAll('[data-vd-sol-btn]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var id = btn.getAttribute('data-vd-sol-btn');
+            var box = document.getElementById('vd-sol-' + id);
+            if (!box) return;
+            var opening = box.style.display === 'none';
+            box.style.display = opening ? 'block' : 'none';
+            btn.textContent = opening ? 'Ẩn lời giải' : 'Xem phương pháp & lời giải';
+          });
+        });
+
+        panel.querySelectorAll('[data-vd-log]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var id = btn.getAttribute('data-vd-log');
+            var vd = D.vi_du_chuyen_de.filter(function (x) { return x.id === id; })[0];
+            if (!vd) return;
+            openErrModal(vd);
+          });
+        });
+      }
+
+      function renderActiveTab(tabKey) {
+        activeTab = tabKey;
+        document.querySelectorAll('[data-tln-tab]').forEach(function (b) {
+          b.classList.toggle('active', b.getAttribute('data-tln-tab') === tabKey);
+        });
+        panel.innerHTML = tabKey === 'tongquan' ? renderOverview() : renderTopicTab(tabKey);
+        bindTabPanelEvents();
+      }
+
+      document.querySelectorAll('[data-tln-tab]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var key = btn.getAttribute('data-tln-tab');
+          renderActiveTab(key);
+          try {
+            history.replaceState(null, '', '?tab=' + encodeURIComponent(key));
+          } catch (e) {}
+        });
+      });
+
+      /* Modal đẩy lỗi */
+      var errModal = document.getElementById('errModal');
+      var errGroupSelect = document.getElementById('errGroupSelect');
+      errGroupSelect.innerHTML = C.ERROR_GROUPS.map(function (g) {
+        return '<option value="' + g + '">' + g + '</option>';
+      }).join('');
+
+      function openErrModal(vd) {
+        stateModalTarget = vd;
+        document.getElementById('errModalMeta').textContent =
+          'Thẻ gắn tự động: [' + vd.ma_lenh + '] + [Cấp độ: ' + vd.cap_do + '] + [Năng lực: ' + vd.nang_luc + ']';
+        document.getElementById('errNoteInput').value = '';
+        errModal.classList.add('open');
+      }
+
+      document.getElementById('btnCloseModal').addEventListener('click', function () {
+        errModal.classList.remove('open');
+      });
+
+      document.getElementById('btnSaveErrLog').addEventListener('click', function () {
+        var vd = stateModalTarget;
+        if (!vd) return;
+        C.addErrorLog({
+          chu_de: vd.chu_de,
+          ma_lenh: vd.ma_lenh,
+          cap_do: vd.cap_do,
+          nang_luc: vd.nang_luc,
+          tom_tat: vd.nhan + ' (Mục ' + vd.tieu_muc + ')',
+          nhom_loi: errGroupSelect.value,
+          ghi_chu: document.getElementById('errNoteInput').value
+        });
+        errModal.classList.remove('open');
+        var btn = panel.querySelector('[data-vd-log="' + vd.id + '"]');
+        if (btn) {
+          btn.textContent = 'Đã lưu Nhật ký lỗi';
+          btn.classList.add('btn-ok');
+          btn.disabled = true;
+        }
+      });
+
+      renderActiveTab(activeTab);
+    })();
+  </script>
+</body>
+</html>
