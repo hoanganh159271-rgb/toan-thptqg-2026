@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Không gian Học tập Toán THPTQG 2026 — GDPT 2018</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        <h1>Không gian Ôn thi Toán THPTQG 2026</h1>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-sm" type="button" id="btnExportJson">Xuất JSON</button>
+        <label class="btn btn-sm" style="cursor: pointer;">
+          Nhập JSON
+          <input type="file" id="inpImportJson" accept=".json" style="display: none;">
+        </label>
+        <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Tổng quan nhanh & Hành động chính -->
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Trung tâm Ma trận 22 câu • 34 lệnh hỏi • 90 phút</h2>
+          <p>Khóa chặt cấu trúc GDPT 2018 (3,0đ TN + 4,0đ Đúng/Sai lũy tiến + 3,0đ Trả lời ngắn). Hoạt động 100% ngoại tuyến.</p>
+        </div>
+        <div class="tag-row">
+          <a class="btn btn-primary" href="luyen_tap/phong_thi_toan.html?mode=full">Mở Phòng thi 90 phút</a>
+          <a class="btn" href="luyen_tap/phong_thi_toan.html?mode=mhh">Luyện 4 câu Mô hình hóa</a>
+        </div>
+      </div>
+
+      <div class="grid grid-4">
+        <div class="card">
+          <div class="stat-label">Điểm đề gần nhất</div>
+          <div class="stat-value" id="statLastScore">—</div>
+          <div class="stat-sub" id="statExamCount">Chưa có bài thi đã nộp</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Tiến độ 5 Chủ đề</div>
+          <div class="stat-value" id="statTopicProgress">0 / 5</div>
+          <div class="progress-track" style="margin-top: 10px;">
+            <div class="progress-fill" id="statTopicBar" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Nhật ký lỗi cần vá</div>
+          <div class="stat-value" id="statErrorCount">0</div>
+          <div class="stat-sub" id="statRepeatWarn">Chưa có lỗi lặp &ge; 2 lần</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Thang điểm chuẩn 2026</div>
+          <div class="stat-value">10,00</div>
+          <div class="stat-sub">12 TN (3đ) + 4 ĐS (4đ) + 6 TLN (3đ)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ma trận 5 Chủ đề -->
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Ma trận tiến độ 5 Chủ đề (34 lệnh hỏi)</h2>
+          <p>Đánh dấu chủ đề đã nắm vững lý thuyết, mở kho kiến thức chuẩn hoặc vào phòng luyện riêng theo từng chủ đề.</p>
+        </div>
+        <a class="btn btn-sm" href="tai_lieu.html?doc=luyen_tap/kho_mhh_van_dung.md">Mở Kho rèn Mô hình hóa</a>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Xong</th>
+              <th>Chủ đề trọng tâm</th>
+              <th class="num">Lệnh (B / H / VD)</th>
+              <th>Vị trí trong đề</th>
+              <th class="num">Hiệu suất thi</th>
+              <th>Thao tác nhanh</th>
+            </tr>
+          </thead>
+          <tbody id="matrixTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4 Phòng Trực Quan Hóa HTML5 Canvas -->
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>4 Phòng Trực Quan Hóa HTML5 Canvas</h2>
+          <p>Chạy thuần ngoại tuyến, hỗ trợ kéo thanh trượt và xoay 3D trực tiếp bằng chuột, ngón tay hoặc bút cảm ứng.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <a class="card card-link" href="truc_quan/01_khao_sat_va_tuong_giao.html">
+          <div>
+            <div class="card-title">1. Khảo sát Hàm số &amp; Tương giao</div>
+            <p class="muted">Bậc 3, Bậc nhất/Bậc nhất, Bậc hai/Bậc nhất. Kéo tham số m, đường cắt y = k, bật/tắt tiệm cận và đạo hàm f'(x).</p>
+          </div>
+          <div class="tag-row">
+            <span class="badge badge-accent">Chủ đề 1 • 12 lệnh</span>
+            <span class="badge">Canvas 2D HiDPI</span>
+          </div>
+        </a>
+
+        <a class="card card-link" href="truc_quan/02_phong_lab_toi_uu_mhh.html">
+          <div>
+            <div class="card-title">2. Phòng Lab Tối ưu Mô hình hóa</div>
+            <p class="muted">2 bài toán kinh điển: Gấp hộp không nắp (V max) &amp; Rào khu vườn giáp sông (Chi phí min) kèm đồ thị f(x) thời gian thực.</p>
+          </div>
+          <div class="tag-row">
+            <span class="badge badge-accent">TLN C1-MHH2.2</span>
+            <span class="badge">5 bước MHH trực tiếp</span>
+          </div>
+        </a>
+
+        <a class="card card-link" href="truc_quan/03_vecto_va_hinh_hoc_3d.html">
+          <div>
+            <div class="card-title">3. Vectơ Oxyz &amp; Hình chóp S.ABCD 3D</div>
+            <p class="muted">Kéo xoay tự do 3D: tổng/hiệu/góc hai vectơ trong Oxyz và trực quan góc nhị diện [S, BD, A], khoảng cách d(A, (SBD)).</p>
+          </div>
+          <div class="tag-row">
+            <span class="badge badge-accent">Chủ đề 4 &amp; 5 • 10 lệnh</span>
+            <span class="badge">Phép chiếu 3D cảm ứng</span>
+          </div>
+        </a>
+
+        <a class="card card-link" href="truc_quan/04_mu_log_va_xac_suat_mhh.html">
+          <div>
+            <div class="card-title">4. Mũ–Logarit &amp; Mô phỏng Xác suất</div>
+            <p class="muted">Tab 1: Tăng trưởng vi khuẩn, lãi kép, độ pH. Tab 2: Sơ đồ cây Bayes &amp; mô phỏng N phép thử đối chiếu lý thuyết.</p>
+          </div>
+          <div class="tag-row">
+            <span class="badge badge-accent">Chủ đề 2 &amp; 3 • ĐS C3, ĐS C4, TLN C3</span>
+            <span class="badge">Mô phỏng Monte Carlo</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Bản đồ Điểm yếu theo Năng lực & Nhật ký lỗi -->
+    <section class="section">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="section-head" style="margin-bottom: 12px;">
+            <div>
+              <h3>Bản đồ Điểm yếu theo 3 Năng lực</h3>
+              <p>Tổng hợp từ bài thi gần nhất và số lượt mắc lỗi theo TD / GQ / MHH.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Năng lực</th>
+                  <th class="num">Đề chuẩn</th>
+                  <th class="num">Tỉ lệ gần nhất</th>
+                  <th class="num">Lỗi đã ghi</th>
+                </tr>
+              </thead>
+              <tbody id="compMapBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head" style="margin-bottom: 12px;">
+            <div>
+              <h3>Nhật ký lỗi gần đây</h3>
+              <p>Gắn thẻ [Mã câu] + [B/H/VD] + [TD/GQ/MHH].</p>
+            </div>
+            <div class="tag-row">
+              <button type="button" class="btn btn-sm" id="btnCopyErrMd">Xuất Markdown</button>
+              <a class="btn btn-sm" href="tai_lieu.html?doc=chan_doan/checklist_truoc_khi_thi.md">Checklist thi</a>
+            </div>
+          </div>
+          <div id="recentErrorList"></div>
+          <textarea id="mdPreviewBox" readonly style="display: none; margin-top: 10px; font-family: var(--font-mono); font-size: 0.84rem;"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tham khảo 7 lệnh tắt mở rộng -->
+    <section class="section">
+      <div class="card">
+        <h3 style="margin-bottom: 10px;">7 Lệnh tắt điều khiển (chi tiết trong AGENT_RULES.md)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Lệnh tắt</th>
+                <th>Chức năng thực thi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="mono">/toan-de [tên đề]</td><td>Sinh đề mới đủ 22 câu khớp 100% ma trận, chạy verify_de_mau.py kiểm chứng và nạp vào phong_thi_toan.html.</td></tr>
+              <tr><td class="mono">/toan-mhh [mã câu]</td><td>Sinh 3 bài thực tế MHH (C1-TLN | C3-ĐS | C3-TLN | C4-TLN), hướng dẫn lập hàm trước, không giải hộ sẵn.</td></tr>
+              <tr><td class="mono">/toan-ve [mô tả]</td><td>Tạo thêm 1 phòng trực quan hóa Canvas 2D/3D trong truc_quan/ và gắn link lên Dashboard.</td></tr>
+              <tr><td class="mono">/toan-loi [mã câu + mô tả]</td><td>Chẩn đoán vào 8 nhóm lỗi, đẩy cảnh báo lặp &ge; 2 lần lên đầu checklist_truoc_khi_thi.md.</td></tr>
+              <tr><td class="mono">/toan-check [bài nháp]</td><td>Soi từng bước biến đổi theo quy trình 6 bước, chỉ đúng dòng sai đầu tiên.</td></tr>
+              <tr><td class="mono">/toan-kb [chủ đề 1-5]</td><td>Bổ sung dạng bài/ghi chú vào kb/ tương ứng, bảo toàn nội dung gốc.</td></tr>
+              <tr><td class="mono">/toan-tongket</td><td>Quét nhật ký lỗi tạo báo cáo điểm nghẽn và lịch ôn Spaced Repetition 1-3-7-14 ngày trong bao_cao_tuan/.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/common.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var C = window.TOAN_COMMON;
+      var M = window.TOAN_MATRIX;
+      C.initTheme();
+
+      function renderDashboard() {
+        var store = C.loadStore();
+        var lastExam = store.examHistory[0] || null;
+
+        // Thống kê đầu trang
+        if (lastExam) {
+          document.getElementById('statLastScore').textContent =
+            C.formatNum(lastExam.totalScore, 2) + ' / ' + C.formatNum(lastExam.maxScore, 2);
+          document.getElementById('statExamCount').textContent =
+            'Đã lưu ' + store.examHistory.length + ' lượt làm bài';
+        } else {
+          document.getElementById('statLastScore').textContent = '—';
+          document.getElementById('statExamCount').textContent = 'Chưa có bài thi đã nộp';
+        }
+
+        var doneCount = 0;
+        M.chu_de.forEach(function (cd) {
+          if (store.topicDone[String(cd.id)]) doneCount++;
+        });
+        document.getElementById('statTopicProgress').textContent = doneCount + ' / 5';
+        document.getElementById('statTopicBar').style.width = ((doneCount / 5) * 100) + '%';
+
+        document.getElementById('statErrorCount').textContent = String(store.errorLogs.length);
+        var rep = C.getRepeatedErrorCounts();
+        var repeatedKeys = Object.keys(rep).filter(function (k) { return rep[k] >= 2; });
+        document.getElementById('statRepeatWarn').textContent = repeatedKeys.length
+          ? ('Cảnh báo lặp >= 2 lần: ' + repeatedKeys[0])
+          : 'Chưa có lỗi lặp >= 2 lần';
+
+        // Bảng 5 chủ đề
+        var tbody = document.getElementById('matrixTableBody');
+        tbody.innerHTML = '';
+        M.chu_de.forEach(function (cd) {
+          var tr = document.createElement('tr');
+          var checked = Boolean(store.topicDone[String(cd.id)]);
+          var topicPerf = '—';
+          if (lastExam && lastExam.byTopic && lastExam.byTopic[cd.id] && lastExam.byTopic[cd.id].tot > 0) {
+            var st = lastExam.byTopic[cd.id];
+            topicPerf = st.ok + '/' + st.tot + ' (' + Math.round((st.ok / st.tot) * 100) + '%)';
+          }
+          tr.innerHTML =
+            '<td><input type="checkbox" aria-label="Hoàn thành chủ đề ' + cd.id + '" ' + (checked ? 'checked' : '') + ' data-topic-chk="' + cd.id + '"></td>' +
+            '<td><strong>Chủ đề ' + cd.id + ':</strong> ' + cd.ten + '</td>' +
+            '<td class="num"><strong>' + cd.lenh.tong + '</strong> (' + cd.lenh.B + 'B · ' + cd.lenh.H + 'H · ' + cd.lenh.VD + 'VD)</td>' +
+            '<td class="muted">' + cd.ma_cau + '</td>' +
+            '<td class="num">' + topicPerf + '</td>' +
+            '<td><div class="tag-row">' +
+              '<a class="btn btn-sm" href="tai_lieu.html?doc=' + encodeURIComponent(cd.file_kb) + '">Lý thuyết</a>' +
+              '<a class="btn btn-sm btn-primary" href="luyen_tap/phong_thi_toan.html?mode=cd' + cd.id + '">Luyện tập</a>' +
+            '</div></td>';
+          tbody.appendChild(tr);
+        });
+
+        document.querySelectorAll('[data-topic-chk]').forEach(function (chk) {
+          chk.addEventListener('change', function () {
+            C.toggleTopicProgress(chk.getAttribute('data-topic-chk'), chk.checked);
+            renderDashboard();
+          });
+        });
+
+        // Bản đồ Năng lực TD / GQ / MHH
+        var errByComp = { TD: 0, GQ: 0, MHH: 0 };
+        store.errorLogs.forEach(function (e) {
+          if (errByComp[e.nang_luc] != null) errByComp[e.nang_luc]++;
+        });
+        var compBody = document.getElementById('compMapBody');
+        compBody.innerHTML = ['TD', 'GQ', 'MHH'].map(function (k) {
+          var meta = M.nang_luc[k];
+          var rate = '—';
+          if (lastExam && lastExam.byCompetency && lastExam.byCompetency[k] && lastExam.byCompetency[k].tot > 0) {
+            var c = lastExam.byCompetency[k];
+            rate = c.ok + '/' + c.tot + ' (' + Math.round((c.ok / c.tot) * 100) + '%)';
+          }
+          return '<tr>' +
+            '<td><strong>' + meta.ten + '</strong></td>' +
+            '<td class="num">' + meta.so_cau + ' câu (' + meta.B + 'B/' + meta.H + 'H/' + meta.VD + 'VD)</td>' +
+            '<td class="num">' + rate + '</td>' +
+            '<td class="num">' + errByComp[k] + '</td>' +
+          '</tr>';
+        }).join('');
+
+        // Danh sách lỗi gần đây
+        var errListEl = document.getElementById('recentErrorList');
+        if (!store.errorLogs.length) {
+          errListEl.innerHTML = '<div class="notice">Chưa có lỗi sai nào được ghi nhận. Khi làm đề trong Phòng thi, bạn có thể bấm "Đẩy vào Nhật ký lỗi" ở từng câu sai.</div>';
+        } else {
+          errListEl.innerHTML = store.errorLogs.slice(0, 6).map(function (it) {
+            return '<div class="ds-row">' +
+              '<div class="ds-text">' +
+                '<div class="tag-row" style="margin-bottom:4px;">' +
+                  '<span class="badge badge-err">' + it.nhom_loi + '</span>' +
+                  '<span class="badge badge-accent">' + it.ma_lenh + '</span>' +
+                  '<span class="badge">' + it.cap_do + '</span>' +
+                  '<span class="badge badge-info">' + it.nang_luc + '</span>' +
+                '</div>' +
+                '<div>' + it.tom_tat + (it.ghi_chu ? ' — <span class="muted">' + it.ghi_chu + '</span>' : '') + '</div>' +
+              '</div>' +
+              '<button type="button" class="btn btn-sm" data-del-err="' + it.id + '">Xóa</button>' +
+            '</div>';
+          }).join('');
+
+          document.querySelectorAll('[data-del-err]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              C.deleteErrorLog(btn.getAttribute('data-del-err'));
+              renderDashboard();
+            });
+          });
+        }
+      }
+
+      document.getElementById('btnExportJson').addEventListener('click', C.exportJSON);
+      document.getElementById('inpImportJson').addEventListener('change', function (ev) {
+        var file = ev.target.files && ev.target.files[0];
+        if (!file) return;
+        C.importJSON(file, function (err) {
+          if (err) alert('Lỗi nhập JSON: ' + err.message);
+          else renderDashboard();
+        });
+      });
+
+      document.getElementById('btnCopyErrMd').addEventListener('click', function () {
+        var box = document.getElementById('mdPreviewBox');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        box.value = C.exportErrorLogsMarkdown();
+      });
+
+      renderDashboard();
+    })();
+  </script>
+</body>
+</html>

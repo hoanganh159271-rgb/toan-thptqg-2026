@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho Tài liệu Toán THPTQG 2026 — GDPT 2018</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        <a class="btn btn-sm" href="index.html">← Dashboard</a>
+        <h1 id="docTitle">Kho Tài liệu Toán THPTQG 2026</h1>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="lab-layout">
+      <aside class="card" aria-label="Danh mục tài liệu">
+        <h3>Danh mục tài liệu</h3>
+        <div id="docNav" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;"></div>
+      </aside>
+
+      <article class="card" id="docContent" style="min-width: 0;"></article>
+    </div>
+  </main>
+
+  <script src="assets/common.js"></script>
+  <script src="assets/docs_data.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var C = window.TOAN_COMMON;
+      var DOCS = window.TOAN_DOCS || {};
+      C.initTheme();
+
+      var DOC_LIST = [
+        { key: 'kb/01_ung_dung_dao_ham.md', label: 'Chủ đề 1: Ứng dụng đạo hàm' },
+        { key: 'kb/02_luong_giac_day_so_mu_log.md', label: 'Chủ đề 2: Lượng giác, Dãy số, Mũ–Log' },
+        { key: 'kb/03_to_hop_xac_suat.md', label: 'Chủ đề 3: Tổ hợp – Xác suất' },
+        { key: 'kb/04_vecto_khong_gian.md', label: 'Chủ đề 4: Vectơ không gian & Oxyz' },
+        { key: 'kb/05_quan_he_vuong_goc.md', label: 'Chủ đề 5: Quan hệ vuông góc 3D' },
+        { key: 'luyen_tap/kho_mhh_van_dung.md', label: 'Kho rèn Mô hình hóa (MHH)' },
+        { key: 'chan_doan/checklist_truoc_khi_thi.md', label: 'Checklist trước khi thi' },
+        { key: 'chan_doan/nhat_ky_loi_sai.md', label: 'Nhật ký lỗi sai (8 nhóm)' }
+      ];
+
+      function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function formatInline(raw) {
+        var s = esc(raw);
+        s = s.replace(/\$\$([^$]+)\$\$/g, '<span class="mwrap">$1</span>');
+        s = s.replace(/\$([^$]+)\$/g, '<span class="mwrap">$1</span>');
+        s = s.replace(/`([^`]+)`/g, '<code class="mono">$1</code>');
+        s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        return s;
+      }
+
+      function renderMarkdown(md) {
+        var lines = String(md || '').replace(/\r\n/g, '\n').split('\n');
+        var html = [];
+        var i = 0;
+        var inUl = false, inOl = false;
+
+        function closeLists() {
+          if (inUl) { html.push('</ul>'); inUl = false; }
+          if (inOl) { html.push('</ol>'); inOl = false; }
+        }
+
+        while (i < lines.length) {
+          var line = lines[i];
+          var trim = line.trim();
+
+          if (!trim) {
+            closeLists();
+            i++;
+            continue;
+          }
+
+          // Block math $$...$$
+          if (trim.indexOf('$$') === 0 && trim.lastIndexOf('$$') > 1) {
+            closeLists();
+            html.push('<div class="mblock">' + esc(trim.slice(2, -2).trim()) + '</div>');
+            i++;
+            continue;
+          }
+
+          // Table
+          if (trim.charAt(0) === '|' && i + 1 < lines.length && /^\s*\|?[\s:|-]+\|/.test(lines[i + 1])) {
+            closeLists();
+            var parseRow = function (r) {
+              return r.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(function (c) { return c.trim(); });
+            };
+            var headers = parseRow(line);
+            html.push('<div class="table-wrap" style="margin: 14px 0;"><table><thead><tr>');
+            headers.forEach(function (h) { html.push('<th>' + formatInline(h) + '</th>'); });
+            html.push('</tr></thead><tbody>');
+            i += 2;
+            while (i < lines.length && lines[i].trim().charAt(0) === '|') {
+              var cols = parseRow(lines[i]);
+              html.push('<tr>');
+              cols.forEach(function (c) { html.push('<td>' + formatInline(c) + '</td>'); });
+              html.push('</tr>');
+              i++;
+            }
+            html.push('</tbody></table></div>');
+            continue;
+          }
+
+          if (/^---+$/.test(trim)) {
+            closeLists();
+            html.push('<div style="height: 20px;"></div>');
+            i++;
+            continue;
+          }
+
+          var hMatch = /^(#{1,4})\s+(.*)$/.exec(trim);
+          if (hMatch) {
+            closeLists();
+            var lvl = hMatch[1].length;
+            var tag = lvl === 1 ? 'h2' : (lvl === 2 ? 'h3' : 'h4');
+            var mt = lvl <= 2 ? 'margin: 22px 0 10px;' : 'margin: 14px 0 6px;';
+            html.push('<' + tag + ' style="' + mt + '">' + formatInline(hMatch[2]) + '</' + tag + '>');
+            i++;
+            continue;
+          }
+
+          if (trim.indexOf('> ') === 0) {
+            closeLists();
+            var qLines = [];
+            while (i < lines.length && lines[i].trim().indexOf('> ') === 0) {
+              qLines.push(formatInline(lines[i].trim().slice(2)));
+              i++;
+            }
+            html.push('<div class="notice" style="margin: 12px 0;">' + qLines.join('<br>') + '</div>');
+            continue;
+          }
+
+          var ulMatch = /^[-*]\s+(.*)$/.exec(trim);
+          if (ulMatch) {
+            if (inOl) { html.push('</ol>'); inOl = false; }
+            if (!inUl) { html.push('<ul class="step-list" style="margin: 8px 0 12px;">'); inUl = true; }
+            html.push('<li>' + formatInline(ulMatch[1]) + '</li>');
+            i++;
+            continue;
+          }
+
+          var olMatch = /^\d+\.\s+(.*)$/.exec(trim);
+          if (olMatch) {
+            if (inUl) { html.push('</ul>'); inUl = false; }
+            if (!inOl) { html.push('<ol class="step-list" style="margin: 8px 0 12px;">'); inOl = true; }
+            html.push('<li>' + formatInline(olMatch[1]) + '</li>');
+            i++;
+            continue;
+          }
+
+          closeLists();
+          html.push('<p>' + formatInline(trim) + '</p>');
+          i++;
+        }
+        closeLists();
+        return html.join('\n');
+      }
+
+      var params = new URLSearchParams(window.location.search);
+      var currentDoc = params.get('doc') || DOC_LIST[0].key;
+      if (!DOCS[currentDoc]) currentDoc = DOC_LIST[0].key;
+
+      var navEl = document.getElementById('docNav');
+      var contentEl = document.getElementById('docContent');
+
+      function selectDoc(key) {
+        currentDoc = key;
+        var found = DOC_LIST.filter(function (d) { return d.key === key; })[0];
+        document.getElementById('docTitle').textContent = found ? found.label : 'Kho Tài liệu Toán THPTQG 2026';
+        contentEl.innerHTML = renderMarkdown(DOCS[key] || 'Không tìm thấy tài liệu.');
+        navEl.querySelectorAll('button').forEach(function (b) {
+          b.classList.toggle('btn-primary', b.getAttribute('data-doc-key') === key);
+        });
+      }
+
+      DOC_LIST.forEach(function (d) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-sm';
+        btn.style.justifyContent = 'flex-start';
+        btn.style.whiteSpace = 'normal';
+        btn.style.textAlign = 'left';
+        btn.setAttribute('data-doc-key', d.key);
+        btn.textContent = d.label;
+        btn.addEventListener('click', function () {
+          selectDoc(d.key);
+          try {
+            history.replaceState(null, '', '?doc=' + encodeURIComponent(d.key));
+          } catch (e) {}
+        });
+        navEl.appendChild(btn);
+      });
+
+      selectDoc(currentDoc);
+    })();
+  </script>
+</body>
+</html>
