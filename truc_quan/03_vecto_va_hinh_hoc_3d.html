@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng 3: Vectơ Oxyz &amp; Hình học 3D — Toán THPTQG 2026</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        <a class="btn btn-sm" href="../index.html">← Dashboard</a>
+        <h1>Phòng 3: Vectơ <span class="m">Oxyz</span> &amp; Quan hệ Vuông góc 3D</h1>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-accent">Chủ đề 4 &amp; 5 • Kéo xoay 3D bằng chuột / bút</span>
+        <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="tab-bar" style="margin-bottom: 20px;">
+      <button type="button" class="tab-btn active" data-tab="vec">Chế độ 1: Phép toán Vectơ Oxyz</button>
+      <button type="button" class="tab-btn" data-tab="chop">Chế độ 2: Hình chóp S.ABCD (Góc nhị diện &amp; Khoảng cách)</button>
+    </div>
+
+    <!-- CHẾ ĐỘ 1: VECTƠ OXYZ -->
+    <section id="tab-vec">
+      <div class="lab-layout">
+        <div class="card">
+          <h3>Tọa độ hai vectơ <span class="mvec">u</span>, <span class="mvec">v</span></h3>
+          <div class="tag-row" style="margin: 10px 0;">
+            <button type="button" class="btn btn-sm btn-primary" id="btnVecTLN5">Mẫu TLN C5</button>
+            <button type="button" class="btn btn-sm" id="btnVecOrtho">Vuông góc</button>
+            <button type="button" class="btn btn-sm" id="btnVecReset">Đặt lại góc nhìn</button>
+          </div>
+
+          <h4 style="margin-top: 10px;">Vectơ <span class="mvec">u</span> = (<span id="lblU">1; −2; 2</span>)</h4>
+          <div class="slider-group">
+            <div class="slider-head"><label for="ux">u₁ (trục Ox)</label><span class="slider-val" id="vUx">1</span></div>
+            <input type="range" id="ux" min="-4" max="4" step="0.5" value="1">
+          </div>
+          <div class="slider-group">
+            <div class="slider-head"><label for="uy">u₂ (trục Oy)</label><span class="slider-val" id="vUy">−2</span></div>
+            <input type="range" id="uy" min="-4" max="4" step="0.5" value="-2">
+          </div>
+          <div class="slider-group">
+            <div class="slider-head"><label for="uz">u₃ (trục Oz)</label><span class="slider-val" id="vUz">2</span></div>
+            <input type="range" id="uz" min="-4" max="4" step="0.5" value="2">
+          </div>
+
+          <h4 style="margin-top: 12px;">Vectơ <span class="mvec">v</span> = (<span id="lblV">2; 1; −2</span>)</h4>
+          <div class="slider-group">
+            <div class="slider-head"><label for="vx">v₁ (trục Ox)</label><span class="slider-val" id="vVx">2</span></div>
+            <input type="range" id="vx" min="-4" max="4" step="0.5" value="2">
+          </div>
+          <div class="slider-group">
+            <div class="slider-head"><label for="vy">v₂ (trục Oy)</label><span class="slider-val" id="vVy">1</span></div>
+            <input type="range" id="vy" min="-4" max="4" step="0.5" value="1">
+          </div>
+          <div class="slider-group">
+            <div class="slider-head"><label for="vz">v₃ (trục Oz)</label><span class="slider-val" id="vVz">−2</span></div>
+            <input type="range" id="vz" min="-4" max="4" step="0.5" value="-2">
+          </div>
+
+          <div class="tag-row" style="margin-top: 10px;">
+            <label class="toggle-chip"><input type="checkbox" id="chkSum" checked><span>Hiện u + v</span></label>
+            <label class="toggle-chip"><input type="checkbox" id="chkDiff"><span>Hiện u − v</span></label>
+            <label class="toggle-chip"><input type="checkbox" id="chkProj"><span>Hình chiếu (Oxy)</span></label>
+          </div>
+        </div>
+
+        <div class="canvas-panel">
+          <div class="canvas-box">
+            <canvas id="vecCanvas" class="math-canvas" aria-label="Không gian tọa độ Oxyz 3D"></canvas>
+          </div>
+          <div class="readout-grid">
+            <div class="readout-item">
+              <div class="r-label">Độ dài |u| và |v|</div>
+              <div class="r-val" id="outVecLen">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Tổng u + v | Hiệu u − v</div>
+              <div class="r-val" id="outVecOps">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Tích vô hướng u · v</div>
+              <div class="r-val" id="outVecDot">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">cos(u, v) &amp; Góc (u, v)</div>
+              <div class="r-val" id="outVecAngle">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHẾ ĐỘ 2: HÌNH CHÓP S.ABCD -->
+    <section id="tab-chop" style="display: none;">
+      <div class="lab-layout">
+        <div class="card">
+          <h3>Hình chóp <span class="m">S.ABCD</span> (<span class="m">SA ⊥ (ABCD)</span>)</h3>
+          <p class="muted" style="margin-top: 6px;">Đáy chữ nhật/vuông cạnh <span class="m">AB = a, AD = b</span>, đường cao <span class="m">SA = h</span>. Chú ý chân vuông góc <span class="m">AK ⊥ BD</span>.</p>
+
+          <div class="tag-row" style="margin: 10px 0;">
+            <button type="button" class="btn btn-sm btn-primary" id="btnPyrTLN6">Mẫu TLN C6 (a=b=2, h=2√3)</button>
+            <button type="button" class="btn btn-sm" id="btnPyrRect">Đáy chữ nhật (3×2×3)</button>
+            <button type="button" class="btn btn-sm" id="btnPyrReset">Đặt lại góc nhìn</button>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head"><label for="pyrA">Cạnh đáy AB = a</label><span class="slider-val" id="vPyrA">2,0</span></div>
+            <input type="range" id="pyrA" min="1" max="5" step="0.2" value="2">
+          </div>
+          <div class="slider-group">
+            <div class="slider-head"><label for="pyrB">Cạnh đáy AD = b</label><span class="slider-val" id="vPyrB">2,0</span></div>
+            <input type="range" id="pyrB" min="1" max="5" step="0.2" value="2">
+          </div>
+          <div class="slider-group">
+            <div class="slider-head"><label for="pyrH">Chiều cao SA = h</label><span class="slider-val" id="vPyrH">3,46</span></div>
+            <input type="range" id="pyrH" min="1" max="5" step="0.02" value="3.46">
+          </div>
+
+          <div class="tag-row" style="margin-top: 10px;">
+            <label class="toggle-chip"><input type="checkbox" id="chkDihedral" checked><span>Góc nhị diện [S, BD, A]</span></label>
+            <label class="toggle-chip"><input type="checkbox" id="chkDist" checked><span>Khoảng cách AH = d(A, (SBD))</span></label>
+            <label class="toggle-chip"><input type="checkbox" id="chkAngSC"><span>Góc (SC, (ABCD))</span></label>
+          </div>
+        </div>
+
+        <div class="canvas-panel">
+          <div class="canvas-box">
+            <canvas id="pyrCanvas" class="math-canvas" aria-label="Hình chóp S.ABCD 3D"></canvas>
+          </div>
+          <div class="readout-grid">
+            <div class="readout-item">
+              <div class="r-label">Chân đường cao AK ⊥ BD</div>
+              <div class="r-val" id="outPyrAK">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Góc nhị diện [S, BD, A] = ∠SKA</div>
+              <div class="r-val" id="outPyrDihedral">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Khoảng cách d(A, (SBD)) = AH</div>
+              <div class="r-val" id="outPyrDist">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Góc (SC, (ABCD)) = ∠SCA</div>
+              <div class="r-val" id="outPyrAngSC">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/common.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var C = window.TOAN_COMMON;
+      C.initTheme();
+
+      var activeTab = 'vec';
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activeTab = btn.getAttribute('data-tab');
+          tabBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
+          document.getElementById('tab-vec').style.display = activeTab === 'vec' ? 'block' : 'none';
+          document.getElementById('tab-chop').style.display = activeTab === 'chop' ? 'block' : 'none';
+          if (activeTab === 'vec') vecEngine.render(); else pyrEngine.render();
+        });
+      });
+
+      /* --- ENGINE 1: VECTƠ OXYZ --- */
+      var elUx = document.getElementById('ux'), elUy = document.getElementById('uy'), elUz = document.getElementById('uz');
+      var elVx = document.getElementById('vx'), elVy = document.getElementById('vy'), elVz = document.getElementById('vz');
+      var chkSum = document.getElementById('chkSum'), chkDiff = document.getElementById('chkDiff'), chkProj = document.getElementById('chkProj');
+
+      var vecCanvas = document.getElementById('vecCanvas');
+      var vecEngine = C.createEngine3D(vecCanvas, { yaw: 0.68, pitch: 0.36, scale: 42, center: [0, 0, 0] }, function (api) {
+        var u = [Number(elUx.value), Number(elUy.value), Number(elUz.value)];
+        var v = [Number(elVx.value), Number(elVy.value), Number(elVz.value)];
+        var s = [u[0] + v[0], u[1] + v[1], u[2] + v[2]];
+        var d = [u[0] - v[0], u[1] - v[1], u[2] - v[2]];
+
+        document.getElementById('vUx').textContent = C.formatNum(u[0], 1);
+        document.getElementById('vUy').textContent = C.formatNum(u[1], 1);
+        document.getElementById('vUz').textContent = C.formatNum(u[2], 1);
+        document.getElementById('vVx').textContent = C.formatNum(v[0], 1);
+        document.getElementById('vVy').textContent = C.formatNum(v[1], 1);
+        document.getElementById('vVz').textContent = C.formatNum(v[2], 1);
+        document.getElementById('lblU').textContent = u.map(function (n) { return C.formatNum(n, 1); }).join('; ');
+        document.getElementById('lblV').textContent = v.map(function (n) { return C.formatNum(n, 1); }).join('; ');
+
+        api.drawGridXY(4, 1);
+        api.drawAxes3D(4.6);
+
+        if (chkProj.checked) {
+          api.drawSegment(u, [u[0], u[1], 0], api.pal.muted, 1.2, true);
+          api.drawSegment([0, 0, 0], [u[0], u[1], 0], api.pal.muted, 1.2, true);
+          api.drawSegment(v, [v[0], v[1], 0], api.pal.muted, 1.2, true);
+          api.drawSegment([0, 0, 0], [v[0], v[1], 0], api.pal.muted, 1.2, true);
+        }
+
+        if (chkSum.checked) {
+          api.drawPolygon([[0, 0, 0], u, s, v], api.pal.faceA, null, 0);
+          api.drawSegment(u, s, api.pal.muted, 1.2, true);
+          api.drawSegment(v, s, api.pal.muted, 1.2, true);
+          api.drawVector([0, 0, 0], s, api.pal.ok, 2.5, 'u+v');
+        }
+
+        if (chkDiff.checked) {
+          api.drawVector(v, u, api.pal.purple, 2.2, 'u−v');
+        }
+
+        api.drawVector([0, 0, 0], u, api.pal.accent, 3, 'u');
+        api.drawVector([0, 0, 0], v, api.pal.secondary, 3, 'v');
+
+        var lenU = Math.hypot(u[0], u[1], u[2]);
+        var lenV = Math.hypot(v[0], v[1], v[2]);
+        var dot = u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+        document.getElementById('outVecLen').textContent = '|u| = ' + C.formatNum(lenU, 2) + ' | |v| = ' + C.formatNum(lenV, 2);
+        document.getElementById('outVecOps').textContent =
+          '(' + s.map(function (n) { return C.formatNum(n, 1); }).join('; ') + ') | (' +
+          d.map(function (n) { return C.formatNum(n, 1); }).join('; ') + ')';
+        document.getElementById('outVecDot').textContent = C.formatNum(dot, 2);
+        if (lenU > 1e-6 && lenV > 1e-6) {
+          var cosA = Math.max(-1, Math.min(1, dot / (lenU * lenV)));
+          var deg = (Math.acos(cosA) * 180) / Math.PI;
+          document.getElementById('outVecAngle').textContent = C.formatNum(cosA, 3) + ' | ' + C.formatNum(deg, 1) + '°';
+        } else {
+          document.getElementById('outVecAngle').textContent = 'Không xác định (vectơ 0)';
+        }
+      });
+
+      [elUx, elUy, elUz, elVx, elVy, elVz, chkSum, chkDiff, chkProj].forEach(function (el) {
+        el.addEventListener('input', vecEngine.render);
+        el.addEventListener('change', vecEngine.render);
+      });
+      document.getElementById('btnVecTLN5').addEventListener('click', function () {
+        elUx.value = '1'; elUy.value = '-2'; elUz.value = '2';
+        elVx.value = '2'; elVy.value = '1'; elVz.value = '-2';
+        vecEngine.render();
+      });
+      document.getElementById('btnVecOrtho').addEventListener('click', function () {
+        elUx.value = '1'; elUy.value = '2'; elUz.value = '1';
+        elVx.value = '-2'; elVy.value = '1'; elVz.value = '0';
+        vecEngine.render();
+      });
+      document.getElementById('btnVecReset').addEventListener('click', function () {
+        vecEngine.setView(0.68, 0.36, 1);
+      });
+
+      /* --- ENGINE 2: HÌNH CHÓP S.ABCD --- */
+      var pyrA = document.getElementById('pyrA');
+      var pyrB = document.getElementById('pyrB');
+      var pyrH = document.getElementById('pyrH');
+      var chkDihedral = document.getElementById('chkDihedral');
+      var chkDist = document.getElementById('chkDist');
+      var chkAngSC = document.getElementById('chkAngSC');
+      var pyrExactH = null;
+
+      var pyrCanvas = document.getElementById('pyrCanvas');
+      var pyrEngine = C.createEngine3D(pyrCanvas, { yaw: 0.78, pitch: 0.34, scale: 62, center: [1, 1, 1.1] }, function (api) {
+        var a = Number(pyrA.value);
+        var b = Number(pyrB.value);
+        var h = pyrExactH !== null ? pyrExactH : Number(pyrH.value);
+
+        document.getElementById('vPyrA').textContent = C.formatNum(a, 1);
+        document.getElementById('vPyrB').textContent = C.formatNum(b, 1);
+        document.getElementById('vPyrH').textContent = C.formatNum(h, 2);
+
+        api.setCenter([a / 2, b / 2, h / 2.6]);
+
+        var A = [0, 0, 0], B = [a, 0, 0], Cpt = [a, b, 0], D = [0, b, 0], S = [0, 0, h];
+        // Chân K của A trên BD: AK ⊥ BD
+        var t = (a * a) / (a * a + b * b);
+        var K = [a * (1 - t), b * t, 0];
+        var AK = (a * b) / Math.hypot(a, b);
+        // Chân H của A trên SK: AH ⊥ SK
+        var ratioH = (h * h) / (h * h + AK * AK);
+        var H = [S[0] + ratioH * (K[0] - S[0]), S[1] + ratioH * (K[1] - S[1]), S[2] + ratioH * (K[2] - S[2])];
+        var AH = (h * AK) / Math.hypot(h, AK);
+
+        // Mặt đáy & các mặt bên
+        api.drawPolygon([A, B, Cpt, D], api.pal.faceA, api.pal.accent, 1.4);
+        api.drawPolygon([S, B, D], api.pal.faceWarn, api.pal.secondary, 1.4);
+
+        // Cạnh khuất / thấy
+        api.drawSegment(A, D, api.pal.ink, 1.6, true);
+        api.drawSegment(A, B, api.pal.ink, 1.8, true);
+        api.drawSegment(S, A, api.pal.accent, 2.5, true);
+        api.drawSegment(B, Cpt, api.pal.ink, 2);
+        api.drawSegment(Cpt, D, api.pal.ink, 2);
+        api.drawSegment(B, D, api.pal.secondary, 2, true);
+        api.drawSegment(S, B, api.pal.ink, 2.2);
+        api.drawSegment(S, Cpt, api.pal.ink, 2.2);
+        api.drawSegment(S, D, api.pal.ink, 2.2);
+
+        if (chkDihedral.checked) {
+          api.drawPolygon([S, A, K], api.pal.faceB, null, 0);
+          api.drawSegment(A, K, api.pal.ok, 2.4, true);
+          api.drawSegment(S, K, api.pal.ok, 2.4);
+          api.drawPoint(K, api.pal.ok, 'K', 4.5);
+        }
+
+        if (chkDist.checked) {
+          api.drawSegment(A, H, api.pal.err, 3);
+          api.drawPoint(H, api.pal.err, 'H', 5);
+        }
+
+        if (chkAngSC.checked) {
+          api.drawSegment(A, Cpt, api.pal.purple, 2, true);
+          api.drawSegment(S, Cpt, api.pal.purple, 2.4);
+        }
+
+        api.drawPoint(A, api.pal.ink, 'A', 4);
+        api.drawPoint(B, api.pal.ink, 'B', 4);
+        api.drawPoint(Cpt, api.pal.ink, 'C', 4);
+        api.drawPoint(D, api.pal.ink, 'D', 4);
+        api.drawPoint(S, api.pal.accent, 'S', 5);
+
+        var dihedralDeg = (Math.atan2(h, AK) * 180) / Math.PI;
+        var angSCDeg = (Math.atan2(h, Math.hypot(a, b)) * 180) / Math.PI;
+        document.getElementById('outPyrAK').textContent = C.formatNum(AK, 3);
+        document.getElementById('outPyrDihedral').textContent = C.formatNum(dihedralDeg, 2) + '°';
+        document.getElementById('outPyrDist').textContent = C.formatNum(AH, 4) + ' (tô TLN: ' + C.formatNum(AH, 2) + ')';
+        document.getElementById('outPyrAngSC').textContent = C.formatNum(angSCDeg, 2) + '°';
+      });
+
+      [pyrA, pyrB].forEach(function (el) {
+        el.addEventListener('input', function () { pyrExactH = null; pyrEngine.render(); });
+      });
+      pyrH.addEventListener('input', function () { pyrExactH = null; pyrEngine.render(); });
+      [chkDihedral, chkDist, chkAngSC].forEach(function (el) {
+        el.addEventListener('change', pyrEngine.render);
+      });
+
+      document.getElementById('btnPyrTLN6').addEventListener('click', function () {
+        pyrA.value = '2'; pyrB.value = '2';
+        pyrExactH = 2 * Math.sqrt(3);
+        pyrH.value = pyrExactH.toFixed(2);
+        pyrEngine.render();
+      });
+      document.getElementById('btnPyrRect').addEventListener('click', function () {
+        pyrA.value = '3'; pyrB.value = '2'; pyrExactH = 3; pyrH.value = '3';
+        pyrEngine.render();
+      });
+      document.getElementById('btnPyrReset').addEventListener('click', function () {
+        pyrEngine.setView(0.78, 0.34, 1);
+      });
+
+      vecEngine.render();
+    })();
+  </script>
+</body>
+</html>

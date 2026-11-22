@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng 2: Phòng Lab Tối ưu Mô hình hóa — Toán THPTQG 2026</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        <a class="btn btn-sm" href="../index.html">← Dashboard</a>
+        <h1>Phòng 2: Phòng Lab Tối ưu Mô hình hóa (C1-MHH2.2)</h1>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-accent">Chủ đề 1 • TLN C1</span>
+        <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="tab-bar" style="margin-bottom: 20px;">
+      <button type="button" class="tab-btn active" data-tab="hop">Mô hình 1: Gấp hộp không nắp (Thể tích Max)</button>
+      <button type="button" class="tab-btn" data-tab="vuon">Mô hình 2: Rào khu vườn giáp sông (Chi phí Min)</button>
+    </div>
+
+    <!-- MÔ HÌNH 1 -->
+    <section id="tab-hop">
+      <div class="lab-layout">
+        <div class="card">
+          <h3>Gấp hộp không nắp từ tấm bìa vuông</h3>
+          <p class="muted" style="margin-top: 6px;">Cắt 4 góc vuông cạnh <span class="m">x</span> từ tấm bìa vuông cạnh <span class="m">a</span> rồi gập thành hộp không nắp. Kéo thanh trượt xem hình và đồ thị <span class="m">V(x)</span>.</p>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="boxA">Cạnh tấm bìa <span class="m">a</span> (cm)</label>
+              <span class="slider-val" id="valBoxA">18</span>
+            </div>
+            <input type="range" id="boxA" min="12" max="30" step="1" value="18">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="boxX">Cạnh góc cắt <span class="m">x</span> (cm)</label>
+              <span class="slider-val" id="valBoxX">3,0</span>
+            </div>
+            <input type="range" id="boxX" min="0.2" max="8.8" step="0.1" value="3">
+          </div>
+
+          <div class="tag-row" style="margin-top: 6px;">
+            <button type="button" class="btn btn-sm btn-primary" id="btnSnapBoxOpt">Đặt x tối ưu (TLN C1: a=18, x=3)</button>
+          </div>
+
+          <div class="solution-box" style="margin-top: 16px;">
+            <h4>5 bước Mô hình hóa trực tiếp</h4>
+            <ol class="step-list" id="boxMhhSteps"></ol>
+          </div>
+        </div>
+
+        <div class="canvas-panel">
+          <div class="dual-canvas">
+            <div class="canvas-box canvas-box-sm">
+              <canvas id="boxGeoCanvas" class="math-canvas" aria-label="Mô hình tấm bìa và hộp"></canvas>
+            </div>
+            <div class="canvas-box canvas-box-sm">
+              <canvas id="boxPlotCanvas" class="math-canvas" aria-label="Đồ thị thể tích V(x)"></canvas>
+            </div>
+          </div>
+
+          <div class="readout-grid">
+            <div class="readout-item">
+              <div class="r-label">Đáy hộp (a − 2x)</div>
+              <div class="r-val" id="outBoxBase">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Thể tích hiện tại V(x)</div>
+              <div class="r-val" id="outBoxVol">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Điểm đạt GTLN x* = a/6</div>
+              <div class="r-val" id="outBoxXOpt">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Thể tích tối đa V_max</div>
+              <div class="r-val" id="outBoxVMax">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÔ HÌNH 2 -->
+    <section id="tab-vuon" style="display: none;">
+      <div class="lab-layout">
+        <div class="card">
+          <h3>Rào khu vườn chữ nhật giáp bờ sông</h3>
+          <p class="muted" style="margin-top: 6px;">Diện tích cố định <span class="m">S</span> (m²), mặt giáp sông không cần rào. Hai cạnh bên vuông góc sông dài <span class="m">x</span> (m), cạnh song song sông dài <span class="m">y = S/x</span>.</p>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="gardenS">Diện tích cố định <span class="m">S</span> (m²)</label>
+              <span class="slider-val" id="valGardenS">200</span>
+            </div>
+            <input type="range" id="gardenS" min="80" max="450" step="10" value="200">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="gardenC1">Đơn giá mặt đối diện sông (nghìn/m)</label>
+              <span class="slider-val" id="valGardenC1">100</span>
+            </div>
+            <input type="range" id="gardenC1" min="50" max="200" step="10" value="100">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="gardenC2">Đơn giá 2 mặt bên (nghìn/m)</label>
+              <span class="slider-val" id="valGardenC2">100</span>
+            </div>
+            <input type="range" id="gardenC2" min="50" max="200" step="10" value="100">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="gardenX">Chiều dài cạnh bên <span class="m">x</span> (m)</label>
+              <span class="slider-val" id="valGardenX">10,0</span>
+            </div>
+            <input type="range" id="gardenX" min="2" max="35" step="0.5" value="10">
+          </div>
+
+          <div class="tag-row" style="margin-top: 6px;">
+            <button type="button" class="btn btn-sm btn-primary" id="btnSnapGardenOpt">Đặt x tối ưu chi phí</button>
+          </div>
+
+          <div class="solution-box" style="margin-top: 16px;">
+            <h4>5 bước Mô hình hóa trực tiếp</h4>
+            <ol class="step-list" id="gardenMhhSteps"></ol>
+          </div>
+        </div>
+
+        <div class="canvas-panel">
+          <div class="dual-canvas">
+            <div class="canvas-box canvas-box-sm">
+              <canvas id="gardenGeoCanvas" class="math-canvas" aria-label="Mặt bằng khu vườn"></canvas>
+            </div>
+            <div class="canvas-box canvas-box-sm">
+              <canvas id="gardenPlotCanvas" class="math-canvas" aria-label="Đồ thị chi phí C(x)"></canvas>
+            </div>
+          </div>
+
+          <div class="readout-grid">
+            <div class="readout-item">
+              <div class="r-label">Cạnh song song sông y = S/x</div>
+              <div class="r-val" id="outGardenY">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Tổng chi phí C(x)</div>
+              <div class="r-val" id="outGardenCost">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Điểm đạt GTNN x*</div>
+              <div class="r-val" id="outGardenXOpt">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Chi phí tối thiểu C_min</div>
+              <div class="r-val" id="outGardenCMin">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/common.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var C = window.TOAN_COMMON;
+      C.initTheme();
+
+      var activeTab = 'hop';
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activeTab = btn.getAttribute('data-tab');
+          tabBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
+          document.getElementById('tab-hop').style.display = activeTab === 'hop' ? 'block' : 'none';
+          document.getElementById('tab-vuon').style.display = activeTab === 'vuon' ? 'block' : 'none';
+          renderActive();
+        });
+      });
+
+      /* --- TAB 1: GẤP HỘP --- */
+      var boxA = document.getElementById('boxA');
+      var boxX = document.getElementById('boxX');
+      var boxGeoCanvas = document.getElementById('boxGeoCanvas');
+      var boxPlotCanvas = document.getElementById('boxPlotCanvas');
+      var boxPlot = C.createPlot2D(boxPlotCanvas, { xMin: 0, xMax: 10, yMin: 0, yMax: 550, xStep: 1, yStep: 100, xLabel: 'x (cm)', yLabel: 'V' });
+
+      function renderBox() {
+        var a = Number(boxA.value);
+        var maxAllow = Number((a / 2 - 0.2).toFixed(1));
+        boxX.max = String(maxAllow);
+        if (Number(boxX.value) > maxAllow) boxX.value = String(maxAllow);
+        var x = Number(boxX.value);
+
+        document.getElementById('valBoxA').textContent = String(a);
+        document.getElementById('valBoxX').textContent = C.formatNum(x, 1);
+
+        var base = a - 2 * x;
+        var vol = x * base * base;
+        var xOpt = a / 6;
+        var vMax = (2 * a * a * a) / 27;
+
+        document.getElementById('outBoxBase').textContent = C.formatNum(base, 2) + ' cm';
+        document.getElementById('outBoxVol').textContent = C.formatNum(vol, 2) + ' cm³';
+        document.getElementById('outBoxXOpt').textContent = C.formatNum(xOpt, 2) + ' cm';
+        document.getElementById('outBoxVMax').textContent = C.formatNum(vMax, 2) + ' cm³';
+
+        document.getElementById('boxMhhSteps').innerHTML =
+          '<li><strong>Đọc đề:</strong> Tấm bìa vuông cạnh ' + a + ' cm, cắt 4 góc vuông cạnh x.</li>' +
+          '<li><strong>Đặt ẩn &amp; ĐK:</strong> 0 &lt; x &lt; ' + C.formatNum(a / 2, 1) + ' (cm).</li>' +
+          '<li><strong>Lập hàm:</strong> V(x) = x(' + a + ' − 2x)² = 4x³ − ' + (4 * a) + 'x² + ' + (a * a) + 'x.</li>' +
+          "<li><strong>Giải toán:</strong> V'(x) = 12x² − " + (8 * a) + 'x + ' + (a * a) + ' = 0 ⇒ x* = ' + C.formatNum(xOpt, 2) + ' cm (nhận).</li>' +
+          '<li><strong>Đối chiếu:</strong> V_max = ' + C.formatNum(vMax, 2) + ' cm³; tại x = ' + C.formatNum(x, 1) + ' cm thì V = ' + C.formatNum(vol, 2) + ' cm³.</li>';
+
+        // Vẽ hình học tấm bìa + hộp
+        var info = C.setupCanvas(boxGeoCanvas);
+        var ctx = info.ctx, w = info.width, h = info.height;
+        var pal = C.getCanvasPalette();
+        ctx.fillStyle = pal.bg;
+        ctx.fillRect(0, 0, w, h);
+
+        // Vẽ tấm bìa ở nửa trái
+        var leftZone = w * 0.52;
+        var sqSize = Math.min(leftZone - 48, h - 68);
+        var sx = 24;
+        var sy = (h - sqSize) / 2 + 8;
+        var pxX = (x / a) * sqSize;
+
+        ctx.fillStyle = pal.faceA;
+        ctx.strokeStyle = pal.accent;
+        ctx.lineWidth = 2;
+        ctx.fillRect(sx, sy, sqSize, sqSize);
+        ctx.strokeRect(sx, sy, sqSize, sqSize);
+
+        // Tô 4 góc cắt bỏ
+        ctx.fillStyle = pal.faceWarn;
+        ctx.strokeStyle = pal.err;
+        ctx.lineWidth = 1.4;
+        var corners = [
+          [sx, sy],
+          [sx + sqSize - pxX, sy],
+          [sx, sy + sqSize - pxX],
+          [sx + sqSize - pxX, sy + sqSize - pxX]
+        ];
+        corners.forEach(function (c) {
+          ctx.fillRect(c[0], c[1], pxX, pxX);
+          ctx.strokeRect(c[0], c[1], pxX, pxX);
+        });
+
+        // Đường gấp đứt nét
+        ctx.save();
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = pal.ink;
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(sx + pxX, sy + pxX, Math.max(0, sqSize - 2 * pxX), Math.max(0, sqSize - 2 * pxX));
+        ctx.restore();
+
+        ctx.fillStyle = pal.ink;
+        ctx.font = '600 12px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Tấm bìa ' + a + '×' + a + ' (cắt x = ' + C.formatNum(x, 1) + ')', sx + sqSize / 2, sy - 10);
+
+        // Vẽ hộp 3D đơn giản ở nửa phải
+        var cx = w * 0.76;
+        var cy = h * 0.62;
+        var scale3 = Math.min(w * 0.34, h * 0.45) / a;
+        var bx = base * scale3;
+        var hx = x * scale3 * 1.15;
+        var dx = bx * 0.36;
+        var dy = -bx * 0.22;
+
+        function drawQuad(pts, fill, stroke) {
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+          for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+          ctx.closePath();
+          ctx.fillStyle = fill;
+          ctx.fill();
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = 1.6;
+          ctx.stroke();
+        }
+
+        var A0 = [cx - bx / 2, cy];
+        var B0 = [cx + bx / 2, cy];
+        var C0 = [B0[0] + dx, B0[1] + dy];
+        var D0 = [A0[0] + dx, A0[1] + dy];
+        var A1 = [A0[0], A0[1] - hx];
+        var B1 = [B0[0], B0[1] - hx];
+        var C1 = [C0[0], C0[1] - hx];
+        var D1 = [D0[0], D0[1] - hx];
+
+        drawQuad([A0, D0, D1, A1], pal.faceB, pal.accent);
+        drawQuad([D0, C0, C1, D1], pal.faceB, pal.accent);
+        drawQuad([A0, B0, B1, A1], pal.faceA, pal.accent);
+        drawQuad([B0, C0, C1, B1], pal.faceA, pal.accent);
+
+        ctx.fillStyle = pal.ink;
+        ctx.font = '600 12px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Hộp không nắp V = ' + C.formatNum(vol, 1) + ' cm³', cx + dx * 0.3, sy - 10);
+
+        // Đồ thị V(x)
+        var yTop = Math.ceil((vMax * 1.2) / 100) * 100;
+        var ySt = Math.max(50, Math.round(yTop / 5 / 50) * 50);
+        var g = boxPlot.begin({
+          xMin: -0.3,
+          xMax: a / 2 + 0.5,
+          yMin: -yTop * 0.08,
+          yMax: yTop,
+          xStep: a > 22 ? 2 : 1,
+          yStep: ySt
+        });
+        g.plotFunction(function (t) {
+          if (t < 0 || t > a / 2) return null;
+          return t * (a - 2 * t) * (a - 2 * t);
+        }, { color: g.pal.accent, width: 2.8 });
+        g.drawPoint(xOpt, vMax, g.pal.ok, 'Max (' + C.formatNum(xOpt, 2) + '; ' + C.formatNum(vMax, 1) + ')', 5.5);
+        g.drawPoint(x, vol, g.pal.err, 'Hiện tại', 5.5);
+        g.end();
+      }
+
+      /* --- TAB 2: RÀO VƯỜN --- */
+      var gS = document.getElementById('gardenS');
+      var gC1 = document.getElementById('gardenC1');
+      var gC2 = document.getElementById('gardenC2');
+      var gX = document.getElementById('gardenX');
+      var gardenGeoCanvas = document.getElementById('gardenGeoCanvas');
+      var gardenPlotCanvas = document.getElementById('gardenPlotCanvas');
+      var gardenPlot = C.createPlot2D(gardenPlotCanvas, { xMin: 0, xMax: 36, yMin: 0, yMax: 10000, xStep: 5, yStep: 2000, xLabel: 'x (m)', yLabel: 'C' });
+
+      function renderGarden() {
+        var S = Number(gS.value);
+        var c1 = Number(gC1.value);
+        var c2 = Number(gC2.value);
+        var x = Number(gX.value);
+
+        document.getElementById('valGardenS').textContent = String(S);
+        document.getElementById('valGardenC1').textContent = String(c1);
+        document.getElementById('valGardenC2').textContent = String(c2);
+        document.getElementById('valGardenX').textContent = C.formatNum(x, 1);
+
+        var y = S / x;
+        var cost = 2 * c2 * x + c1 * y;
+        var xOpt = Math.sqrt((c1 * S) / (2 * c2));
+        var cMin = 2 * c2 * xOpt + (c1 * S) / xOpt;
+
+        document.getElementById('outGardenY').textContent = C.formatNum(y, 2) + ' m';
+        document.getElementById('outGardenCost').textContent = C.formatNum(cost, 1) + ' nghìn đ';
+        document.getElementById('outGardenXOpt').textContent = C.formatNum(xOpt, 2) + ' m';
+        document.getElementById('outGardenCMin').textContent = C.formatNum(cMin, 1) + ' nghìn đ';
+
+        document.getElementById('gardenMhhSteps').innerHTML =
+          '<li><strong>Đọc đề:</strong> Diện tích S = ' + S + ' m², giá mặt đối diện sông ' + c1 + 'k/m, hai mặt bên ' + c2 + 'k/m.</li>' +
+          '<li><strong>Đặt ẩn &amp; ĐK:</strong> Cạnh bên x &gt; 0 (m) ⇒ cạnh song song sông y = ' + S + '/x (m).</li>' +
+          '<li><strong>Lập hàm:</strong> C(x) = ' + (2 * c2) + 'x + ' + (c1 * S) + '/x (nghìn đồng).</li>' +
+          "<li><strong>Giải toán:</strong> C'(x) = " + (2 * c2) + ' − ' + (c1 * S) + '/x² = 0 ⇒ x* = ' + C.formatNum(xOpt, 2) + ' m.</li>' +
+          '<li><strong>Đối chiếu:</strong> C_min = ' + C.formatNum(cMin, 1) + ' nghìn đ; tại x = ' + C.formatNum(x, 1) + ' m thì C = ' + C.formatNum(cost, 1) + ' nghìn đ.</li>';
+
+        // Vẽ mặt bằng khu vườn
+        var info = C.setupCanvas(gardenGeoCanvas);
+        var ctx = info.ctx, w = info.width, h = info.height;
+        var pal = C.getCanvasPalette();
+        ctx.fillStyle = pal.bg;
+        ctx.fillRect(0, 0, w, h);
+
+        // Bờ sông ở trên
+        ctx.fillStyle = pal.faceA;
+        ctx.fillRect(0, 0, w, 54);
+        ctx.strokeStyle = pal.accent;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 54);
+        ctx.lineTo(w, 54);
+        ctx.stroke();
+        ctx.fillStyle = pal.accent;
+        ctx.font = '600 13px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('BỜ SÔNG (Không cần rào mặt này)', w / 2, 32);
+
+        var maxW = w - 80;
+        var maxH = h - 110;
+        var scale = Math.min(maxW / Math.max(y, 12), maxH / Math.max(x, 12));
+        var rw = Math.max(38, Math.min(maxW, y * scale));
+        var rh = Math.max(38, Math.min(maxH, x * scale));
+        var rx = (w - rw) / 2;
+        var ry = 54;
+
+        ctx.fillStyle = pal.faceB;
+        ctx.fillRect(rx, ry, rw, rh);
+
+        // 3 cạnh hàng rào
+        ctx.strokeStyle = pal.secondary;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(rx, ry);
+        ctx.lineTo(rx, ry + rh);
+        ctx.lineTo(rx + rw, ry + rh);
+        ctx.lineTo(rx + rw, ry);
+        ctx.stroke();
+
+        ctx.fillStyle = pal.ink;
+        ctx.font = '600 12px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('y = ' + C.formatNum(y, 1) + ' m (' + c1 + 'k/m)', w / 2, ry + rh + 20);
+        ctx.fillText('S = ' + S + ' m²', w / 2, ry + rh / 2 + 4);
+        ctx.textAlign = 'right';
+        ctx.fillText('x = ' + C.formatNum(x, 1) + ' m', rx - 8, ry + rh / 2 + 4);
+
+        // Đồ thị C(x)
+        var yTop = Math.ceil((cMin * 2.4) / 1000) * 1000;
+        var g = gardenPlot.begin({
+          xMin: -1,
+          xMax: 36,
+          yMin: -yTop * 0.06,
+          yMax: yTop,
+          xStep: 5,
+          yStep: Math.max(1000, Math.round(yTop / 5 / 500) * 500)
+        });
+        g.drawObliqueLine(2 * c2, 0, g.pal.ok, 'TCX y = ' + (2 * c2) + 'x');
+        g.plotFunction(function (t) {
+          return t <= 0.4 ? null : 2 * c2 * t + (c1 * S) / t;
+        }, { color: g.pal.accent, width: 2.8 });
+        g.drawPoint(xOpt, cMin, g.pal.ok, 'Min (' + C.formatNum(xOpt, 1) + '; ' + C.formatNum(cMin, 0) + ')', 5.5);
+        g.drawPoint(x, cost, g.pal.err, 'Hiện tại', 5.5);
+        g.end();
+      }
+
+      function renderActive() {
+        if (activeTab === 'hop') renderBox();
+        else renderGarden();
+      }
+
+      [boxA, boxX].forEach(function (el) { el.addEventListener('input', renderBox); });
+      [gS, gC1, gC2, gX].forEach(function (el) { el.addEventListener('input', renderGarden); });
+
+      document.getElementById('btnSnapBoxOpt').addEventListener('click', function () {
+        boxA.value = '18';
+        boxX.max = '8.8';
+        boxX.value = '3';
+        renderBox();
+      });
+
+      document.getElementById('btnSnapGardenOpt').addEventListener('click', function () {
+        var S = Number(gS.value), c1 = Number(gC1.value), c2 = Number(gC2.value);
+        var xOpt = Math.sqrt((c1 * S) / (2 * c2));
+        gX.value = String(Math.min(35, Math.max(2, Math.round(xOpt * 2) / 2)));
+        renderGarden();
+      });
+
+      window.addEventListener('toan:themechange', renderActive);
+      if (typeof ResizeObserver !== 'undefined') {
+        [boxGeoCanvas, boxPlotCanvas, gardenGeoCanvas, gardenPlotCanvas].forEach(function (cv) {
+          new ResizeObserver(renderActive).observe(cv);
+        });
+      } else {
+        window.addEventListener('resize', renderActive);
+      }
+      renderActive();
+    })();
+  </script>
+</body>
+</html>

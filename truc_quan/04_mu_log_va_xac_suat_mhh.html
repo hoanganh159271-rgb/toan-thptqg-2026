@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng 4: Mũ–Logarit &amp; Xác suất Mô hình hóa — Toán THPTQG 2026</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        <a class="btn btn-sm" href="../index.html">← Dashboard</a>
+        <h1>Phòng 4: Mũ–Logarit &amp; Xác suất Thực nghiệm</h1>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-accent">Chủ đề 2 &amp; 3 • ĐS C3, ĐS C4, TLN C3</span>
+        <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="tab-bar" style="margin-bottom: 20px;">
+      <button type="button" class="tab-btn active" data-tab="mulog">Tab 1: Mô hình Mũ &amp; Logarit thực tế</button>
+      <button type="button" class="tab-btn" data-tab="xacsuat">Tab 2: Mô phỏng Xác suất Thực nghiệm vs Lý thuyết</button>
+    </div>
+
+    <!-- TAB 1: MŨ LOG -->
+    <section id="tab-mulog">
+      <div class="lab-layout">
+        <div class="card">
+          <h3>Chọn mô hình Mũ – Logarit</h3>
+          <div class="slider-group">
+            <label for="mlModel">Bài toán thực tế</label>
+            <select id="mlModel">
+              <option value="bacteria">Tăng trưởng vi khuẩn N(t) = N₀·e^(rt) (Mẫu ĐS C3)</option>
+              <option value="interest">Lãi kép A(t) = P(1 + r/k)^(kt) so với Lãi đơn</option>
+              <option value="ph">Độ pH dung dịch pH = −log₁₀[H⁺]</option>
+            </select>
+          </div>
+
+          <div id="ctrl-bacteria">
+            <div class="slider-group">
+              <div class="slider-head"><label for="bacN0">Ban đầu N₀ (nghìn con / 1000)</label><span class="slider-val" id="vBacN0">500</span></div>
+              <input type="range" id="bacN0" min="100" max="1000" step="50" value="500">
+            </div>
+            <div class="slider-group">
+              <div class="slider-head"><label for="bacR">Tốc độ tăng trưởng r (giờ⁻¹)</label><span class="slider-val" id="vBacR">0,693 (ln 2)</span></div>
+              <input type="range" id="bacR" min="0.2" max="1.1" step="0.001" value="0.693">
+            </div>
+            <div class="slider-group">
+              <div class="slider-head"><label for="bacTarget">Ngưỡng mục tiêu (nghìn con)</label><span class="slider-val" id="vBacTarget">100</span></div>
+              <input type="range" id="bacTarget" min="20" max="200" step="10" value="100">
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" id="btnBacDSC3">Đặt mẫu ĐS C3 (N₀=500, r=ln2)</button>
+          </div>
+
+          <div id="ctrl-interest" style="display: none;">
+            <div class="slider-group">
+              <div class="slider-head"><label for="intP">Vốn gốc P (triệu đồng)</label><span class="slider-val" id="vIntP">100</span></div>
+              <input type="range" id="intP" min="20" max="500" step="10" value="100">
+            </div>
+            <div class="slider-group">
+              <div class="slider-head"><label for="intR">Lãi suất năm r (%)</label><span class="slider-val" id="vIntR">8%</span></div>
+              <input type="range" id="intR" min="3" max="15" step="0.5" value="8">
+            </div>
+            <div class="slider-group">
+              <label for="intK">Kỳ ghép lãi mỗi năm</label>
+              <select id="intK">
+                <option value="1">1 lần / năm (k = 1)</option>
+                <option value="4" selected>Theo quý (k = 4)</option>
+                <option value="12">Theo tháng (k = 12)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="ctrl-ph" style="display: none;">
+            <div class="slider-group">
+              <div class="slider-head"><label for="phVal">Giá trị pH hiện tại</label><span class="slider-val" id="vPhVal">4,5</span></div>
+              <input type="range" id="phVal" min="0" max="14" step="0.1" value="4.5">
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-panel">
+          <div class="canvas-box">
+            <canvas id="mlCanvas" class="math-canvas" aria-label="Đồ thị Mũ và Logarit"></canvas>
+          </div>
+          <div class="readout-grid">
+            <div class="readout-item">
+              <div class="r-label">Công thức mô hình</div>
+              <div class="r-val" id="outMlFormula">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Kết quả mốc chính</div>
+              <div class="r-val" id="outMlMain">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Ngưỡng / Đối chiếu</div>
+              <div class="r-val" id="outMlThresh">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: XÁC SUẤT -->
+    <section id="tab-xacsuat" style="display: none;">
+      <div class="lab-layout">
+        <div class="card">
+          <h3>Mô phỏng Xác suất Thực nghiệm vs Lý thuyết</h3>
+          <div class="slider-group">
+            <label for="probModel">Chọn bài toán xác suất</label>
+            <select id="probModel">
+              <option value="bayes">Xưởng 2 dây chuyền &amp; Công thức Bayes (Mẫu TLN C3)</option>
+              <option value="cards">Rút 2 thẻ từ 1..10 &amp; Luật số lớn (Mẫu ĐS C4)</option>
+            </select>
+          </div>
+
+          <div id="ctrl-bayes">
+            <div class="slider-group">
+              <div class="slider-head"><label for="bP1">Tỉ lệ dây chuyền I: P(A₁)</label><span class="slider-val" id="vBP1">70%</span></div>
+              <input type="range" id="bP1" min="20" max="90" step="5" value="70">
+            </div>
+            <div class="slider-group">
+              <div class="slider-head"><label for="bE1">Tỉ lệ phế phẩm I: P(B|A₁)</label><span class="slider-val" id="vBE1">2%</span></div>
+              <input type="range" id="bE1" min="1" max="10" step="0.5" value="2">
+            </div>
+            <div class="slider-group">
+              <div class="slider-head"><label for="bE2">Tỉ lệ phế phẩm II: P(B|A₂)</label><span class="slider-val" id="vBE2">4%</span></div>
+              <input type="range" id="bE2" min="1" max="15" step="0.5" value="4">
+            </div>
+          </div>
+
+          <div class="tag-row" style="margin-top: 12px;">
+            <button type="button" class="btn btn-sm btn-primary" id="btnSim100">Chạy +100 phép thử</button>
+            <button type="button" class="btn btn-sm btn-primary" id="btnSim1000">Chạy +1.000 phép thử</button>
+            <button type="button" class="btn btn-sm btn-primary" id="btnSim10000">Chạy +10.000 phép thử</button>
+            <button type="button" class="btn btn-sm" id="btnSimReset">Đặt lại (0)</button>
+          </div>
+
+          <div class="notice" style="margin-top: 14px;" id="probTheorySummary">—</div>
+        </div>
+
+        <div class="canvas-panel">
+          <div class="dual-canvas">
+            <div class="canvas-box canvas-box-sm">
+              <canvas id="probTreeCanvas" class="math-canvas" aria-label="Sơ đồ cây xác suất"></canvas>
+            </div>
+            <div class="canvas-box canvas-box-sm">
+              <canvas id="probChartCanvas" class="math-canvas" aria-label="So sánh thực nghiệm và lý thuyết"></canvas>
+            </div>
+          </div>
+          <div class="readout-grid">
+            <div class="readout-item">
+              <div class="r-label">Tổng số phép thử N</div>
+              <div class="r-val" id="outProbN">0</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Lý thuyết</div>
+              <div class="r-val" id="outProbTheory">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Thực nghiệm (tần suất)</div>
+              <div class="r-val" id="outProbEmp">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/common.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var C = window.TOAN_COMMON;
+      C.initTheme();
+
+      var activeTab = 'mulog';
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activeTab = btn.getAttribute('data-tab');
+          tabBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
+          document.getElementById('tab-mulog').style.display = activeTab === 'mulog' ? 'block' : 'none';
+          document.getElementById('tab-xacsuat').style.display = activeTab === 'xacsuat' ? 'block' : 'none';
+          renderActive();
+        });
+      });
+
+      /* --- TAB 1: MŨ LOG --- */
+      var mlModel = document.getElementById('mlModel');
+      var bacN0 = document.getElementById('bacN0'), bacR = document.getElementById('bacR'), bacTarget = document.getElementById('bacTarget');
+      var intP = document.getElementById('intP'), intR = document.getElementById('intR'), intK = document.getElementById('intK');
+      var phVal = document.getElementById('phVal');
+      var mlCanvas = document.getElementById('mlCanvas');
+      var mlPlot = C.createPlot2D(mlCanvas, { xMin: 0, xMax: 10, yMin: 0, yMax: 150, xStep: 1, yStep: 30 });
+
+      function renderMuLog() {
+        var mode = mlModel.value;
+        document.getElementById('ctrl-bacteria').style.display = mode === 'bacteria' ? 'block' : 'none';
+        document.getElementById('ctrl-interest').style.display = mode === 'interest' ? 'block' : 'none';
+        document.getElementById('ctrl-ph').style.display = mode === 'ph' ? 'block' : 'none';
+
+        if (mode === 'bacteria') {
+          var N0 = Number(bacN0.value);
+          var r = Number(bacR.value);
+          var targetK = Number(bacTarget.value); // nghìn con
+          document.getElementById('vBacN0').textContent = String(N0);
+          document.getElementById('vBacR').textContent = C.formatNum(r, 3) + (Math.abs(r - Math.LN2) < 0.002 ? ' (≈ ln 2)' : '');
+          document.getElementById('vBacTarget').textContent = String(targetK) + ' nghìn';
+
+          var tExact = Math.log((targetK * 1000) / N0) / r;
+          var tInt = Math.max(0, Math.ceil(tExact));
+          var n5 = N0 * Math.exp(r * 5);
+          var yMaxPlot = Math.max(targetK * 1.45, (N0 * Math.exp(r * 8)) / 1000 * 1.1);
+          yMaxPlot = Math.min(300, Math.max(80, Math.ceil(yMaxPlot / 20) * 20));
+
+          var g = mlPlot.begin({ xMin: -0.4, xMax: 9.5, yMin: -5, yMax: yMaxPlot, xStep: 1, yStep: Math.max(20, Math.round(yMaxPlot / 5 / 10) * 10), xLabel: 't (giờ)', yLabel: 'N (nghìn)' });
+          g.plotFunction(function (t) { return t < 0 ? null : (N0 * Math.exp(r * t)) / 1000; }, { color: g.pal.accent, width: 2.8 });
+          g.drawHorizontalLine(targetK, g.pal.secondary, 'Ngưỡng ' + targetK + ' nghìn', false);
+          if (tExact >= 0 && tExact <= 9.5) {
+            g.drawPoint(tExact, targetK, g.pal.err, 't* = ' + C.formatNum(tExact, 2) + 'h', 5.5);
+          }
+          if (tInt <= 9.5) {
+            g.drawPoint(tInt, (N0 * Math.exp(r * tInt)) / 1000, g.pal.ok, 't = ' + tInt + 'h', 5);
+          }
+          g.end();
+
+          document.getElementById('outMlFormula').textContent = 'N(t) = ' + N0 + '·e^(' + C.formatNum(r, 3) + 't)';
+          document.getElementById('outMlMain').textContent = 'Sau 5 giờ: ' + Math.round(n5).toLocaleString('vi-VN') + ' con';
+          document.getElementById('outMlThresh').textContent = 'Vượt ' + (targetK * 1000).toLocaleString('vi-VN') + ': t > ' + C.formatNum(tExact, 2) + 'h ⇒ ít nhất ' + tInt + ' giờ nguyên';
+        } else if (mode === 'interest') {
+          var P = Number(intP.value);
+          var rPct = Number(intR.value) / 100;
+          var k = Number(intK.value);
+          document.getElementById('vIntP').textContent = String(P) + ' tr';
+          document.getElementById('vIntR').textContent = C.formatNum(Number(intR.value), 1) + '%';
+
+          var maxA = P * Math.pow(1 + rPct / k, k * 20);
+          var yTop = Math.ceil((maxA * 1.15) / 50) * 50;
+          var g2 = mlPlot.begin({ xMin: -0.5, xMax: 20, yMin: 0, yMax: yTop, xStep: 2, yStep: Math.max(50, Math.round(yTop / 5 / 50) * 50), xLabel: 'năm', yLabel: 'triệu đ' });
+          g2.plotFunction(function (t) { return t < 0 ? null : P * Math.pow(1 + rPct / k, k * t); }, { color: g2.pal.accent, width: 2.8 });
+          g2.plotFunction(function (t) { return t < 0 ? null : P * (1 + rPct * t); }, { color: g2.pal.secondary, width: 2.2, dashed: true });
+          g2.drawPoint(10, P * Math.pow(1 + rPct / k, k * 10), g2.pal.ok, '10 năm', 5);
+          g2.end();
+
+          var a10 = P * Math.pow(1 + rPct / k, k * 10);
+          var s10 = P * (1 + rPct * 10);
+          document.getElementById('outMlFormula').textContent = 'A(t) = ' + P + '·(1 + ' + C.formatNum(rPct, 3) + '/' + k + ')^(' + k + 't)';
+          document.getElementById('outMlMain').textContent = 'Sau 10 năm: Kép = ' + C.formatNum(a10, 2) + ' tr | Đơn = ' + C.formatNum(s10, 2) + ' tr';
+          document.getElementById('outMlThresh').textContent = 'Chênh lệch lãi kép: +' + C.formatNum(a10 - s10, 2) + ' triệu đ';
+        } else {
+          var ph = Number(phVal.value);
+          document.getElementById('vPhVal').textContent = C.formatNum(ph, 1);
+          var g3 = mlPlot.begin({ xMin: -1, xMax: 15, yMin: -1, yMax: 15, xStep: 2, yStep: 2, xLabel: 'p = -log10[H+]', yLabel: 'pH' });
+          g3.plotFunction(function (p) { return p < 0 || p > 14 ? null : p; }, { color: g3.pal.accent, width: 2.8 });
+          g3.drawVerticalLine(7, g3.pal.ok, 'Trung tính pH = 7');
+          g3.drawPoint(ph, ph, g3.pal.err, 'pH = ' + C.formatNum(ph, 1), 6);
+          g3.end();
+
+          var env = ph < 6.95 ? 'Môi trường Axit' : (ph > 7.05 ? 'Môi trường Bazơ (Kiềm)' : 'Trung tính');
+          document.getElementById('outMlFormula').textContent = 'pH = −log₁₀[H⁺] ⇔ [H⁺] = 10^(−pH)';
+          document.getElementById('outMlMain').textContent = '[H⁺] = 10^(−' + C.formatNum(ph, 1) + ') mol/L';
+          document.getElementById('outMlThresh').textContent = env;
+        }
+      }
+
+      /* --- TAB 2: XÁC SUẤT --- */
+      var probModel = document.getElementById('probModel');
+      var bP1 = document.getElementById('bP1'), bE1 = document.getElementById('bE1'), bE2 = document.getElementById('bE2');
+      var probTreeCanvas = document.getElementById('probTreeCanvas');
+      var probChartCanvas = document.getElementById('probChartCanvas');
+
+      var sim = { n: 0, bCount: 0, a2bCount: 0, cardsB: 0, cardsC: 0, cardsBC: 0, history: [] };
+
+      function resetSim() {
+        sim = { n: 0, bCount: 0, a2bCount: 0, cardsB: 0, cardsC: 0, cardsBC: 0, history: [] };
+        renderProb();
+      }
+
+      function runSim(count) {
+        var mode = probModel.value;
+        var p1 = Number(bP1.value) / 100;
+        var e1 = Number(bE1.value) / 100;
+        var e2 = Number(bE2.value) / 100;
+        for (var i = 0; i < count; i++) {
+          sim.n += 1;
+          if (mode === 'bayes') {
+            var isA1 = Math.random() < p1;
+            var isB = Math.random() < (isA1 ? e1 : e2);
+            if (isB) {
+              sim.bCount += 1;
+              if (!isA1) sim.a2bCount += 1;
+            }
+          } else {
+            var x = 1 + Math.floor(Math.random() * 10);
+            var y = 1 + Math.floor(Math.random() * 9);
+            if (y >= x) y += 1;
+            var sumEven = ((x + y) % 2) === 0;
+            var prodEven = ((x * y) % 2) === 0;
+            if (sumEven) sim.cardsB += 1;
+            if (prodEven) {
+              sim.cardsC += 1;
+              if (sumEven) sim.cardsBC += 1;
+            }
+            if (sim.n <= 200 || sim.n % Math.max(1, Math.floor(sim.n / 80)) === 0) {
+              sim.history.push({ n: sim.n, fB: sim.cardsB / sim.n });
+            }
+          }
+        }
+        renderProb();
+      }
+
+      function renderProb() {
+        var mode = probModel.value;
+        document.getElementById('ctrl-bayes').style.display = mode === 'bayes' ? 'block' : 'none';
+        var p1 = Number(bP1.value) / 100;
+        var p2 = 1 - p1;
+        var e1 = Number(bE1.value) / 100;
+        var e2 = Number(bE2.value) / 100;
+
+        document.getElementById('vBP1').textContent = bP1.value + '%';
+        document.getElementById('vBE1').textContent = C.formatNum(Number(bE1.value), 1) + '%';
+        document.getElementById('vBE2').textContent = C.formatNum(Number(bE2.value), 1) + '%';
+        document.getElementById('outProbN').textContent = sim.n.toLocaleString('vi-VN');
+
+        var tInfo = C.setupCanvas(probTreeCanvas);
+        var tCtx = tInfo.ctx, tw = tInfo.width, th = tInfo.height;
+        var pal = C.getCanvasPalette();
+        tCtx.fillStyle = pal.bg;
+        tCtx.fillRect(0, 0, tw, th);
+
+        var cInfo = C.setupCanvas(probChartCanvas);
+        var cCtx = cInfo.ctx, cw = cInfo.width, ch = cInfo.height;
+        cCtx.fillStyle = pal.bg;
+        cCtx.fillRect(0, 0, cw, ch);
+
+        if (mode === 'bayes') {
+          var pB = p1 * e1 + p2 * e2;
+          var pA2B = (p2 * e2) / pB;
+
+          document.getElementById('probTheorySummary').innerHTML =
+            '<strong>Công thức Bayes:</strong> P(B) = ' + C.formatNum(pB, 4) + ' | P(A₂|B) = ' + C.formatNum(pA2B, 4) +
+            ' (mẫu mặc định 70% / 2% / 4% cho P(A₂|B) = 6/13 ≈ <strong>0,46</strong>).';
+          document.getElementById('outProbTheory').textContent = 'P(B)=' + C.formatNum(pB * 100, 2) + '% | P(A₂|B)=' + C.formatNum(pA2B, 4);
+
+          if (sim.n > 0) {
+            var empB = sim.bCount / sim.n;
+            var empA2B = sim.bCount > 0 ? sim.a2bCount / sim.bCount : 0;
+            document.getElementById('outProbEmp').textContent = 'f(B)=' + C.formatNum(empB * 100, 2) + '% | f(A₂|B)=' + (sim.bCount > 0 ? C.formatNum(empA2B, 4) : 'chưa có phế phẩm');
+          } else {
+            document.getElementById('outProbEmp').textContent = 'Bấm chạy mô phỏng để đối chiếu';
+          }
+
+          // Vẽ sơ đồ cây
+          var rx = 44, ry = th / 2;
+          var mx = tw * 0.42, y1 = th * 0.28, y2 = th * 0.72;
+          var ex = tw * 0.82;
+          var ys = [th * 0.14, th * 0.38, th * 0.62, th * 0.86];
+
+          function branch(x1, yA, x2, yB, col, lbl) {
+            tCtx.strokeStyle = col;
+            tCtx.lineWidth = 2;
+            tCtx.beginPath();
+            tCtx.moveTo(x1, yA);
+            tCtx.lineTo(x2, yB);
+            tCtx.stroke();
+            tCtx.fillStyle = pal.ink;
+            tCtx.font = '600 11px "Segoe UI", sans-serif';
+            tCtx.textAlign = 'center';
+            tCtx.fillText(lbl, (x1 + x2) / 2, (yA + yB) / 2 - 6);
+          }
+
+          branch(rx, ry, mx, y1, pal.accent, 'A₁: ' + C.formatNum(p1, 2));
+          branch(rx, ry, mx, y2, pal.secondary, 'A₂: ' + C.formatNum(p2, 2));
+          branch(mx, y1, ex, ys[0], pal.err, 'B: ' + C.formatNum(e1, 3));
+          branch(mx, y1, ex, ys[1], pal.muted, 'B̄: ' + C.formatNum(1 - e1, 3));
+          branch(mx, y2, ex, ys[2], pal.err, 'B: ' + C.formatNum(e2, 3));
+          branch(mx, y2, ex, ys[3], pal.muted, 'B̄: ' + C.formatNum(1 - e2, 3));
+
+          tCtx.fillStyle = pal.ink;
+          tCtx.font = '600 11px "Cascadia Mono", monospace';
+          tCtx.textAlign = 'left';
+          tCtx.fillText(C.formatNum(p1 * e1, 4), ex + 6, ys[0] + 4);
+          tCtx.fillText(C.formatNum(p2 * e2, 4), ex + 6, ys[2] + 4);
+
+          // Biểu đồ cột so sánh
+          var empBVal = sim.n > 0 ? sim.bCount / sim.n : 0;
+          var empA2Val = sim.bCount > 0 ? sim.a2bCount / sim.bCount : 0;
+          var groups = [
+            { label: 'P(B) Toàn phần', th: pB, em: empBVal },
+            { label: 'P(A₂|B) Bayes', th: pA2B, em: empA2Val }
+          ];
+          var pad = 42, plotW = cw - pad * 2, plotH = ch - 72;
+          cCtx.strokeStyle = pal.axis;
+          cCtx.beginPath();
+          cCtx.moveTo(pad, 24);
+          cCtx.lineTo(pad, 24 + plotH);
+          cCtx.lineTo(pad + plotW, 24 + plotH);
+          cCtx.stroke();
+
+          groups.forEach(function (gr, idx) {
+            var gx = pad + (idx + 0.5) * (plotW / 2);
+            var bw = 36;
+            var hTh = gr.th * plotH;
+            var hEm = gr.em * plotH;
+            cCtx.fillStyle = pal.accent;
+            cCtx.fillRect(gx - bw - 4, 24 + plotH - hTh, bw, hTh);
+            cCtx.fillStyle = pal.secondary;
+            cCtx.fillRect(gx + 4, 24 + plotH - hEm, bw, hEm);
+
+            cCtx.fillStyle = pal.ink;
+            cCtx.font = '600 11px "Segoe UI", sans-serif';
+            cCtx.textAlign = 'center';
+            cCtx.fillText(gr.label, gx, 24 + plotH + 18);
+            cCtx.fillText(C.formatNum(gr.th, 3), gx - bw / 2 - 4, 24 + plotH - hTh - 6);
+            cCtx.fillText(sim.n > 0 ? C.formatNum(gr.em, 3) : '—', gx + bw / 2 + 4, 24 + plotH - hEm - 6);
+          });
+          cCtx.fillStyle = pal.accent; cCtx.fillRect(pad + 10, 8, 12, 12);
+          cCtx.fillStyle = pal.ink; cCtx.textAlign = 'left'; cCtx.fillText('Lý thuyết', pad + 26, 18);
+          cCtx.fillStyle = pal.secondary; cCtx.fillRect(pad + 110, 8, 12, 12);
+          cCtx.fillStyle = pal.ink; cCtx.fillText('Thực nghiệm', pad + 126, 18);
+        } else {
+          var thPB = 4 / 9;
+          var thPBC = 2 / 7;
+          document.getElementById('probTheorySummary').innerHTML =
+            '<strong>Hộp 10 thẻ (1..10), rút 2 thẻ:</strong> n(Ω)=45. P(B="tổng chẵn") = 4/9 ≈ 0,4444 | P(B|C) = 2/7 ≈ 0,2857.';
+          document.getElementById('outProbTheory').textContent = 'P(B)=0,4444 | P(B|C)=0,2857';
+          document.getElementById('outProbEmp').textContent = sim.n > 0
+            ? 'f(B)=' + C.formatNum(sim.cardsB / sim.n, 4) + ' | f(B|C)=' + (sim.cardsC > 0 ? C.formatNum(sim.cardsBC / sim.cardsC, 4) : '—')
+            : 'Bấm chạy mô phỏng';
+
+          tCtx.fillStyle = pal.ink;
+          tCtx.font = '600 13px "Segoe UI", sans-serif';
+          tCtx.fillText('Không gian mẫu & Biến cố (10 thẻ 1..10)', 16, 28);
+          tCtx.font = '13px "Segoe UI", sans-serif';
+          tCtx.fillText('• n(Ω) = C(10, 2) = 45 cặp thẻ', 16, 62);
+          tCtx.fillText('• Tổng chẵn B: 2 chẵn (C(5,2)=10) hoặc 2 lẻ (C(5,2)=10) → n(B) = 20', 16, 92);
+          tCtx.fillText('• Tích chẵn C: đối của 2 lẻ → n(C) = 45 − 10 = 35', 16, 122);
+          tCtx.fillText('• B ∩ C: cả 2 thẻ đều chẵn → n(B ∩ C) = 10 ⇒ P(B|C) = 10/35 = 2/7', 16, 152);
+
+          // Đồ thị hội tụ f_n(B) về 4/9
+          var pad2 = 42, pw = cw - pad2 * 2, ph2 = ch - 56;
+          cCtx.strokeStyle = pal.axis;
+          cCtx.beginPath();
+          cCtx.moveTo(pad2, 20);
+          cCtx.lineTo(pad2, 20 + ph2);
+          cCtx.lineTo(pad2 + pw, 20 + ph2);
+          cCtx.stroke();
+
+          var y49 = 20 + (1 - thPB) * ph2;
+          cCtx.save();
+          cCtx.setLineDash([6, 4]);
+          cCtx.strokeStyle = pal.ok;
+          cCtx.beginPath();
+          cCtx.moveTo(pad2, y49);
+          cCtx.lineTo(pad2 + pw, y49);
+          cCtx.stroke();
+          cCtx.restore();
+          cCtx.fillStyle = pal.ok;
+          cCtx.font = '600 11px "Segoe UI", sans-serif';
+          cCtx.fillText('Lý thuyết 4/9 ≈ 0,444', pad2 + 8, y49 - 6);
+
+          if (sim.history.length > 1) {
+            cCtx.strokeStyle = pal.accent;
+            cCtx.lineWidth = 2;
+            cCtx.beginPath();
+            var maxN = sim.history[sim.history.length - 1].n;
+            sim.history.forEach(function (pt, idx) {
+              var px = pad2 + (pt.n / maxN) * pw;
+              var py = 20 + (1 - pt.fB) * ph2;
+              if (idx === 0) cCtx.moveTo(px, py); else cCtx.lineTo(px, py);
+            });
+            cCtx.stroke();
+          }
+        }
+      }
+
+      function renderActive() {
+        if (activeTab === 'mulog') renderMuLog(); else renderProb();
+      }
+
+      [mlModel, bacN0, bacR, bacTarget, intP, intR, intK, phVal].forEach(function (el) {
+        el.addEventListener('input', renderMuLog);
+        el.addEventListener('change', renderMuLog);
+      });
+      document.getElementById('btnBacDSC3').addEventListener('click', function () {
+        bacN0.value = '500'; bacR.value = '0.693'; bacTarget.value = '100';
+        renderMuLog();
+      });
+
+      probModel.addEventListener('change', resetSim);
+      [bP1, bE1, bE2].forEach(function (el) { el.addEventListener('input', resetSim); });
+      document.getElementById('btnSim100').addEventListener('click', function () { runSim(100); });
+      document.getElementById('btnSim1000').addEventListener('click', function () { runSim(1000); });
+      document.getElementById('btnSim10000').addEventListener('click', function () { runSim(10000); });
+      document.getElementById('btnSimReset').addEventListener('click', resetSim);
+
+      window.addEventListener('toan:themechange', renderActive);
+      if (typeof ResizeObserver !== 'undefined') {
+        [mlCanvas, probTreeCanvas, probChartCanvas].forEach(function (cv) {
+          new ResizeObserver(renderActive).observe(cv);
+        });
+      } else {
+        window.addEventListener('resize', renderActive);
+      }
+      renderActive();
+    })();
+  </script>
+</body>
+</html>

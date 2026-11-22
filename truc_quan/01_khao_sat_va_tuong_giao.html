@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng 1: Khảo sát Hàm số & Tương giao — Toán THPTQG 2026</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        <a class="btn btn-sm" href="../index.html">← Dashboard</a>
+        <h1>Phòng 1: Khảo sát Hàm số &amp; Tương giao</h1>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-accent">Chủ đề 1 • 12 lệnh</span>
+        <button class="btn btn-sm" type="button" data-theme-toggle>Chế độ Tối</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="lab-layout">
+      <section class="card" aria-label="Bảng điều khiển hàm số">
+        <h3>Thiết lập hàm số &amp; tham số</h3>
+        <div class="slider-group">
+          <label for="fnFamily">Chọn họ hàm khảo sát (GDPT 2018)</label>
+          <select id="fnFamily">
+            <option value="cubic">Hàm bậc ba: y = x³ − 3mx + 1</option>
+            <option value="rat11">Bậc nhất / Bậc nhất: y = (2x + m) / (x − 1)</option>
+            <option value="rat21">Bậc hai / Bậc nhất: y = (x² − 2x + m) / (x − 1)</option>
+          </select>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-head">
+            <label for="paramM">Tham số <span class="m">m</span></label>
+            <span class="slider-val" id="valM">1,0</span>
+          </div>
+          <input type="range" id="paramM" min="-4" max="5" step="0.1" value="1">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-head">
+            <label for="paramK">Đường cắt ngang <span class="m">y = k</span></label>
+            <span class="slider-val" id="valK">0,5</span>
+          </div>
+          <input type="range" id="paramK" min="-6" max="6" step="0.1" value="0.5">
+        </div>
+
+        <div class="tag-row" style="margin-top: 8px;">
+          <label class="toggle-chip">
+            <input type="checkbox" id="chkAsymptote" checked>
+            <span>Đường tiệm cận</span>
+          </label>
+          <label class="toggle-chip">
+            <input type="checkbox" id="chkDerivative">
+            <span>Đồ thị f'(x)</span>
+          </label>
+          <label class="toggle-chip">
+            <input type="checkbox" id="chkExtrema" checked>
+            <span>Cực trị &amp; Tâm ĐX</span>
+          </label>
+          <label class="toggle-chip">
+            <input type="checkbox" id="chkCutLine" checked>
+            <span>Tương giao y = k</span>
+          </label>
+        </div>
+
+        <div id="warnBox" class="notice notice-warn" style="margin-top: 14px; display: none;"></div>
+
+        <div class="tag-row" style="margin-top: 16px;">
+          <button type="button" class="btn btn-sm" id="btnPresetC6">Mẫu TN C6 (m=1)</button>
+          <button type="button" class="btn btn-sm" id="btnPresetDSC1">Mẫu ĐS C1 (m=2)</button>
+          <button type="button" class="btn btn-sm" id="btnPresetTLN2">Mẫu TLN C2 (m=5)</button>
+        </div>
+      </section>
+
+      <section class="canvas-panel">
+        <div class="canvas-box">
+          <canvas id="plotCanvas" class="math-canvas" aria-label="Đồ thị khảo sát hàm số"></canvas>
+        </div>
+
+        <div class="readout-grid">
+          <div class="readout-item">
+            <div class="r-label">Hàm số &amp; Tập xác định</div>
+            <div class="r-val" id="outFunc">—</div>
+          </div>
+          <div class="readout-item">
+            <div class="r-label">Đạo hàm f'(x)</div>
+            <div class="r-val" id="outDeriv">—</div>
+          </div>
+          <div class="readout-item">
+            <div class="r-label">Đường tiệm cận</div>
+            <div class="r-val" id="outAsym">—</div>
+          </div>
+          <div class="readout-item">
+            <div class="r-label">Số giao điểm với y = k</div>
+            <div class="r-val" id="outIntersections">—</div>
+          </div>
+        </div>
+
+        <div class="readout-grid">
+          <div class="readout-item">
+            <div class="r-label">Cực trị &amp; Tâm đối xứng</div>
+            <div class="r-val" id="outExtrema">—</div>
+          </div>
+          <div class="readout-item">
+            <div class="r-label">Chiều biến thiên</div>
+            <div class="r-val" id="outMono">—</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="../assets/common.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var C = window.TOAN_COMMON;
+      C.initTheme();
+
+      var canvas = document.getElementById('plotCanvas');
+      var plot = C.createPlot2D(canvas, { xMin: -6, xMax: 6, yMin: -6, yMax: 6, xStep: 1, yStep: 1 });
+
+      var elFamily = document.getElementById('fnFamily');
+      var elM = document.getElementById('paramM');
+      var elK = document.getElementById('paramK');
+      var chkAsym = document.getElementById('chkAsymptote');
+      var chkDeriv = document.getElementById('chkDerivative');
+      var chkExt = document.getElementById('chkExtrema');
+      var chkCut = document.getElementById('chkCutLine');
+      var warnBox = document.getElementById('warnBox');
+
+      function fmt(v) { return C.formatNum(v, 2); }
+
+      function findCubicRoots(a, b, c, d) {
+        // Giải ax^3 + bx^2 + cx + d = 0 bằng tìm cực trị + chia đôi + biên
+        var roots = [];
+        var f = function (x) { return ((a * x + b) * x + c) * x + d; };
+        var pts = [-30];
+        var disc = 4 * b * b - 12 * a * c;
+        if (disc > 1e-9) {
+          var s = Math.sqrt(disc);
+          var x1 = (-2 * b - s) / (6 * a);
+          var x2 = (-2 * b + s) / (6 * a);
+          if (x1 > x2) { var t = x1; x1 = x2; x2 = t; }
+          pts.push(x1, x2);
+        }
+        pts.push(30);
+        for (var i = 0; i < pts.length - 1; i++) {
+          var l = pts[i], r = pts[i + 1];
+          var fl = f(l), fr = f(r);
+          if (Math.abs(fl) < 1e-7) {
+            if (roots.every(function (rv) { return Math.abs(rv - l) > 1e-4; })) roots.push(l);
+          }
+          if (Math.abs(fr) < 1e-7) {
+            if (roots.every(function (rv) { return Math.abs(rv - r) > 1e-4; })) roots.push(r);
+          }
+          if (fl * fr < 0) {
+            var lo = l, hi = r;
+            for (var it = 0; it < 50; it++) {
+              var mid = 0.5 * (lo + hi);
+              var fm = f(mid);
+              if (fl * fm <= 0) { hi = mid; fr = fm; } else { lo = mid; fl = fm; }
+            }
+            var root = 0.5 * (lo + hi);
+            if (roots.every(function (rv) { return Math.abs(rv - root) > 1e-4; })) roots.push(root);
+          }
+        }
+        return roots.sort(function (x, y) { return x - y; });
+      }
+
+      function render() {
+        var fam = elFamily.value;
+        var m = Number(elM.value);
+        var k = Number(elK.value);
+        document.getElementById('valM').textContent = C.formatNum(m, 1);
+        document.getElementById('valK').textContent = C.formatNum(k, 1);
+
+        var g = plot.begin();
+        var pal = g.pal;
+        var fn = null, dfn = null;
+        var isDegenerate = false;
+        var intersections = [];
+
+        warnBox.style.display = 'none';
+        warnBox.textContent = '';
+
+        if (fam === 'cubic') {
+          fn = function (x) { return x * x * x - 3 * m * x + 1; };
+          dfn = function (x) { return 3 * x * x - 3 * m; };
+          document.getElementById('outFunc').textContent = 'y = x³ − (' + fmt(3 * m) + ')x + 1 | D = ℝ';
+          document.getElementById('outDeriv').textContent = "y' = 3x² − (" + fmt(3 * m) + ')';
+          document.getElementById('outAsym').textContent = 'Không có tiệm cận (đa thức)';
+
+          if (m > 1e-6) {
+            var xc = Math.sqrt(m);
+            var yCD = fn(-xc), yCT = fn(xc);
+            document.getElementById('outExtrema').textContent =
+              'CĐ(-' + fmt(xc) + '; ' + fmt(yCD) + '), CT(' + fmt(xc) + '; ' + fmt(yCT) + ') | I(0; 1)';
+            document.getElementById('outMono').textContent =
+              'Đồng biến (-∞; -' + fmt(xc) + '), (' + fmt(xc) + '; +∞) | Nghịch biến (-' + fmt(xc) + '; ' + fmt(xc) + ')';
+          } else {
+            document.getElementById('outExtrema').textContent = 'Không có cực trị | Tâm ĐX I(0; 1)';
+            document.getElementById('outMono').textContent = 'Đồng biến trên ℝ';
+          }
+          intersections = findCubicRoots(1, 0, -3 * m, 1 - k);
+        } else if (fam === 'rat11') {
+          fn = function (x) { return Math.abs(x - 1) < 0.015 ? null : (2 * x + m) / (x - 1); };
+          dfn = function (x) { return Math.abs(x - 1) < 0.015 ? null : (-2 - m) / Math.pow(x - 1, 2); };
+          isDegenerate = Math.abs(m + 2) < 1e-6;
+          document.getElementById('outFunc').textContent = 'y = (2x + ' + fmt(m) + ') / (x − 1) | D = ℝ\\{1}';
+          document.getElementById('outDeriv').textContent = "y' = " + fmt(-2 - m) + ' / (x − 1)²';
+          if (isDegenerate) {
+            warnBox.style.display = 'block';
+            warnBox.textContent = 'Cảnh báo suy biến: Với m = −2, tử 2x − 2 = 2(x − 1) rút gọn thành hằng số y = 2 (x ≠ 1), đồ thị không còn là hyperbol và không có TCĐ x = 1.';
+            document.getElementById('outAsym').textContent = 'Suy biến đường thẳng y = 2 (x ≠ 1)';
+            document.getElementById('outExtrema').textContent = 'Không có cực trị';
+            document.getElementById('outMono').textContent = 'Hàm hằng trên (−∞; 1) và (1; +∞)';
+          } else {
+            document.getElementById('outAsym').textContent = 'TCĐ: x = 1 | TCN: y = 2';
+            document.getElementById('outExtrema').textContent = 'Không có cực trị | Tâm ĐX I(1; 2)';
+            document.getElementById('outMono').textContent = (-2 - m) > 0
+              ? 'Đồng biến trên (−∞; 1) và (1; +∞)'
+              : 'Nghịch biến trên (−∞; 1) và (1; +∞)';
+            if (Math.abs(k - 2) > 1e-6) {
+              intersections.push((k + m) / (k - 2));
+            }
+          }
+        } else {
+          fn = function (x) { return Math.abs(x - 1) < 0.015 ? null : (x * x - 2 * x + m) / (x - 1); };
+          dfn = function (x) { return Math.abs(x - 1) < 0.015 ? null : 1 - (m - 1) / Math.pow(x - 1, 2); };
+          isDegenerate = Math.abs(m - 1) < 1e-6;
+          document.getElementById('outFunc').textContent = 'y = (x² − 2x + ' + fmt(m) + ') / (x − 1) | D = ℝ\\{1}';
+          document.getElementById('outDeriv').textContent = "y' = 1 − (" + fmt(m - 1) + ') / (x − 1)²';
+          if (isDegenerate) {
+            warnBox.style.display = 'block';
+            warnBox.textContent = 'Cảnh báo suy biến: Với m = 1, tử (x − 1)² chia hết cho x − 1 nên hàm suy biến thành đường thẳng y = x − 1 (bỏ điểm (1; 0)).';
+            document.getElementById('outAsym').textContent = 'Suy biến đường thẳng y = x − 1 (x ≠ 1)';
+            document.getElementById('outExtrema').textContent = 'Không có cực trị';
+            document.getElementById('outMono').textContent = 'Đồng biến trên (−∞; 1) và (1; +∞)';
+          } else {
+            document.getElementById('outAsym').textContent = 'TCĐ: x = 1 | TCX: y = x − 1';
+            if (m > 1) {
+              var d = Math.sqrt(m - 1);
+              var x1 = 1 - d, x2 = 1 + d;
+              var y1 = -2 * d, y2 = 2 * d;
+              document.getElementById('outExtrema').textContent =
+                'CĐ(' + fmt(x1) + '; ' + fmt(y1) + '), CT(' + fmt(x2) + '; ' + fmt(y2) + ') | I(1; 0)';
+              document.getElementById('outMono').textContent =
+                'ĐB: (−∞;' + fmt(x1) + '), (' + fmt(x2) + ';+∞) | NB: (' + fmt(x1) + ';1), (1;' + fmt(x2) + ')';
+            } else {
+              document.getElementById('outExtrema').textContent = 'Không có cực trị | Tâm ĐX I(1; 0)';
+              document.getElementById('outMono').textContent = 'Đồng biến trên (−∞; 1) và (1; +∞)';
+            }
+            var discQ = (2 + k) * (2 + k) - 4 * (m + k);
+            if (discQ > 1e-9) {
+              var sq = Math.sqrt(discQ);
+              var r1 = ((2 + k) - sq) / 2;
+              var r2 = ((2 + k) + sq) / 2;
+              if (Math.abs(r1 - 1) > 1e-6) intersections.push(r1);
+              if (Math.abs(r2 - 1) > 1e-6) intersections.push(r2);
+            } else if (Math.abs(discQ) <= 1e-9) {
+              var r0 = (2 + k) / 2;
+              if (Math.abs(r0 - 1) > 1e-6) intersections.push(r0);
+            }
+          }
+        }
+
+        // Vẽ tiệm cận
+        if (chkAsym.checked && !isDegenerate) {
+          if (fam === 'rat11') {
+            g.drawVerticalLine(1, pal.err, 'TCĐ x = 1');
+            g.drawHorizontalLine(2, pal.ok, 'TCN y = 2', false);
+          } else if (fam === 'rat21') {
+            g.drawVerticalLine(1, pal.err, 'TCĐ x = 1');
+            g.drawObliqueLine(1, -1, pal.ok, 'TCX y = x - 1');
+          }
+        }
+
+        // Vẽ đạo hàm
+        if (chkDeriv.checked && dfn) {
+          g.plotFunction(dfn, { color: pal.purple, width: 1.8, dashed: true });
+        }
+
+        // Vẽ f(x)
+        if (fn) {
+          g.plotFunction(fn, { color: pal.accent, width: 2.8 });
+        }
+
+        // Vẽ đường y = k và giao điểm
+        if (chkCut.checked) {
+          g.drawHorizontalLine(k, pal.secondary, 'y = ' + fmt(k), true);
+          intersections.forEach(function (rx) {
+            if (rx >= g.bounds.xMin && rx <= g.bounds.xMax) {
+              g.drawPoint(rx, k, pal.err, '(' + fmt(rx) + '; ' + fmt(k) + ')', 5);
+            }
+          });
+        }
+
+        // Vẽ cực trị & tâm đối xứng
+        if (chkExt.checked && !isDegenerate) {
+          if (fam === 'cubic') {
+            g.drawPoint(0, 1, pal.ok, 'I(0; 1)', 4.5);
+            if (m > 1e-6) {
+              var xc2 = Math.sqrt(m);
+              g.drawPoint(-xc2, fn(-xc2), pal.secondary, 'CĐ', 5);
+              g.drawPoint(xc2, fn(xc2), pal.secondary, 'CT', 5);
+            }
+          } else if (fam === 'rat11') {
+            g.drawPoint(1, 2, pal.ok, 'I(1; 2)', 4.5);
+          } else if (fam === 'rat21') {
+            g.drawPoint(1, 0, pal.ok, 'I(1; 0)', 4.5);
+            if (m > 1) {
+              var d2 = Math.sqrt(m - 1);
+              g.drawPoint(1 - d2, -2 * d2, pal.secondary, 'CĐ', 5);
+              g.drawPoint(1 + d2, 2 * d2, pal.secondary, 'CT', 5);
+            }
+          }
+        }
+
+        g.end();
+
+        if (isDegenerate && fam === 'rat11') {
+          document.getElementById('outIntersections').textContent = Math.abs(k - 2) < 1e-6 ? 'Trùng đường y = 2' : '0 giao điểm';
+        } else {
+          var coordsTxt = intersections.map(function (x) { return fmt(x); }).join(', ');
+          document.getElementById('outIntersections').textContent =
+            intersections.length + ' giao điểm' + (coordsTxt ? ' (x ≈ ' + coordsTxt + ')' : '');
+        }
+      }
+
+      [elFamily, elM, elK, chkAsym, chkDeriv, chkExt, chkCut].forEach(function (el) {
+        el.addEventListener('input', render);
+        el.addEventListener('change', render);
+      });
+
+      document.getElementById('btnPresetC6').addEventListener('click', function () {
+        elFamily.value = 'cubic'; elM.value = '1'; elK.value = '1'; render();
+      });
+      document.getElementById('btnPresetDSC1').addEventListener('click', function () {
+        elFamily.value = 'rat21'; elM.value = '2'; elK.value = '2.5'; render();
+      });
+      document.getElementById('btnPresetTLN2').addEventListener('click', function () {
+        elFamily.value = 'rat21'; elM.value = '5'; elK.value = '4'; render();
+      });
+
+      window.addEventListener('toan:themechange', render);
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(render).observe(canvas);
+      } else {
+        window.addEventListener('resize', render);
+      }
+      render();
+    })();
+  </script>
+</body>
+</html>
