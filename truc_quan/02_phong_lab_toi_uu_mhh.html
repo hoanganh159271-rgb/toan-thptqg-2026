@@ -24,6 +24,7 @@
     <div class="tab-bar" style="margin-bottom: 20px;">
       <button type="button" class="tab-btn active" data-tab="hop">Mô hình 1: Gấp hộp không nắp (Thể tích Max)</button>
       <button type="button" class="tab-btn" data-tab="vuon">Mô hình 2: Rào khu vườn giáp sông (Chi phí Min)</button>
+      <button type="button" class="tab-btn" data-tab="ong">Mô hình 3: Đường ống dẫn dầu bờ biển (VD 1.1)</button>
     </div>
 
     <!-- MÔ HÌNH 1 -->
@@ -51,6 +52,7 @@
 
           <div class="tag-row" style="margin-top: 6px;">
             <button type="button" class="btn btn-sm btn-primary" id="btnSnapBoxOpt">Đặt x tối ưu (TLN C1: a=18, x=3)</button>
+            <button type="button" class="btn btn-sm" id="btnSnapBoxTln1">Đề TLN 01 (a=12, x=2 → V=128)</button>
           </div>
 
           <div class="solution-box" style="margin-top: 16px;">
@@ -171,6 +173,95 @@
         </div>
       </div>
     </section>
+
+    <!-- MÔ HÌNH 3 -->
+    <section id="tab-ong" style="display: none;">
+      <div class="lab-layout">
+        <div class="card">
+          <h3>Đường ống dẫn dầu bờ biển – ngoài khơi</h3>
+          <p class="muted" style="margin-top: 6px;">Điểm <span class="m">A</span> trên bờ biển, giàn khoan <span class="m">C</span> ngoài khơi cách bờ <span class="m">CB</span>. Chọn điểm nối <span class="m">M</span> trên <span class="m">AB</span> với <span class="m">BM = x</span> để tổng chi phí lắp đặt nhỏ nhất.</p>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="pipeAB">Khoảng cách dọc bờ <span class="m">AB</span> (km)</label>
+              <span class="slider-val" id="valPipeAB">9</span>
+            </div>
+            <input type="range" id="pipeAB" min="4" max="15" step="0.5" value="9">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="pipeCB">Khoảng cách ra khơi <span class="m">CB</span> (km)</label>
+              <span class="slider-val" id="valPipeCB">6</span>
+            </div>
+            <input type="range" id="pipeCB" min="2" max="12" step="0.5" value="6">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="pipeC1">Đơn giá trên bờ <span class="m">c₁</span> (tr.đ/km)</label>
+              <span class="slider-val" id="valPipeC1">100</span>
+            </div>
+            <input type="range" id="pipeC1" min="50" max="200" step="10" value="100">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="pipeC2">Đơn giá dưới biển <span class="m">c₂</span> (tr.đ/km)</label>
+              <span class="slider-val" id="valPipeC2">260</span>
+            </div>
+            <input type="range" id="pipeC2" min="120" max="400" step="10" value="260">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-head">
+              <label for="pipeX">Vị trí điểm nối <span class="m">x = BM</span> (km)</label>
+              <span class="slider-val" id="valPipeX">2,5</span>
+            </div>
+            <input type="range" id="pipeX" min="0" max="9" step="0.1" value="2.5">
+          </div>
+
+          <div class="tag-row" style="margin-top: 6px;">
+            <button type="button" class="btn btn-sm btn-primary" id="btnSnapPipeOpt">Đặt x tối ưu (VD 1.1: x = 2,5 → 2340)</button>
+          </div>
+
+          <div class="solution-box" style="margin-top: 16px;">
+            <h4>5 bước Mô hình hóa trực tiếp</h4>
+            <ol class="step-list" id="pipeMhhSteps"></ol>
+          </div>
+        </div>
+
+        <div class="canvas-panel">
+          <div class="dual-canvas">
+            <div class="canvas-box canvas-box-sm">
+              <canvas id="pipeGeoCanvas" class="math-canvas" aria-label="Sơ đồ tuyến ống dẫn dầu bờ biển"></canvas>
+            </div>
+            <div class="canvas-box canvas-box-sm">
+              <canvas id="pipePlotCanvas" class="math-canvas" aria-label="Đồ thị chi phí lắp đặt C(x)"></canvas>
+            </div>
+          </div>
+
+          <div class="readout-grid">
+            <div class="readout-item">
+              <div class="r-label">Đoạn trên bờ AM = AB − x</div>
+              <div class="r-val" id="outPipeAM">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Đoạn dưới biển MC</div>
+              <div class="r-val" id="outPipeMC">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Tổng chi phí C(x)</div>
+              <div class="r-val" id="outPipeCost">—</div>
+            </div>
+            <div class="readout-item">
+              <div class="r-label">Chi phí nhỏ nhất C_min</div>
+              <div class="r-val" id="outPipeCMin">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="../assets/common.js"></script>
@@ -188,6 +279,7 @@
           tabBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
           document.getElementById('tab-hop').style.display = activeTab === 'hop' ? 'block' : 'none';
           document.getElementById('tab-vuon').style.display = activeTab === 'vuon' ? 'block' : 'none';
+          document.getElementById('tab-ong').style.display = activeTab === 'ong' ? 'block' : 'none';
           renderActive();
         });
       });
@@ -440,18 +532,208 @@
         g.end();
       }
 
+      /* --- TAB 3: ĐƯỜNG ỐNG DẪN DẦU --- */
+      var pAB = document.getElementById('pipeAB');
+      var pCB = document.getElementById('pipeCB');
+      var pC1 = document.getElementById('pipeC1');
+      var pC2 = document.getElementById('pipeC2');
+      var pX = document.getElementById('pipeX');
+      var pipeGeoCanvas = document.getElementById('pipeGeoCanvas');
+      var pipePlotCanvas = document.getElementById('pipePlotCanvas');
+      var pipePlot = C.createPlot2D(pipePlotCanvas, { xMin: -0.5, xMax: 10, yMin: 0, yMax: 3200, xStep: 1, yStep: 500, xLabel: 'x (km)', yLabel: 'C' });
+
+      function computePipeOpt(AB, CB, c1, c2) {
+        if (c2 <= c1) return AB;
+        var raw = (c1 * CB) / Math.sqrt(c2 * c2 - c1 * c1);
+        return Math.min(AB, Math.max(0, raw));
+      }
+
+      function renderPipe() {
+        var AB = Number(pAB.value);
+        var CB = Number(pCB.value);
+        var c1 = Number(pC1.value);
+        var c2 = Number(pC2.value);
+        pX.max = String(AB);
+        if (Number(pX.value) > AB) pX.value = String(AB);
+        var x = Number(pX.value);
+
+        document.getElementById('valPipeAB').textContent = C.formatNum(AB, 1);
+        document.getElementById('valPipeCB').textContent = C.formatNum(CB, 1);
+        document.getElementById('valPipeC1').textContent = String(c1);
+        document.getElementById('valPipeC2').textContent = String(c2);
+        document.getElementById('valPipeX').textContent = C.formatNum(x, 1);
+
+        var am = Math.max(0, AB - x);
+        var mc = Math.hypot(x, CB);
+        var cost = c1 * am + c2 * mc;
+        var xOpt = computePipeOpt(AB, CB, c1, c2);
+        var cMin = c1 * Math.max(0, AB - xOpt) + c2 * Math.hypot(xOpt, CB);
+
+        document.getElementById('outPipeAM').textContent = C.formatNum(am, 2) + ' km';
+        document.getElementById('outPipeMC').textContent = C.formatNum(mc, 2) + ' km';
+        document.getElementById('outPipeCost').textContent = C.formatNum(cost, 1) + ' tr.đ';
+        document.getElementById('outPipeCMin').textContent = C.formatNum(cMin, 1) + ' tr.đ';
+
+        var condText = c2 <= c1
+          ? ('Do c₂ ≤ c₁ nên C\'(x) < 0, tối ưu tại biên x* = AB = ' + C.formatNum(AB, 1) + ' km.')
+          : ('C\'(x) = −' + c1 + ' + ' + c2 + 'x/√(x²+' + C.formatNum(CB * CB, 1) + ') = 0 ⇒ x* = ' + C.formatNum(xOpt, 2) + ' km.');
+
+        document.getElementById('pipeMhhSteps').innerHTML =
+          '<li><strong>Đọc đề:</strong> Bờ AB = ' + C.formatNum(AB, 1) + ' km, khơi CB = ' + C.formatNum(CB, 1) + ' km, bờ ' + c1 + ' tr/km, biển ' + c2 + ' tr/km.</li>' +
+          '<li><strong>Đặt ẩn &amp; ĐK:</strong> BM = x (km) với 0 ≤ x ≤ ' + C.formatNum(AB, 1) + '.</li>' +
+          '<li><strong>Lập hàm:</strong> C(x) = ' + c1 + '(' + C.formatNum(AB, 1) + ' − x) + ' + c2 + '√(x² + ' + C.formatNum(CB * CB, 1) + ').</li>' +
+          '<li><strong>Giải toán:</strong> ' + condText + '</li>' +
+          '<li><strong>Đối chiếu:</strong> C_min = ' + C.formatNum(cMin, 1) + ' triệu đ; tại x = ' + C.formatNum(x, 1) + ' km thì C = ' + C.formatNum(cost, 1) + ' triệu đ.</li>';
+
+        // Vẽ sơ đồ bờ biển và giàn khoan
+        var info = C.setupCanvas(pipeGeoCanvas);
+        var ctx = info.ctx, w = info.width, h = info.height;
+        var pal = C.getCanvasPalette();
+        ctx.fillStyle = pal.bg;
+        ctx.fillRect(0, 0, w, h);
+
+        var shoreY = Math.round(h * 0.28);
+        ctx.fillStyle = pal.faceA;
+        ctx.fillRect(0, shoreY, w, h - shoreY);
+        ctx.strokeStyle = pal.accent;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, shoreY);
+        ctx.lineTo(w, shoreY);
+        ctx.stroke();
+
+        ctx.fillStyle = pal.ink;
+        ctx.font = '600 12px "Segoe UI", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('ĐẤT LIỀN (Bờ ' + c1 + ' tr/km)', 16, 22);
+        ctx.fillStyle = pal.accent;
+        ctx.fillText('BIỂN KHƠI (Biển ' + c2 + ' tr/km)', 16, h - 14);
+
+        var padX = 72;
+        var maxDrawW = w - padX * 2;
+        var maxDrawH = h - shoreY - 56;
+        var sc = Math.min(maxDrawW / Math.max(AB, 4), maxDrawH / Math.max(CB, 2));
+
+        var bx = padX + AB * sc;
+        var ax = bx - AB * sc;
+        var mx = bx - x * sc;
+        var cy = shoreY + CB * sc;
+
+        // CB nét đứt và góc vuông tại B
+        ctx.save();
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = pal.muted;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(bx, shoreY);
+        ctx.lineTo(bx, cy);
+        ctx.stroke();
+        ctx.restore();
+        ctx.strokeStyle = pal.muted;
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(bx - 9, shoreY, 9, 9);
+
+        // Đường nối M -> B
+        ctx.strokeStyle = pal.muted;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(mx, shoreY);
+        ctx.lineTo(bx, shoreY);
+        ctx.stroke();
+
+        // Tuyến ống trên bờ A -> M
+        ctx.strokeStyle = pal.ok;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(ax, shoreY);
+        ctx.lineTo(mx, shoreY);
+        ctx.stroke();
+
+        // Tuyến ống dưới biển M -> C
+        ctx.strokeStyle = pal.err;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(mx, shoreY);
+        ctx.lineTo(bx, cy);
+        ctx.stroke();
+
+        function drawPt(px, py, color, label, dy) {
+          ctx.beginPath();
+          ctx.arc(px, py, 5, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.strokeStyle = pal.bg;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.fillStyle = pal.ink;
+          ctx.font = '700 12px "Segoe UI", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(label, px, py + dy);
+        }
+
+        drawPt(ax, shoreY, pal.ok, 'A', -10);
+        drawPt(mx, shoreY, pal.err, 'M', -10);
+        drawPt(bx, shoreY, pal.axis, 'B', -10);
+        drawPt(bx, cy, pal.secondary, 'C (Giàn khoan)', 18);
+
+        ctx.fillStyle = pal.ok;
+        ctx.font = '600 11px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        if (mx - ax > 48) ctx.fillText('AM = ' + C.formatNum(am, 1), (ax + mx) / 2, shoreY + 16);
+        ctx.fillStyle = pal.err;
+        ctx.textAlign = 'right';
+        ctx.fillText('MC = ' + C.formatNum(mc, 2) + ' km', (mx + bx) / 2 - 8, (shoreY + cy) / 2 + 12);
+        ctx.fillStyle = pal.muted;
+        ctx.textAlign = 'left';
+        ctx.fillText('CB = ' + C.formatNum(CB, 1) + ' km', bx + 8, (shoreY + cy) / 2);
+
+        // Đồ thị C(x)
+        var c0 = c1 * AB + c2 * CB;
+        var cEnd = c2 * Math.hypot(AB, CB);
+        var cPeak = Math.max(c0, cEnd, cMin * 1.25);
+        var yTop = Math.ceil((cPeak * 1.12) / 500) * 500;
+        var g = pipePlot.begin({
+          xMin: -0.4,
+          xMax: AB + 0.6,
+          yMin: -yTop * 0.05,
+          yMax: yTop,
+          xStep: AB > 10 ? 2 : 1,
+          yStep: Math.max(400, Math.round(yTop / 5 / 200) * 200)
+        });
+        g.plotFunction(function (t) {
+          if (t < 0 || t > AB) return null;
+          return c1 * (AB - t) + c2 * Math.hypot(t, CB);
+        }, { color: g.pal.accent, width: 2.8 });
+        if (Math.abs(x - xOpt) < 0.45) {
+          g.drawPoint(xOpt, cMin, g.pal.ok, 'Tối ưu = Hiện tại (' + C.formatNum(xOpt, 2) + '; ' + C.formatNum(cMin, 0) + ')', 5.5);
+        } else {
+          g.drawPoint(xOpt, cMin, g.pal.ok, 'Min (' + C.formatNum(xOpt, 2) + '; ' + C.formatNum(cMin, 0) + ')', 5.5);
+          g.drawPoint(x, cost, g.pal.err, 'Hiện tại', 5.5);
+        }
+        g.end();
+      }
+
       function renderActive() {
         if (activeTab === 'hop') renderBox();
-        else renderGarden();
+        else if (activeTab === 'vuon') renderGarden();
+        else renderPipe();
       }
 
       [boxA, boxX].forEach(function (el) { el.addEventListener('input', renderBox); });
       [gS, gC1, gC2, gX].forEach(function (el) { el.addEventListener('input', renderGarden); });
+      [pAB, pCB, pC1, pC2, pX].forEach(function (el) { el.addEventListener('input', renderPipe); });
 
       document.getElementById('btnSnapBoxOpt').addEventListener('click', function () {
         boxA.value = '18';
         boxX.max = '8.8';
         boxX.value = '3';
+        renderBox();
+      });
+
+      document.getElementById('btnSnapBoxTln1').addEventListener('click', function () {
+        boxA.value = '12';
+        boxX.max = '5.8';
+        boxX.value = '2';
         renderBox();
       });
 
@@ -462,9 +744,19 @@
         renderGarden();
       });
 
+      document.getElementById('btnSnapPipeOpt').addEventListener('click', function () {
+        pAB.value = '9';
+        pCB.value = '6';
+        pC1.value = '100';
+        pC2.value = '260';
+        pX.max = '9';
+        pX.value = '2.5';
+        renderPipe();
+      });
+
       window.addEventListener('toan:themechange', renderActive);
       if (typeof ResizeObserver !== 'undefined') {
-        [boxGeoCanvas, boxPlotCanvas, gardenGeoCanvas, gardenPlotCanvas].forEach(function (cv) {
+        [boxGeoCanvas, boxPlotCanvas, gardenGeoCanvas, gardenPlotCanvas, pipeGeoCanvas, pipePlotCanvas].forEach(function (cv) {
           new ResizeObserver(renderActive).observe(cv);
         });
       } else {

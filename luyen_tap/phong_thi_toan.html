@@ -32,6 +32,9 @@
           <select id="modeSelect" aria-label="Chọn chế độ luyện thi" style="width: auto; min-width: 240px;">
             <option value="full">Đề chuẩn Ma trận 2026 (22 câu • 90')</option>
             <option value="mhh">Chuyên đề 4 câu Mô hình hóa (MHH)</option>
+            <option value="tln_de1">Đề tự luyện TLN số 01 — Chuẩn Ma trận (6 câu • 30')</option>
+            <option value="tln_de2">Đề tự luyện TLN số 02 — Chuẩn Ma trận (6 câu • 30')</option>
+            <option value="tln_vd">Luyện 14 Ví dụ TLN Vận dụng &amp; Mở rộng (14 câu • 60')</option>
             <option value="cd1">Chủ đề 1: Ứng dụng đạo hàm (8 câu)</option>
             <option value="cd2">Chủ đề 2: Lượng giác, Dãy số, Mũ-Log (3 câu)</option>
             <option value="cd3">Chủ đề 3: Tổ hợp – Xác suất (3 câu)</option>
@@ -164,18 +167,20 @@
 
   <script src="../assets/common.js"></script>
   <script src="data_de_mau.js"></script>
+  <script src="data_tln_van_dung.js"></script>
   <script>
     (function () {
       'use strict';
       var C = window.TOAN_COMMON;
       var M = window.TOAN_MATRIX;
       var BANK = window.TOAN_DE_MAU;
+      var TLN_BANK = window.TOAN_TLN_VANDUNG || {};
       C.initTheme();
 
       var params = new URLSearchParams(window.location.search);
       var currentMode = params.get('mode') || 'full';
       var modeSelect = document.getElementById('modeSelect');
-      if (['full', 'mhh', 'cd1', 'cd2', 'cd3', 'cd4', 'cd5'].indexOf(currentMode) >= 0) {
+      if (['full', 'mhh', 'tln_de1', 'tln_de2', 'tln_vd', 'cd1', 'cd2', 'cd3', 'cd4', 'cd5'].indexOf(currentMode) >= 0) {
         modeSelect.value = currentMode;
       } else {
         currentMode = 'full';
@@ -197,6 +202,16 @@
       }
 
       function buildItems(mode) {
+        if (mode === 'tln_de1') {
+          return (TLN_BANK.de_tu_luyen_1 || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        }
+        if (mode === 'tln_de2') {
+          return (TLN_BANK.de_tu_luyen_2 || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        }
+        if (mode === 'tln_vd') {
+          return (TLN_BANK.vi_du_chuyen_de || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        }
+
         var all = [];
         BANK.phan_1.forEach(function (q) { all.push(Object.assign({ phan: 'TN' }, q)); });
         BANK.phan_2.forEach(function (q) { all.push(Object.assign({ phan: 'DS' }, q)); });
@@ -687,10 +702,16 @@
         document.getElementById('btnSubmitExam').disabled = false;
         document.getElementById('btnSubmitExam').textContent = 'Nộp bài thi & Chấm điểm';
 
-        var minutes = mode === 'full' ? 90 : Math.max(15, state.items.length * 5);
+        var minutes = mode === 'full' ? 90
+          : (mode === 'tln_vd' ? 60
+          : ((mode === 'tln_de1' || mode === 'tln_de2') ? 30
+          : Math.max(15, state.items.length * 5)));
         var titleMap = {
           full: 'Đề thi thử chuẩn Ma trận 2026 (22 câu | 34 lệnh | 90 phút)',
           mhh: 'Luyện tập chuyên sâu: 4 câu Mô hình hóa (MHH)',
+          tln_de1: 'Đề tự luyện Trả lời ngắn số 01 (6 câu | 4 VD + 2 Hiểu | 30 phút)',
+          tln_de2: 'Đề tự luyện Trả lời ngắn số 02 (6 câu | 4 VD + 2 Hiểu | 30 phút)',
+          tln_vd: 'Luyện tập 14 Ví dụ Trả lời ngắn Vận dụng & Mở rộng (60 phút)',
           cd1: 'Luyện theo Chủ đề 1: Ứng dụng đạo hàm',
           cd2: 'Luyện theo Chủ đề 2: Lượng giác – Dãy số – Mũ, Logarit',
           cd3: 'Luyện theo Chủ đề 3: Tổ hợp – Xác suất',
