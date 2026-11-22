@@ -1,0 +1,10 @@
+{
+  "name": "Toán THPTQG 2026 — Không gian Ôn thi (GDPT 2018)",
+  "short_name": "Toán THPTQG 2026",
+  "description": "Không gian ôn thi Toán THPTQG 2026: 4 phòng trực quan hóa Canvas 2D/3D, Phòng thi chuẩn Ma trận 22 câu / 34 lệnh hỏi và Kho kiến thức GDPT 2018.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F7F8FA",
+  "theme_color": "#1D4ED8",
+  "lang": "vi"
+}
