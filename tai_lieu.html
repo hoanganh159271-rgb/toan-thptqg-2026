@@ -46,6 +46,7 @@
         { key: 'kb/03_to_hop_xac_suat.md', label: 'Chủ đề 3: Tổ hợp – Xác suất' },
         { key: 'kb/04_vecto_khong_gian.md', label: 'Chủ đề 4: Vectơ không gian & Oxyz' },
         { key: 'kb/05_quan_he_vuong_goc.md', label: 'Chủ đề 5: Quan hệ vuông góc 3D' },
+        { key: 'luyen_tap/chuyen_de_tln_van_dung.md', label: 'Chuyên đề TLN Vận dụng (PDF 2026)' },
         { key: 'luyen_tap/kho_mhh_van_dung.md', label: 'Kho rèn Mô hình hóa (MHH)' },
         { key: 'chan_doan/checklist_truoc_khi_thi.md', label: 'Checklist trước khi thi' },
         { key: 'chan_doan/nhat_ky_loi_sai.md', label: 'Nhật ký lỗi sai (8 nhóm)' }
@@ -55,13 +56,229 @@
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
 
+      function readBraceGroup(str, idx) {
+        if (idx >= str.length) return { content: '', next: idx };
+        if (str.charAt(idx) !== '{') {
+          if (str.charAt(idx) === '\\') {
+            var cmdM = /^\\[A-Za-z]+/.exec(str.slice(idx));
+            if (cmdM) return { content: cmdM[0], next: idx + cmdM[0].length };
+            return { content: str.slice(idx, idx + 2), next: idx + 2 };
+          }
+          return { content: str.charAt(idx), next: idx + 1 };
+        }
+        var depth = 0;
+        var i = idx;
+        while (i < str.length) {
+          var ch = str.charAt(i);
+          if (ch === '\\' && i + 1 < str.length) { i += 2; continue; }
+          if (ch === '{') depth++;
+          else if (ch === '}') {
+            depth--;
+            if (depth === 0) {
+              return { content: str.slice(idx + 1, i), next: i + 1 };
+            }
+          }
+          i++;
+        }
+        return { content: str.slice(idx + 1), next: str.length };
+      }
+
+      var TEX_SYMBOLS = {
+        Leftrightarrow: '⇔', Rightarrow: '⇒', Leftarrow: '⇐', leftrightarrow: '↔',
+        to: '→', mapsto: '↦', le: '≤', leq: '≤', ge: '≥', geq: '≥',
+        neq: '≠', ne: '≠', approx: '≈', equiv: '≡', cdot: '·', times: '×',
+        pm: '±', mp: '∓', infty: '∞', circ: '°', pi: 'π', alpha: 'α',
+        beta: 'β', gamma: 'γ', theta: 'θ', varphi: 'φ', phi: 'φ',
+        Delta: 'Δ', Omega: 'Ω', Sigma: '∑', sum: '∑', prod: '∏',
+        in: '∈', notin: '∉', subset: '⊂', subseteq: '⊆', cup: '∪', cap: '∩',
+        varnothing: '∅', emptyset: '∅', perp: '⊥', parallel: '∥',
+        forall: '∀', exists: '∃', dots: '…', ldots: '…', cdots: '⋯',
+        lfloor: '⌊', rfloor: '⌋', lceil: '⌈', rceil: '⌉',
+        lvert: '|', rvert: '|', lVert: '‖', rVert: '‖', mid: '|',
+        lim: 'lim', max: 'max', min: 'min', log: 'log', ln: 'ln',
+        sin: 'sin', cos: 'cos', tan: 'tan', cot: 'cot', arccos: 'arccos',
+        arcsin: 'arcsin', arctan: 'arctan', deg: 'deg', prime: '′',
+        quad: ' ', qquad: '  '
+      };
+
+      var BB_MAP = { R: 'ℝ', Z: 'ℤ', N: 'ℕ', Q: 'ℚ', C: 'ℂ' };
+
+      function renderMathOffline(escTex) {
+        var s = String(escTex || '');
+        var out = '';
+        var i = 0;
+        while (i < s.length) {
+          var ch = s.charAt(i);
+
+          if (ch === '\\') {
+            var nextCh = s.charAt(i + 1);
+            if (nextCh === '{' || nextCh === '}') {
+              out += nextCh;
+              i += 2;
+              continue;
+            }
+            if (nextCh === ';' || nextCh === ',' || nextCh === ' ' || nextCh === '!') {
+              out += nextCh === '!' ? '' : '&thinsp;';
+              i += 2;
+              continue;
+            }
+            if (nextCh === '\\') {
+              out += '<br>';
+              i += 2;
+              continue;
+            }
+            var m = /^\\([A-Za-z]+)/.exec(s.slice(i));
+            if (m) {
+              var cmd = m[1];
+              var pos = i + m[0].length;
+              if (cmd === 'left' || cmd === 'right') {
+                if (s.charAt(pos) === '.') pos++;
+                i = pos;
+                continue;
+              }
+              if (cmd === 'begin' || cmd === 'end') {
+                var gEnv = readBraceGroup(s, pos);
+                pos = gEnv.next;
+                if (cmd === 'begin' && gEnv.content === 'array') {
+                  var gSpec = readBraceGroup(s, pos);
+                  pos = gSpec.next;
+                }
+                i = pos;
+                continue;
+              }
+              if (cmd === 'dfrac' || cmd === 'frac') {
+                while (s.charAt(pos) === ' ') pos++;
+                var gNum = readBraceGroup(s, pos);
+                pos = gNum.next;
+                while (s.charAt(pos) === ' ') pos++;
+                var gDen = readBraceGroup(s, pos);
+                out += '<span class="mfrac"><span class="mnum">' + renderMathOffline(gNum.content) + '</span><span class="mden">' + renderMathOffline(gDen.content) + '</span></span>';
+                i = gDen.next;
+                continue;
+              }
+              if (cmd === 'sqrt') {
+                while (s.charAt(pos) === ' ') pos++;
+                var rootIdx = '';
+                if (s.charAt(pos) === '[') {
+                  var rb = s.indexOf(']', pos);
+                  if (rb > pos) {
+                    rootIdx = '<sup style="margin-right:1px;">' + renderMathOffline(s.slice(pos + 1, rb)) + '</sup>';
+                    pos = rb + 1;
+                  }
+                }
+                while (s.charAt(pos) === ' ') pos++;
+                var gSq = readBraceGroup(s, pos);
+                out += rootIdx + '<span class="msqrt"><span class="mrad">' + renderMathOffline(gSq.content) + '</span></span>';
+                i = gSq.next;
+                continue;
+              }
+              if (cmd === 'overrightarrow' || cmd === 'vec') {
+                while (s.charAt(pos) === ' ') pos++;
+                var gVec = readBraceGroup(s, pos);
+                out += '<span class="mvec">' + renderMathOffline(gVec.content) + '</span>';
+                i = gVec.next;
+                continue;
+              }
+              if (cmd === 'widehat' || cmd === 'hat') {
+                while (s.charAt(pos) === ' ') pos++;
+                var gHat = readBraceGroup(s, pos);
+                out += '<span class="mhat">' + renderMathOffline(gHat.content) + '</span>';
+                i = gHat.next;
+                continue;
+              }
+              if (cmd === 'overline' || cmd === 'bar') {
+                while (s.charAt(pos) === ' ') pos++;
+                var gBar = readBraceGroup(s, pos);
+                out += '<span style="text-decoration: overline;">' + renderMathOffline(gBar.content) + '</span>';
+                i = gBar.next;
+                continue;
+              }
+              if (cmd === 'text' || cmd === 'mathrm') {
+                while (s.charAt(pos) === ' ') pos++;
+                var gTxt = readBraceGroup(s, pos);
+                out += '<span style="font-family: var(--font-sans); font-style: normal;">' + gTxt.content + '</span>';
+                i = gTxt.next;
+                continue;
+              }
+              if (cmd === 'mathbb') {
+                while (s.charAt(pos) === ' ') pos++;
+                var gBb = readBraceGroup(s, pos);
+                var key = gBb.content.trim();
+                out += BB_MAP[key] || ('<strong>' + key + '</strong>');
+                i = gBb.next;
+                continue;
+              }
+              if (Object.prototype.hasOwnProperty.call(TEX_SYMBOLS, cmd)) {
+                out += TEX_SYMBOLS[cmd];
+                i = pos;
+                continue;
+              }
+              out += cmd;
+              i = pos;
+              continue;
+            }
+            i++;
+            continue;
+          }
+
+          if (ch === '{') {
+            var grp = readBraceGroup(s, i);
+            out += grp.content === ',' ? ',' : renderMathOffline(grp.content);
+            i = grp.next;
+            continue;
+          }
+
+          if (ch === '^') {
+            var gSup = readBraceGroup(s, i + 1);
+            var supHtml = renderMathOffline(gSup.content.trim());
+            if (supHtml === '°') out += '°';
+            else if (supHtml === '′') out += '′';
+            else out += '<sup>' + supHtml + '</sup>';
+            i = gSup.next;
+            continue;
+          }
+
+          if (ch === '_') {
+            var gSub = readBraceGroup(s, i + 1);
+            out += '<sub>' + renderMathOffline(gSub.content.trim()) + '</sub>';
+            i = gSub.next;
+            continue;
+          }
+
+          if (ch === "'") {
+            out += '′';
+            i++;
+            continue;
+          }
+
+          out += ch;
+          i++;
+        }
+        return out;
+      }
+
       function formatInline(raw) {
         var s = esc(raw);
-        s = s.replace(/\$\$([^$]+)\$\$/g, '<span class="mwrap">$1</span>');
-        s = s.replace(/\$([^$]+)\$/g, '<span class="mwrap">$1</span>');
-        s = s.replace(/`([^`]+)`/g, '<code class="mono">$1</code>');
+        var tokens = [];
+        var pushTok = function (html) {
+          var idx = tokens.length;
+          tokens.push(html);
+          return '\u0001TOK' + idx + '\u0002';
+        };
+        s = s.replace(/\$\$([^$]+)\$\$/g, function (_, m) {
+          return pushTok('<span class="mwrap">' + renderMathOffline(m) + '</span>');
+        });
+        s = s.replace(/\$([^$]+)\$/g, function (_, m) {
+          return pushTok('<span class="mwrap">' + renderMathOffline(m) + '</span>');
+        });
+        s = s.replace(/`([^`]+)`/g, function (_, c) {
+          return pushTok('<code class="mono">' + c + '</code>');
+        });
         s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
         s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        s = s.replace(/\u0001TOK(\d+)\u0002/g, function (_, id) {
+          return tokens[Number(id)] || '';
+        });
         return s;
       }
 
@@ -89,8 +306,20 @@
           // Block math $$...$$
           if (trim.indexOf('$$') === 0 && trim.lastIndexOf('$$') > 1) {
             closeLists();
-            html.push('<div class="mblock">' + esc(trim.slice(2, -2).trim()) + '</div>');
+            html.push('<div class="mblock">' + renderMathOffline(esc(trim.slice(2, -2).trim())) + '</div>');
             i++;
+            continue;
+          }
+          if (trim === '$$') {
+            closeLists();
+            var mLines = [];
+            i++;
+            while (i < lines.length && lines[i].trim() !== '$$') {
+              mLines.push(lines[i]);
+              i++;
+            }
+            if (i < lines.length && lines[i].trim() === '$$') i++;
+            html.push('<div class="mblock">' + renderMathOffline(esc(mLines.join(' ').trim())) + '</div>');
             continue;
           }
 
@@ -98,7 +327,29 @@
           if (trim.charAt(0) === '|' && i + 1 < lines.length && /^\s*\|?[\s:|-]+\|/.test(lines[i + 1])) {
             closeLists();
             var parseRow = function (r) {
-              return r.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(function (c) { return c.trim(); });
+              var trimmed = r.trim().replace(/^\|/, '').replace(/\|$/, '');
+              var cells = [];
+              var cur = '';
+              var inMath = false;
+              var inCode = false;
+              for (var k = 0; k < trimmed.length; k++) {
+                var c = trimmed.charAt(k);
+                if (c === '\\' && k + 1 < trimmed.length && trimmed.charAt(k + 1) === '|') {
+                  cur += '|';
+                  k++;
+                  continue;
+                }
+                if (c === '`' && !inMath) { inCode = !inCode; cur += c; continue; }
+                if (c === '$' && !inCode) { inMath = !inMath; cur += c; continue; }
+                if (c === '|' && !inMath && !inCode) {
+                  cells.push(cur.trim());
+                  cur = '';
+                } else {
+                  cur += c;
+                }
+              }
+              cells.push(cur.trim());
+              return cells;
             };
             var headers = parseRow(line);
             html.push('<div class="table-wrap" style="margin: 14px 0;"><table><thead><tr>');

@@ -319,7 +319,7 @@
   }
 
   function validateShortAnswer(raw) {
-    var s = String(raw == null ? '' : raw).trim().replace(/\s+/g, '');
+    var s = String(raw == null ? '' : raw).trim().replace(/\s+/g, '').replace(/\u2212/g, '-');
     if (!s) return { valid: true, empty: true, normalized: '', reason: '' };
     if (s.length > 4) {
       return { valid: false, empty: false, normalized: s, reason: 'Vượt quá 4 ký tự chuẩn phiếu tô.' };
@@ -334,7 +334,7 @@
     var v = validateShortAnswer(userRaw);
     if (!v.valid || v.empty) return false;
     var uNum = Number(v.normalized.replace(',', '.'));
-    var eStr = String(expected).trim().replace('.', ',');
+    var eStr = String(expected).trim().replace(/\u2212/g, '-').replace('.', ',');
     var eNum = Number(eStr.replace(',', '.'));
     if (v.normalized === eStr) return true;
     if (!isNaN(uNum) && !isNaN(eNum)) {
