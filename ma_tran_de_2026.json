@@ -1,0 +1,205 @@
+{
+  "meta": {
+    "ten_ma_tran": "Ma trận Đề thi thử TN THPT môn Toán 2026 (GDPT 2018)",
+    "nam": 2026,
+    "tong_cau": 22,
+    "tong_lenh": 34,
+    "thoi_gian_phut": 90,
+    "thang_diem": 10
+  },
+  "dang_thuc": {
+    "TN": {
+      "ten": "Trắc nghiệm nhiều lựa chọn",
+      "so_cau": 12,
+      "so_lenh": 12,
+      "diem_moi_cau": 0.25,
+      "tong_diem": 3.0,
+      "phan_bo_cap_do": { "B": 9, "H": 3, "VD": 0 }
+    },
+    "DS": {
+      "ten": "Trắc nghiệm Đúng/Sai",
+      "so_cau": 4,
+      "so_lenh": 16,
+      "diem_luy_tien": [0.0, 0.1, 0.25, 0.5, 1.0],
+      "tong_diem": 4.0,
+      "phan_bo_cap_do": { "B": 4, "H": 8, "VD": 4 }
+    },
+    "TLN": {
+      "ten": "Trắc nghiệm Trả lời ngắn",
+      "so_cau": 6,
+      "so_lenh": 6,
+      "diem_moi_cau": 0.5,
+      "tong_diem": 3.0,
+      "max_chars": 4,
+      "phan_bo_cap_do": { "B": 0, "H": 2, "VD": 4 }
+    }
+  },
+  "nang_luc": {
+    "TD": {
+      "ten": "Tư duy & Lập luận toán học",
+      "so_cau": 7,
+      "phan_bo_cap_do": { "B": 6, "H": 1, "VD": 0 }
+    },
+    "GQ": {
+      "ten": "Giải quyết vấn đề toán học",
+      "so_cau": 11,
+      "phan_bo_cap_do": { "B": 6, "H": 4, "VD": 1 }
+    },
+    "MHH": {
+      "ten": "Mô hình hóa toán học",
+      "so_cau": 4,
+      "phan_bo_cap_do": { "B": 1, "H": 0, "VD": 3 },
+      "ghi_chu": "Gồm C3-ĐS (tổng hợp 4 ý 1B-2H-1VD) và C1-TLN, C3-TLN, C4-TLN (VD)."
+    }
+  },
+  "nhom_loi": [
+    "Hổng kiến thức",
+    "Hổng bản chất",
+    "Thiếu ý tưởng",
+    "Lỗi vận dụng",
+    "Tính toán ẩu",
+    "Đọc sót dữ kiện",
+    "Quản lý thời gian",
+    "Bất cẩn"
+  ],
+  "chu_de": [
+    {
+      "id": 1,
+      "ten": "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số",
+      "file_kb": "kb/01_ung_dung_dao_ham.md",
+      "lenh": { "tong": 12, "B": 5, "H": 4, "VD": 3 },
+      "tieu_muc": [
+        { "ma": "1.1", "ten": "Tính đơn điệu, cực trị", "lenh": ["TN C1-TD1.2 (B)", "TN C2-TD2.1 (H)"] },
+        { "ma": "1.2", "ten": "GTLN và GTNN của hàm số", "lenh": ["TN C3-TD1.2 (B)", "TLN C1-MHH2.2 (VD)"] },
+        { "ma": "1.3", "ten": "Đường tiệm cận của đồ thị", "lenh": ["TN C4-GQ1.2 (B)", "TN C5-GQ2.1 (H)"] },
+        { "ma": "1.4", "ten": "Khảo sát và vẽ đồ thị hàm số", "lenh": ["TN C6-GQ1.4 (B)", "TLN C2-GQ2.2 (VD)"] },
+        { "ma": "1.1-1.4", "ten": "Tổng hợp khảo sát hàm số", "lenh": ["ĐS C1a,b,c,d-GQ (1B, 2H, 1VD)"] }
+      ]
+    },
+    {
+      "id": 2,
+      "ten": "Lượng giác - Dãy số - CSC - CSN - Mũ, Logarit",
+      "file_kb": "kb/02_luong_giac_day_so_mu_log.md",
+      "lenh": { "tong": 6, "B": 3, "H": 2, "VD": 1 },
+      "tieu_muc": [
+        { "ma": "2.1", "ten": "Lượng giác", "lenh": ["TN C7-TD1.2 (B)"] },
+        { "ma": "2.2", "ten": "Dãy số - CSC - CSN", "lenh": ["TN C8-TD1.2 (B)"] },
+        { "ma": "2.3", "ten": "Mũ - Logarit (Mô hình thực tế)", "lenh": ["ĐS C3a,b,c,d-MHH (1B, 2H, 1VD)"] }
+      ]
+    },
+    {
+      "id": 3,
+      "ten": "Tổ hợp - Xác suất",
+      "file_kb": "kb/03_to_hop_xac_suat.md",
+      "lenh": { "tong": 6, "B": 2, "H": 2, "VD": 2 },
+      "tieu_muc": [
+        { "ma": "3.1", "ten": "Nhị thức Newton", "lenh": ["TN C9-GQ1.2 (B)"] },
+        { "ma": "3.2-3.3", "ten": "Xác suất của biến cố & Quy tắc tính xác suất", "lenh": ["ĐS C4a,b,c,d-GQ (1B, 2H, 1VD)", "TLN C3-MHH2.2 (VD)"] }
+      ]
+    },
+    {
+      "id": 4,
+      "ten": "Vectơ trong không gian",
+      "file_kb": "kb/04_vecto_khong_gian.md",
+      "lenh": { "tong": 9, "B": 3, "H": 4, "VD": 2 },
+      "tieu_muc": [
+        { "ma": "4.1", "ten": "Vectơ và các phép toán về vectơ trong không gian", "lenh": ["TN C10-TD1.2 (B)", "TN C11-GQ2.1 (H)", "TLN C4-MHH2.2 (VD)"] },
+        { "ma": "4.2", "ten": "Tọa độ của vectơ", "lenh": ["TN C12-TD1.2 (B)", "TLN C5-GQ2.2 (H)"] },
+        { "ma": "4.1-4.2", "ten": "Tổng hợp vectơ & tọa độ Oxyz", "lenh": ["ĐS C2a,b,c,d-GQ (1B, 2H, 1VD)"] }
+      ]
+    },
+    {
+      "id": 5,
+      "ten": "Quan hệ vuông góc",
+      "file_kb": "kb/05_quan_he_vuong_goc.md",
+      "lenh": { "tong": 1, "B": 0, "H": 1, "VD": 0 },
+      "tieu_muc": [
+        { "ma": "5.1-5.2", "ten": "Góc & Khoảng cách trong không gian", "lenh": ["TLN C6-GQ2.1 (H)"] }
+      ]
+    }
+  ],
+  "danh_sach_cau": [
+    { "id": "TN-01", "phan": "TN", "so_cau": 1, "chu_de": 1, "tieu_muc": "1.1", "ma_lenh": "C1-TD1.2", "cap_do": "B", "nang_luc": "TD" },
+    { "id": "TN-02", "phan": "TN", "so_cau": 2, "chu_de": 1, "tieu_muc": "1.1", "ma_lenh": "C2-TD2.1", "cap_do": "H", "nang_luc": "TD" },
+    { "id": "TN-03", "phan": "TN", "so_cau": 3, "chu_de": 1, "tieu_muc": "1.2", "ma_lenh": "C3-TD1.2", "cap_do": "B", "nang_luc": "TD" },
+    { "id": "TN-04", "phan": "TN", "so_cau": 4, "chu_de": 1, "tieu_muc": "1.3", "ma_lenh": "C4-GQ1.2", "cap_do": "B", "nang_luc": "GQ" },
+    { "id": "TN-05", "phan": "TN", "so_cau": 5, "chu_de": 1, "tieu_muc": "1.3", "ma_lenh": "C5-GQ2.1", "cap_do": "H", "nang_luc": "GQ" },
+    { "id": "TN-06", "phan": "TN", "so_cau": 6, "chu_de": 1, "tieu_muc": "1.4", "ma_lenh": "C6-GQ1.4", "cap_do": "B", "nang_luc": "GQ" },
+    { "id": "TN-07", "phan": "TN", "so_cau": 7, "chu_de": 2, "tieu_muc": "2.1", "ma_lenh": "C7-TD1.2", "cap_do": "B", "nang_luc": "TD" },
+    { "id": "TN-08", "phan": "TN", "so_cau": 8, "chu_de": 2, "tieu_muc": "2.2", "ma_lenh": "C8-TD1.2", "cap_do": "B", "nang_luc": "TD" },
+    { "id": "TN-09", "phan": "TN", "so_cau": 9, "chu_de": 3, "tieu_muc": "3.1", "ma_lenh": "C9-GQ1.2", "cap_do": "B", "nang_luc": "GQ" },
+    { "id": "TN-10", "phan": "TN", "so_cau": 10, "chu_de": 4, "tieu_muc": "4.1", "ma_lenh": "C10-TD1.2", "cap_do": "B", "nang_luc": "TD" },
+    { "id": "TN-11", "phan": "TN", "so_cau": 11, "chu_de": 4, "tieu_muc": "4.1", "ma_lenh": "C11-GQ2.1", "cap_do": "H", "nang_luc": "GQ" },
+    { "id": "TN-12", "phan": "TN", "so_cau": 12, "chu_de": 4, "tieu_muc": "4.2", "ma_lenh": "C12-TD1.2", "cap_do": "B", "nang_luc": "TD" },
+    {
+      "id": "DS-01",
+      "phan": "DS",
+      "so_cau": 1,
+      "chu_de": 1,
+      "tieu_muc": "1.1-1.4",
+      "ma_lenh": "C1-GQ",
+      "cap_do": "B-H-VD",
+      "nang_luc": "GQ",
+      "lenh": [
+        { "y": "a", "ma_lenh": "C1a-GQ", "cap_do": "B", "nang_luc": "GQ" },
+        { "y": "b", "ma_lenh": "C1b-GQ", "cap_do": "H", "nang_luc": "GQ" },
+        { "y": "c", "ma_lenh": "C1c-GQ", "cap_do": "H", "nang_luc": "GQ" },
+        { "y": "d", "ma_lenh": "C1d-GQ", "cap_do": "VD", "nang_luc": "GQ" }
+      ]
+    },
+    {
+      "id": "DS-02",
+      "phan": "DS",
+      "so_cau": 2,
+      "chu_de": 4,
+      "tieu_muc": "4.1-4.2",
+      "ma_lenh": "C2-GQ",
+      "cap_do": "B-H-VD",
+      "nang_luc": "GQ",
+      "lenh": [
+        { "y": "a", "ma_lenh": "C2a-GQ", "cap_do": "B", "nang_luc": "GQ" },
+        { "y": "b", "ma_lenh": "C2b-GQ", "cap_do": "H", "nang_luc": "GQ" },
+        { "y": "c", "ma_lenh": "C2c-GQ", "cap_do": "H", "nang_luc": "GQ" },
+        { "y": "d", "ma_lenh": "C2d-GQ", "cap_do": "VD", "nang_luc": "GQ" }
+      ]
+    },
+    {
+      "id": "DS-03",
+      "phan": "DS",
+      "so_cau": 3,
+      "chu_de": 2,
+      "tieu_muc": "2.3",
+      "ma_lenh": "C3-MHH",
+      "cap_do": "B-H-VD",
+      "nang_luc": "MHH",
+      "lenh": [
+        { "y": "a", "ma_lenh": "C3a-MHH", "cap_do": "B", "nang_luc": "MHH" },
+        { "y": "b", "ma_lenh": "C3b-MHH", "cap_do": "H", "nang_luc": "MHH" },
+        { "y": "c", "ma_lenh": "C3c-MHH", "cap_do": "H", "nang_luc": "MHH" },
+        { "y": "d", "ma_lenh": "C3d-MHH", "cap_do": "VD", "nang_luc": "MHH" }
+      ]
+    },
+    {
+      "id": "DS-04",
+      "phan": "DS",
+      "so_cau": 4,
+      "chu_de": 3,
+      "tieu_muc": "3.2-3.3",
+      "ma_lenh": "C4-GQ",
+      "cap_do": "B-H-VD",
+      "nang_luc": "GQ",
+      "lenh": [
+        { "y": "a", "ma_lenh": "C4a-GQ", "cap_do": "B", "nang_luc": "GQ" },
+        { "y": "b", "ma_lenh": "C4b-GQ", "cap_do": "H", "nang_luc": "GQ" },
+        { "y": "c", "ma_lenh": "C4c-GQ", "cap_do": "H", "nang_luc": "GQ" },
+        { "y": "d", "ma_lenh": "C4d-GQ", "cap_do": "VD", "nang_luc": "GQ" }
+      ]
+    },
+    { "id": "TLN-01", "phan": "TLN", "so_cau": 1, "chu_de": 1, "tieu_muc": "1.2", "ma_lenh": "C1-MHH2.2", "cap_do": "VD", "nang_luc": "MHH" },
+    { "id": "TLN-02", "phan": "TLN", "so_cau": 2, "chu_de": 1, "tieu_muc": "1.4", "ma_lenh": "C2-GQ2.2", "cap_do": "VD", "nang_luc": "GQ" },
+    { "id": "TLN-03", "phan": "TLN", "so_cau": 3, "chu_de": 3, "tieu_muc": "3.2-3.3", "ma_lenh": "C3-MHH2.2", "cap_do": "VD", "nang_luc": "MHH" },
+    { "id": "TLN-04", "phan": "TLN", "so_cau": 4, "chu_de": 4, "tieu_muc": "4.1", "ma_lenh": "C4-MHH2.2", "cap_do": "VD", "nang_luc": "MHH" },
+    { "id": "TLN-05", "phan": "TLN", "so_cau": 5, "chu_de": 4, "tieu_muc": "4.2", "ma_lenh": "C5-GQ2.2", "cap_do": "H", "nang_luc": "GQ" },
+    { "id": "TLN-06", "phan": "TLN", "so_cau": 6, "chu_de": 5, "tieu_muc": "5.1-5.2", "ma_lenh": "C6-GQ2.1", "cap_do": "H", "nang_luc": "GQ" }
+  ]
+}
