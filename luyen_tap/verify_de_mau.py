@@ -11,6 +11,8 @@ import os
 import re
 import subprocess
 import sys
+from fractions import Fraction
+from itertools import combinations, permutations
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MATRIX_JSON_PATH = os.path.join(ROOT_DIR, "ma_tran_de_2026.json")
@@ -18,6 +20,7 @@ COMMON_JS_PATH = os.path.join(ROOT_DIR, "assets", "common.js")
 DATA_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_de_mau.js")
 TLN_VD_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_tln_van_dung.js")
 TLN_HOT_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_tln_hot_2026.js")
+SCHOOL_JS_PATH = os.path.join(ROOT_DIR, "luyen_tap", "data_de_truong.js")
 
 
 def load_js_runtime():
@@ -28,6 +31,7 @@ const commonPath = process.argv[1];
 const dataPath = process.argv[2];
 const tlnVdPath = process.argv[3];
 const tlnHotPath = process.argv[4];
+const schoolPath = process.argv[5];
 
 const noop = () => {};
 const fakeEl = () => ({
@@ -74,6 +78,7 @@ vm.runInNewContext(fs.readFileSync(commonPath, 'utf8'), sandbox, { filename: com
 vm.runInNewContext(fs.readFileSync(dataPath, 'utf8'), sandbox, { filename: dataPath });
 vm.runInNewContext(fs.readFileSync(tlnVdPath, 'utf8'), sandbox, { filename: tlnVdPath });
 vm.runInNewContext(fs.readFileSync(tlnHotPath, 'utf8'), sandbox, { filename: tlnHotPath });
+vm.runInNewContext(fs.readFileSync(schoolPath, 'utf8'), sandbox, { filename: schoolPath });
 
 const C = sandbox.TOAN_COMMON;
 const scoringTests = {
@@ -99,11 +104,12 @@ console.log(JSON.stringify({
   de_mau: sandbox.TOAN_DE_MAU,
   tln_vd: sandbox.TOAN_TLN_VANDUNG,
   tln_hot: sandbox.TOAN_TLN_HOT_2026,
+  school: sandbox.TOAN_DE_TRUONG,
   scoringTests
 }));
 """
     res = subprocess.run(
-        ["node", "-e", node_script, COMMON_JS_PATH, DATA_JS_PATH, TLN_VD_JS_PATH, TLN_HOT_JS_PATH],
+        ["node", "-e", node_script, COMMON_JS_PATH, DATA_JS_PATH, TLN_VD_JS_PATH, TLN_HOT_JS_PATH, SCHOOL_JS_PATH],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -570,6 +576,177 @@ def verify_math_independently(de):
     assert p3["TLN-06"]["dap_an"] == "1,31"
 
 
+def verify_school_sets(sets, matrix):
+    canonical = {(q["phan"], q["so_cau"]): q for q in matrix["danh_sach_cau"]}
+    questions = {}
+    for letter, pack in sets.items():
+        assert [(q["phan"], q["so_cau"]) for q in pack] == [
+            (part, number) for part in ("DS", "TLN") for number in range(1, 5)
+        ]
+        for q in pack:
+            key = q["id"]
+            assert key == f"TR-{letter.upper()}-{q['phan']}{q['so_cau']}" and key not in questions
+            questions[key] = q
+            expected = canonical[q["phan"], q["so_cau"]]
+            for field in ("chu_de", "tieu_muc", "ma_lenh", "cap_do", "nang_luc"):
+                assert q[field] == expected[field], (key, field)
+            assert q["goi_y"] and q["bay"] and len(q["loi_giai"]) == 6
+            assert q["ban"] and q["cau_goc"] and q["nguon"]
+            assert re.fullmatch(r"https://toanmath[.]com/toanmath-pdf/[a-z0-9-]+[.]pdf#page=[1-9][0-9]*", q["lien_nguon"])
+            if q["nang_luc"] == "MHH":
+                assert len(q["mo_hinh_hoa"]) == 5
+            if q["phan"] == "DS":
+                assert len(q["cac_y"]) == 4
+                for sub, slot in zip(q["cac_y"], expected["lenh"]):
+                    assert sub["giai_thich"] and all(sub[k] == slot[k] for k in slot), key
+            else:
+                assert len(q["dap_an"]) <= 4 and re.fullmatch(r"-?[0-9]+(,[0-9]+)?", q["dap_an"])
+    assert len(questions) == 16
+
+    # Liệt kê hoán vị để kiểm tra độc lập các xác suất của bài ghép tem.
+    count_x = count_y = count_xy = count_yz = count_xyz = 0
+    for perm in permutations(range(8)):
+        x = sum(i != value for i, value in enumerate(perm)) == 3
+        y = perm[0] == 0
+        z = perm[1] != 1 and perm[2] != 2
+        count_x += x
+        count_y += y
+        count_xy += x and y
+        count_yz += y and z
+        count_xyz += x and y and z
+
+    # Dùng lương từng tháng và bảng số dư từng năm làm hai phép kiểm tra độc lập.
+    salary_a = [10 + 6 * (month // 36) for month in range(240)]
+    salary_b = [10 * 1.4 ** (month // 36) for month in range(240)]
+    balances, skipped = [0], 0
+    for year in range(1, 7):
+        balances.append(1.12 * balances[-1] + 50)
+        skipped = skipped * 1.12 + (0 if year == 3 else 50)
+
+    # Hộp được chọn đúng một lần. Liệt kê có trọng số vì ba hộp khác kích thước.
+    draws = [(size, first, second, Fraction(1, 3 * size**2))
+             for size in (4, 3, 2) for first in range(1, size + 1) for second in range(1, size + 1)]
+    p1 = sum(w for _, first, _, w in draws if first == 1)
+    p13 = sum(w for _, first, second, w in draws if (first, second) == (1, 3))
+
+    def f(x):
+        return Fraction(3 * x + 2, x - 2)
+
+    def cubic(x):
+        return x * x * (3 - x)
+
+    def intersections_at(level):
+        # Trên ba nhánh đơn điệu, các giá trị cực trị là 0 và 4.
+        if level in (0, 4):
+            return 2
+        return 3 if 0 < level < 4 else 1
+
+    def distance_squared(t):
+        return math.dist((2 + 3*t, -6 + 4*t, 3), (58 - 4*t, 10 - t, 11)) ** 2
+
+    tangent_offsets = [f(x) + 2*x for x in (0, 4)]
+    point_a, point_b = (4, 5, 6), (2, 4, 9)
+    ab = tuple(v - u for u, v in zip(point_a, point_b))
+    normal = (2, 1, -1)
+    dot = sum(u * v for u, v in zip(ab, normal))
+    four_roots = [m for m in range(1, 5) if intersections_at(m) + intersections_at(-m) == 4]
+    a, b, c = 74, -944, 3456 - 22**2
+    roots = [(-b + sign * math.sqrt(b*b - 4*a*c)) / (2*a) for sign in (-1, 1)]
+    total_perms = math.factorial(8)
+    answers_ds = {
+        "TR-A-DS1": [
+            3*2 + 2 != 0,
+            f(3) < f(4),
+            all(f(x) == 3 + Fraction(8, x-2) for x in (0, 1, 3, 4)),
+            abs(tangent_offsets[1] - tangent_offsets[0]) == 16,
+        ],
+        "TR-A-DS2": [
+            ab == (-2, -1, 3),
+            dot == 8,
+            sum(u*v for u, v in zip(point_a, normal)) == 7,
+            math.isclose(abs(dot) / math.hypot(*normal), 8 / math.sqrt(6)),
+        ],
+        "TR-A-DS3": [
+            salary_a.count(10) == 36,
+            math.isclose(salary_b[72], 10 * 1.4**2),
+            salary_b[108] > salary_a[108],
+            round(sum(salary_b) - sum(salary_a)) == 1180,
+        ],
+        "TR-A-DS4": [
+            Fraction(count_y, total_perms) == Fraction(1, 8),
+            Fraction(count_x, total_perms) == Fraction(1, 180),
+            Fraction(count_xy, count_y) == Fraction(1, 36),
+            Fraction(count_xyz, count_yz) == Fraction(1, 372),
+        ],
+        "TR-B-DS1": [
+            cubic(0) == 0,
+            cubic(1.5) < cubic(1),
+            intersections_at(4) == 2,
+            len(four_roots) == 4,
+        ],
+        "TR-B-DS2": [
+            math.hypot(3, 4) == 5,
+            -6 + 4*8 == 32,
+            2 + 3*8 == 58 - 4*8 == 26,
+            roots[0] != roots[1] and all(0 < t < 8 and math.isclose(distance_squared(t), 484) for t in roots),
+        ],
+        "TR-B-DS3": [
+            balances[1] == 56,
+            balances[2] == 106,
+            balances[5] >= 320,
+            skipped >= 320,
+        ],
+        "TR-B-DS4": [
+            sum(w for n, i, _, w in draws if n == 4 and i == 1) * 3 == Fraction(1, 4),
+            sum(w for _, i, _, w in draws if i == 3) == Fraction(5, 36),
+            sum(w for n, i, _, w in draws if n == 4 and i == 1) / p1 == Fraction(3, 13),
+            sum(w for n, i, j, w in draws if n == 3 and (i, j) == (1, 3)) / p13 == Fraction(16, 27),
+        ],
+    }
+    for key, answers in answers_ds.items():
+        assert [s["dap_an"] for s in questions[key]["cac_y"]] == answers, key
+
+    # Đếm trực tiếp các tứ giác có hai cạnh đối cùng phương theo tổng chỉ số.
+    valid, trapezoids = 0, 0
+    for i, j, k, l in combinations(range(1, 33), 4):
+        if not any(v % 2 for v in (i, j, k, l)):
+            continue
+        valid += 1
+        trapezoids += (i+j-k-l) % 32 == 0 or (j+k-l-i) % 32 == 0
+    probability = Fraction(trapezoids, valid)
+    count_ap = sum(j-i == k-j == l-k for i, j, k, l in combinations(range(1, 21), 4))
+    # Đếm dấu g' trên lưới (hai đầu đã nằm ngoài mọi nghiệm).
+    def composite_derivative(x):
+        h = x**3 - 3*x
+        return (h-1)*(h-2)**2*(h-3)**3 * (3*x*x-3)
+    slopes = [composite_derivative(i/1000) for i in range(-4000, 4001)]
+    signs = [v > 0 for v in slopes if v]
+    switches = sum(u != v for u, v in zip(signs, signs[1:]))
+
+    def fmt(number, precision):
+        return f"{number:.{precision}f}".replace(".", ",")
+
+    profit = lambda x: (-x*x+24*x+18)/(x+3)
+    # Hai giao điểm bên phải x = 2 ⇔ t² − (m−1)t + 8 có hai nghiệm dương phân biệt.
+    two_right = sum(m-1 > 0 and (m-1)**2 > 32 for m in range(13))
+    balloon_gap = min(math.dist((50+t, 40+2*t, 20), (60-2*t, 50+3*t, 30)) for t in (i/100 for i in range(1001)))
+    cable = min(30*(4-x/1000) + 50*math.hypot(3, x/1000) for x in range(4001))
+    sx = math.sqrt(18**2 - 4**2 - 2**2)
+    projected = (36, -2+4*32/sx, 3-2*32/sx)
+    answers_short = {
+        "TR-A-TLN1": fmt(max(profit(i/1000) for i in range(2000, 10001)), 1),
+        "TR-A-TLN2": str(two_right),
+        "TR-A-TLN3": str(probability.denominator-probability.numerator),
+        "TR-A-TLN4": fmt(balloon_gap, 1),
+        "TR-B-TLN1": fmt(cable, 0),
+        "TR-B-TLN2": str(switches),
+        "TR-B-TLN3": str(Fraction(math.comb(20,4), count_ap)),
+        "TR-B-TLN4": fmt(math.dist(projected, (36, -2, 3)), 2)
+    }
+    for key, answer in answers_short.items():
+        assert questions[key]["dap_an"] == answer, (key, answer)
+
+
 def check_zero_cdn_and_offline():
     forbidden_patterns = [
         (re.compile(r"https?://", re.I), "URL ngoài (http/https)"),
@@ -585,6 +762,9 @@ def check_zero_cdn_and_offline():
                 scanned += 1
                 with open(path, "r", encoding="utf-8") as f:
                     content = f.read()
+                if path == SCHOOL_JS_PATH:
+                    # Liên kết PDF để người học tự mở. Tệp này không tải PDF khi chạy web.
+                    content = re.sub(r"(?m)^ +pdf: 'https://toanmath[.]com/toanmath-pdf/[a-z0-9-]+[.]pdf'$", "", content)
                 for pat, msg in forbidden_patterns:
                     if fn == "sw.js" and msg.startswith("fetch()"):
                         continue
@@ -603,12 +783,14 @@ def main():
     verify_math_independently(runtime["de_mau"])
     tln_count = verify_tln_van_dung(runtime["tln_vd"])
     hot_count = verify_tln_hot_2026(runtime["tln_hot"])
+    verify_school_sets(runtime["school"], matrix_json)
     scanned_files = check_zero_cdn_and_offline()
 
     print("PASS 22/22 câu (34/34 lệnh hỏi) khớp 100% ma_tran_de_2026.json!")
     print("PASS kiểm chứng toán học độc lập: 12 TN + 16 ý ĐS + 6 TLN (<= 4 ký tự).")
     print(f"PASS kiểm chứng độc lập {tln_count} câu TLN Vận dụng & Mở rộng (14 VD + Đề 01 + Đề 02).")
     print(f"PASS kiểm chứng độc lập {hot_count} câu TLN Đề HOT 2026 (15 VD C1-C4 + 5 Hiểu C5-C6).")
+    print("PASS 2 bộ đề trường: 32 ý Đúng/Sai, 8 câu TLN, đúng vị trí, đáp án và lời giải.")
     print("PASS thang chấm điểm JS: 0,25 TN | 0,10-0,25-0,50-1,00 ĐS | 0,50 TLN.")
     print(f"PASS 0 CDN violations across {scanned_files} web files (.html/.css/.js).")
 

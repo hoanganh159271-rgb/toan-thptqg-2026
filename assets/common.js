@@ -261,7 +261,7 @@
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
       var manifestLink = document.querySelector('link[rel="manifest"]');
       if (manifestLink) {
-        navigator.serviceWorker.register('./sw.js').catch(function () {});
+        navigator.serviceWorker.register(new URL('sw.js', manifestLink.href)).catch(function () {});
       }
     }
   }
@@ -341,6 +341,49 @@
       return Math.abs(uNum - eNum) < 1e-9;
     }
     return false;
+  }
+
+  var bankLoads = Object.create(null);
+  function loadQuestionBank(file) {
+    if (!bankLoads[file]) {
+      bankLoads[file] = new Promise(function (resolve, reject) {
+        var script = document.createElement('script');
+        script.src = file;
+        script.onload = resolve;
+        script.onerror = function () {
+          delete bankLoads[file];
+          script.remove();
+          reject(new Error('Không tải được bộ câu hỏi.'));
+        };
+        document.head.appendChild(script);
+      });
+    }
+    return bankLoads[file];
+  }
+
+  function questionSource(q) {
+    if (!q.lien_nguon) return q.nguon || '';
+    return q.ban + ' · <a class="source-link" href="' + q.lien_nguon +
+      '" target="_blank" rel="noopener noreferrer">' + q.nguon + '</a>';
+  }
+
+  function questionHint(q) {
+    var hint = q.goi_y || (q.loi_giai || []).find(function (step) { return /^Ý tưởng:/.test(step); });
+    if (!hint) return '';
+    return '<details class="study-hint"><summary>Gợi ý cách bắt đầu</summary><p>' +
+      hint.replace(/^Ý tưởng:\s*/, '') + '</p></details>';
+  }
+
+  function solutionSteps(q) {
+    function list(steps) {
+      return '<ol class="step-list">' + steps.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol>';
+    }
+    var html = '<h4>Lời giải 6 bước</h4>' + list(q.loi_giai);
+    if (q.bay) html += '<p class="study-trap"><strong>Chỗ dễ nhầm</strong> ' + q.bay + '</p>';
+    if (q.mo_hinh_hoa) {
+      html += '<details class="study-hint"><summary>5 bước mô hình hóa</summary>' + list(q.mo_hinh_hoa) + '</details>';
+    }
+    return html;
   }
 
   function formatNum(val, digits) {
@@ -897,6 +940,10 @@
     scorePart3: scorePart3,
     validateShortAnswer: validateShortAnswer,
     compareShortAnswer: compareShortAnswer,
+    loadQuestionBank: loadQuestionBank,
+    questionSource: questionSource,
+    questionHint: questionHint,
+    solutionSteps: solutionSteps,
     formatNum: formatNum,
     setupCanvas: setupCanvas,
     createPlot2D: createPlot2D,

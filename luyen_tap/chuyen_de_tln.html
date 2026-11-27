@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chuyên đề Trả lời ngắn Mức Vận dụng 2026 — Toán THPTQG</title>
   <link rel="stylesheet" href="../assets/style.css">
+  <link rel="manifest" href="../manifest.json">
 </head>
 <body>
   <header class="topbar">
@@ -25,6 +26,7 @@
   <main class="wrap">
     <nav class="tab-bar" id="tlnTabBar" aria-label="Điều hướng Chuyên đề Trả lời ngắn" style="margin-bottom: 24px;">
       <button type="button" class="tab-btn active" data-tln-tab="tongquan">Tổng quan &amp; Chiến lược</button>
+      <button type="button" class="tab-btn" data-tln-tab="de_truong">Câu vận dụng từ đề trường</button>
       <button type="button" class="tab-btn" data-tln-tab="cd1">CĐ 1: GTLN–GTNN (C1-MHH2.2)</button>
       <button type="button" class="tab-btn" data-tln-tab="cd2">CĐ 2: Khảo sát &amp; Đồ thị (C2-GQ2.2)</button>
       <button type="button" class="tab-btn" data-tln-tab="cd3">CĐ 3: Xác suất (C3-MHH2.2)</button>
@@ -58,16 +60,18 @@
 
   <script src="../assets/common.js"></script>
   <script src="data_tln_van_dung.js"></script>
-  <script src="data_tln_hot_2026.js"></script>
   <script>
     (function () {
       'use strict';
       var C = window.TOAN_COMMON;
       var D = window.TOAN_TLN_VANDUNG;
-      var HOT = window.TOAN_TLN_HOT_2026 || { meta: {}, danh_sach_cau: [] };
+      var HOT = { meta: {}, danh_sach_cau: [] };
+      var schoolItems = [];
+      var questionsById = new Map();
+      var tabRequest = 0;
       C.initTheme();
 
-      var validTabs = ['tongquan', 'cd1', 'cd2', 'cd3', 'cd4', 'cd56', 'hot20'];
+      var validTabs = ['tongquan', 'cd1', 'cd2', 'cd3', 'cd4', 'cd56', 'hot20', 'de_truong'];
       var params = new URLSearchParams(window.location.search);
       var activeTab = params.get('tab') || 'tongquan';
       if (validTabs.indexOf(activeTab) < 0) activeTab = 'tongquan';
@@ -78,18 +82,8 @@
       var stateModalTarget = null;
 
       function renderExampleCard(vd) {
+        questionsById.set(vd.id, vd);
         var capLabel = vd.cap_do === 'VD' ? 'Vận dụng' : 'Hiểu';
-        var mhhHtml = '';
-        if (vd.mo_hinh_hoa && vd.mo_hinh_hoa.length) {
-          mhhHtml = '<div class="mhh-box"><h4>5 bước Mô hình hóa (MHH)</h4><ol class="step-list">' +
-            vd.mo_hinh_hoa.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
-            '</ol></div>';
-        }
-        var solHtml = mhhHtml +
-          '<h4>Lời giải 6 bước tư duy</h4><ol class="step-list">' +
-          vd.loi_giai.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
-          '</ol>' +
-          '<p style="margin-top: 12px;"><strong>Đáp số điền phiếu:</strong> <span class="badge badge-ok mono">' + vd.dap_an + '</span></p>';
 
         var savedVal = stateInputs[vd.id] || '';
         return '<article class="card question-card" id="vd-' + vd.id + '">' +
@@ -100,21 +94,22 @@
               '<span class="badge">' + capLabel + '</span>' +
               '<span class="badge badge-info">' + vd.nang_luc + '</span>' +
             '</div>' +
-            '<span class="muted" style="font-size: 0.85rem;">Mục ' + vd.tieu_muc + (vd.nguon ? ' • ' + vd.nguon : '') + '</span>' +
+            '<span class="muted question-meta">Mục ' + vd.tieu_muc + (vd.nguon ? ' · ' + C.questionSource(vd) : '') + '</span>' +
           '</div>' +
           '<div class="q-stem">' + vd.de_bai + '</div>' +
+          C.questionHint(vd) +
           '<div class="tln-box">' +
             '<input type="text" class="tln-input" maxlength="6" inputmode="decimal" value="' + savedVal.replace(/"/g, '&quot;') + '" data-vd-input="' + vd.id + '" placeholder="Tối đa 4 ký tự" aria-label="Đáp án ' + vd.nhan + '">' +
             '<button type="button" class="btn btn-sm btn-primary" data-vd-check="' + vd.id + '">Kiểm tra đáp số</button>' +
-            '<button type="button" class="btn btn-sm" data-vd-sol-btn="' + vd.id + '">Xem phương pháp &amp; lời giải</button>' +
+            '<button type="button" class="btn btn-sm" data-vd-sol-btn="' + vd.id + '" aria-expanded="false" aria-controls="vd-sol-' + vd.id + '">Xem lời giải</button>' +
             '<button type="button" class="btn btn-sm" style="display: none;" data-vd-log="' + vd.id + '">Đẩy vào Nhật ký lỗi</button>' +
           '</div>' +
           '<div style="margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">' +
             '<span class="muted" style="font-size: 0.88rem;">' + vd.quy_tac_lam_tron + '</span>' +
             '<span class="badge badge-err" style="display: none;" data-vd-warn="' + vd.id + '"></span>' +
-            '<span class="badge" style="display: none;" data-vd-res="' + vd.id + '"></span>' +
+            '<span class="answer-feedback" role="status" data-vd-res="' + vd.id + '"></span>' +
           '</div>' +
-          '<div class="solution-box" id="vd-sol-' + vd.id + '" style="display: none;">' + solHtml + '</div>' +
+          '<div class="solution-box" id="vd-sol-' + vd.id + '" hidden></div>' +
         '</article>';
       }
 
@@ -271,7 +266,16 @@
           '</div>' +
           examplesHtml +
         '</section>' +
-        hotSectionHtml;
+        hotSectionHtml + renderSchoolQuestions(schoolItems.filter(function (q) { return q.chuyen_de_key === tabKey; }));
+      }
+
+      function renderSchoolQuestions(items) {
+        if (!items.length) return '';
+        return '<section class="section"><div class="section-head"><div><h2>Trả lời ngắn từ đề trường</h2>' +
+          '<p>' + items.length + ' bài. Mở gợi ý khi cần, sau đó nhập đáp số để tự kiểm tra.</p></div>' +
+          '<div class="tag-row"><a class="btn btn-sm" href="phong_thi_toan.html?mode=truong_a">Luyện cả bộ A</a>' +
+          '<a class="btn btn-sm" href="phong_thi_toan.html?mode=truong_b">Luyện cả bộ B</a></div></div>' +
+          items.map(renderExampleCard).join('') + '</section>';
       }
 
       function renderHot20Tab() {
@@ -323,8 +327,6 @@
       }
 
       function bindTabPanelEvents() {
-        var allPool = D.vi_du_chuyen_de.concat(HOT.danh_sach_cau || []);
-
         panel.querySelectorAll('[data-hot-filter]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             stateHotFilter = btn.getAttribute('data-hot-filter') || 'all';
@@ -337,6 +339,10 @@
             var id = inp.getAttribute('data-vd-input');
             stateInputs[id] = inp.value;
             var warn = panel.querySelector('[data-vd-warn="' + id + '"]');
+            var res = panel.querySelector('[data-vd-res="' + id + '"]');
+            res.textContent = '';
+            res.className = 'answer-feedback';
+            panel.querySelector('[data-vd-log="' + id + '"]').style.display = 'none';
             var v = C.validateShortAnswer(inp.value);
             if (!v.valid) {
               warn.style.display = 'inline-flex';
@@ -351,7 +357,7 @@
         panel.querySelectorAll('[data-vd-check]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var id = btn.getAttribute('data-vd-check');
-            var vd = allPool.filter(function (x) { return x.id === id; })[0];
+            var vd = questionsById.get(id);
             var inp = panel.querySelector('[data-vd-input="' + id + '"]');
             var resBadge = panel.querySelector('[data-vd-res="' + id + '"]');
             var logBtn = panel.querySelector('[data-vd-log="' + id + '"]');
@@ -360,7 +366,7 @@
             var raw = inp.value;
             var v = C.validateShortAnswer(raw);
             if (!v.valid || v.empty) {
-              resBadge.className = 'badge badge-warn';
+              resBadge.className = 'answer-feedback feedback-warn';
               resBadge.style.display = 'inline-flex';
               resBadge.textContent = v.empty ? 'Hãy nhập đáp số trước khi kiểm tra.' : v.reason;
               return;
@@ -368,12 +374,12 @@
             var ok = C.compareShortAnswer(raw, vd.dap_an);
             resBadge.style.display = 'inline-flex';
             if (ok) {
-              resBadge.className = 'badge badge-ok';
+              resBadge.className = 'answer-feedback feedback-ok';
               resBadge.textContent = 'Chính xác! Đáp số chuẩn phiếu tô: ' + vd.dap_an;
               if (logBtn) logBtn.style.display = 'none';
             } else {
-              resBadge.className = 'badge badge-err';
-              resBadge.textContent = 'Chưa đúng — hãy rà lại điều kiện, đơn vị hoặc quy tắc làm tròn rồi thử lại.';
+              resBadge.className = 'answer-feedback feedback-err';
+              resBadge.textContent = 'Chưa đúng. ' + (vd.bay || 'Hãy rà lại điều kiện, đơn vị và quy tắc làm tròn rồi thử lại.');
               if (logBtn) logBtn.style.display = 'inline-flex';
             }
           });
@@ -384,30 +390,58 @@
             var id = btn.getAttribute('data-vd-sol-btn');
             var box = document.getElementById('vd-sol-' + id);
             if (!box) return;
-            var opening = box.style.display === 'none';
-            box.style.display = opening ? 'block' : 'none';
-            btn.textContent = opening ? 'Ẩn lời giải' : 'Xem phương pháp & lời giải';
+            var vd = questionsById.get(id);
+            if (box.hidden && !box.hasChildNodes()) {
+              box.innerHTML = C.solutionSteps(vd) + '<p class="answer-key"><strong>Đáp số điền phiếu</strong> ' + vd.dap_an + '</p>';
+            }
+            box.hidden = !box.hidden;
+            btn.setAttribute('aria-expanded', String(!box.hidden));
+            btn.textContent = box.hidden ? 'Xem lời giải' : 'Ẩn lời giải';
           });
         });
 
         panel.querySelectorAll('[data-vd-log]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var id = btn.getAttribute('data-vd-log');
-            var vd = allPool.filter(function (x) { return x.id === id; })[0];
+            var vd = questionsById.get(id);
             if (!vd) return;
             openErrModal(vd);
           });
         });
       }
 
-      function renderActiveTab(tabKey) {
+      async function renderActiveTab(tabKey) {
+        var request = ++tabRequest;
         activeTab = tabKey;
         document.querySelectorAll('[data-tln-tab]').forEach(function (b) {
           b.classList.toggle('active', b.getAttribute('data-tln-tab') === tabKey);
+          b.setAttribute('aria-pressed', String(b.getAttribute('data-tln-tab') === tabKey));
         });
-        panel.innerHTML = tabKey === 'tongquan'
-          ? renderOverview()
-          : (tabKey === 'hot20' ? renderHot20Tab() : renderTopicTab(tabKey));
+        var banks = [];
+        if (tabKey !== 'tongquan' && tabKey !== 'de_truong') banks.push('data_tln_hot_2026.js');
+        if (['de_truong', 'cd1', 'cd2', 'cd3', 'cd4'].includes(tabKey)) banks.push('data_de_truong.js');
+        panel.setAttribute('aria-busy', 'true');
+        panel.textContent = 'Đang mở chuyên đề…';
+        try {
+          await Promise.all(banks.map(C.loadQuestionBank));
+        } catch (err) {
+          if (request !== tabRequest) return;
+          panel.textContent = 'Chưa tải được bộ câu hỏi. Chọn lại chuyên đề để thử lại.';
+          panel.setAttribute('aria-busy', 'false');
+          return;
+        }
+        if (request !== tabRequest) return;
+        HOT = window.TOAN_TLN_HOT_2026 || HOT;
+        if (window.TOAN_DE_TRUONG && !schoolItems.length) {
+          var packs = window.TOAN_DE_TRUONG;
+          schoolItems = packs.a.concat(packs.b).filter(function (q) { return q.phan === 'TLN'; });
+        }
+        questionsById.clear();
+        if (tabKey === 'tongquan') panel.innerHTML = renderOverview();
+        else if (tabKey === 'hot20') panel.innerHTML = renderHot20Tab();
+        else if (tabKey === 'de_truong') panel.innerHTML = renderSchoolQuestions(schoolItems);
+        else panel.innerHTML = renderTopicTab(tabKey);
+        panel.setAttribute('aria-busy', 'false');
         bindTabPanelEvents();
       }
 

@@ -235,22 +235,26 @@
           {
             y: 'a', ma_lenh: 'C1a-GQ', cap_do: 'B', nang_luc: 'GQ',
             noi_dung: 'Tập xác định của hàm số là <span class="m">D = ℝ\\{1}</span> và đồ thị <span class="m">(C)</span> có tiệm cận đứng <span class="m">x = 1</span>.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'x = 1 làm mẫu bằng 0 nhưng tử bằng 1. Giá trị của phân thức tăng hoặc giảm vô hạn khi x tiến tới 1 từ hai phía.'
           },
           {
             y: 'b', ma_lenh: 'C1b-GQ', cap_do: 'H', nang_luc: 'GQ',
             noi_dung: 'Hàm số nghịch biến trên khoảng <span class="m">(0; 2)</span>.',
-            dap_an: false
+            dap_an: false,
+            giai_thich: 'Khoảng (0; 2) chứa x = 1, nơi hàm số không xác định. Chỉ có thể xét riêng (0; 1) và (1; 2).'
           },
           {
             y: 'c', ma_lenh: 'C1c-GQ', cap_do: 'H', nang_luc: 'GQ',
             noi_dung: 'Đồ thị <span class="m">(C)</span> có đường tiệm cận xiên là <span class="m">y = x − 1</span> và tâm đối xứng là <span class="m">I(1; 0)</span>.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'Viết f(x) = x − 1 + 1/(x − 1). Hai tiệm cận x = 1 và y = x − 1 cắt nhau tại tâm (1; 0).'
           },
           {
             y: 'd', ma_lenh: 'C1d-GQ', cap_do: 'VD', nang_luc: 'GQ',
             noi_dung: 'Phương trình <span class="m">f(x) = m</span> có đúng hai nghiệm phân biệt lớn hơn <span class="m">1</span> khi và chỉ khi <span class="m">m > 2</span>.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'Đặt t = x − 1 > 0. Hàm t + 1/t giảm từ +∞ xuống 2 tại t = 1 rồi tăng tới +∞, nên mỗi mức m > 2 cho hai nghiệm.'
           }
         ],
         loi_giai: [
@@ -269,22 +273,26 @@
           {
             y: 'a', ma_lenh: 'C2a-GQ', cap_do: 'B', nang_luc: 'GQ',
             noi_dung: 'Vectơ <span class="m">' + vec('AB') + ' = (2; 2; −2)</span> và độ dài đoạn thẳng <span class="m">AB = 2' + sqrt('3') + '</span>.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'Lấy B trừ A được (2; 2; −2). Tổng bình phương ba thành phần bằng 12 nên độ dài là 2√3.'
           },
           {
             y: 'b', ma_lenh: 'C2b-GQ', cap_do: 'H', nang_luc: 'GQ',
             noi_dung: '<span class="m">' + vec('AB') + ' · ' + vec('AC') + ' = 8</span> và <span class="m">cos(∠BAC) = ' + frac(sqrt('3'), '3') + '</span>.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'AC = (0; 4; 0) nên AB · AC = 8. Chia cho tích hai độ dài 2√3 và 4 được √3/3.'
           },
           {
             y: 'c', ma_lenh: 'C2c-GQ', cap_do: 'H', nang_luc: 'GQ',
             noi_dung: 'Điểm <span class="m">D(1; 2; 4)</span> thỏa mãn <span class="m">ABCD</span> là hình bình hành.',
-            dap_an: false
+            dap_an: false,
+            giai_thich: 'Hai đường chéo của hình bình hành có cùng trung điểm. Từ A + C = B + D được D = (−1; 2; 4), khác hoành độ đã nêu.'
           },
           {
             y: 'd', ma_lenh: 'C2d-GQ', cap_do: 'VD', nang_luc: 'GQ',
             noi_dung: 'Khi điểm <span class="m">M</span> di động trên trục <span class="m">Oy</span>, giá trị nhỏ nhất của biểu thức <span class="m">T = MA² + MB² + MC²</span> bằng <span class="m">30</span>.',
-            dap_an: false
+            dap_an: false,
+            giai_thich: 'Với M = (0; y; 0), tổng bình phương khoảng cách là 3(y − 2)² + 27. Giá trị 27 đạt được tại y = 2.'
           }
         ],
         loi_giai: [
@@ -303,22 +311,26 @@
           {
             y: 'a', ma_lenh: 'C3a-MHH', cap_do: 'B', nang_luc: 'MHH',
             noi_dung: 'Giá trị <span class="m">N₀ = 500</span> và hàm số <span class="m">N(t)</span> đồng biến trên nửa khoảng <span class="m">[0; +∞)</span>.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'N(0) = 500. Sau hai giờ lượng đo được tăng gấp bốn nên tốc độ tăng trưởng r dương và hàm tăng.'
           },
           {
             y: 'b', ma_lenh: 'C3b-MHH', cap_do: 'H', nang_luc: 'MHH',
             noi_dung: 'Hằng số tốc độ tăng trưởng là <span class="m">r = ln 2</span> (giờ⁻¹).',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'Tỉ số N(2)/N(0) = 4 cho e^(2r) = 4, tức r = ln(4)/2 = ln(2).'
           },
           {
             y: 'c', ma_lenh: 'C3c-MHH', cap_do: 'H', nang_luc: 'MHH',
             noi_dung: 'Sau <span class="m">5</span> giờ kể từ thời điểm ban đầu, mẫu có đúng <span class="m">12 000</span> con vi khuẩn.',
-            dap_an: false
+            dap_an: false,
+            giai_thich: 'Mỗi giờ số lượng tăng gấp đôi. Năm giờ sau có 500·2⁵ = 16 000.'
           },
           {
             y: 'd', ma_lenh: 'C3d-MHH', cap_do: 'VD', nang_luc: 'MHH',
             noi_dung: 'Để số lượng vi khuẩn trong mẫu vượt quá <span class="m">100 000</span> con thì cần ít nhất <span class="m">8</span> giờ nguyên.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'Sau 7 giờ có 64 000, còn sau 8 giờ có 128 000. Vì số lượng tăng liên tục, mốc giờ nguyên đầu tiên vượt ngưỡng là 8.'
           }
         ],
         mo_hinh_hoa: [
@@ -334,7 +346,7 @@
           'Điều kiện: t ≥ 0, N(t) > 0.',
           'Ý tưởng: Tìm r từ N(2) để rút gọn hàm mũ về dạng 500·2^t.',
           'Biến đổi: (a) N₀ = 500, N\'(t) = N₀·r·e^(rt) > 0 với r > 0 ⇒ đồng biến ⇒ ĐÚNG. (b) e^(2r) = 4 ⇒ r = ln 2 ⇒ ĐÚNG. (c) N(5) = 500·2⁵ = 16 000 ≠ 12 000 ⇒ SAI. (d) N(7) = 64 000 < 100 000 < 128 000 = N(8) ⇒ cần ít nhất 8 giờ nguyên ⇒ ĐÚNG.',
-          'Kiểm chứng: log₂(200) ≈ 7,6439 nên số nguyên nhỏ nhất vượt 200 là 8. Kết quả: Đ-Đ-S-Đ.'
+          'Kiểm chứng: log₂(200) ≈ 7,6439 nên 8 là số giờ nguyên nhỏ nhất thỏa 2^t > 200. Kết quả: Đ-Đ-S-Đ.'
         ]
       },
       {
@@ -344,22 +356,26 @@
           {
             y: 'a', ma_lenh: 'C4a-GQ', cap_do: 'B', nang_luc: 'GQ',
             noi_dung: 'Số phần tử của không gian mẫu là <span class="m">n(Ω) = 90</span>.',
-            dap_an: false
+            dap_an: false,
+            giai_thich: 'Hai thẻ được lấy đồng thời nên thứ tự không được ghi nhận. C(10,2) = 45 cặp.'
           },
           {
             y: 'b', ma_lenh: 'C4b-GQ', cap_do: 'H', nang_luc: 'GQ',
             noi_dung: 'Xác suất của biến cố <span class="m">B</span> là <span class="m">P(B) = ' + frac('4', '9') + '</span>.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'Tổng chẵn khi hai thẻ cùng chẵn hoặc cùng lẻ. Có 2·C(5,2) = 20 cặp như vậy trong 45 cặp.'
           },
           {
             y: 'c', ma_lenh: 'C4c-GQ', cap_do: 'H', nang_luc: 'GQ',
             noi_dung: 'Hai biến cố <span class="m">A</span> và <span class="m">B</span> độc lập với nhau.',
-            dap_an: false
+            dap_an: false,
+            giai_thich: 'Nếu A xảy ra thì chắc chắn B xảy ra. Khi đó P(B | A) = 1 khác với P(B) = 4/9.'
           },
           {
             y: 'd', ma_lenh: 'C4d-GQ', cap_do: 'VD', nang_luc: 'GQ',
             noi_dung: 'Biết rằng tích hai số ghi trên hai thẻ là số chẵn, xác suất để tổng hai số đó cũng là số chẵn bằng <span class="m">' + frac('2', '7') + '</span>.',
-            dap_an: true
+            dap_an: true,
+            giai_thich: 'Có 35 cặp cho tích chẵn sau khi loại 10 cặp toàn lẻ. Trong đó chỉ 10 cặp toàn chẵn có tổng chẵn, cho xác suất 10/35 = 2/7.'
           }
         ],
         loi_giai: [

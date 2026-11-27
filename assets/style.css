@@ -875,6 +875,106 @@ canvas.math-canvas {
 
 .question-card {
   margin-bottom: 20px;
+  scroll-margin-top: 6rem;
+  overflow-wrap: anywhere;
+}
+
+.school-pack {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.school-pack p, .question-meta {
+  color: var(--ink-muted);
+}
+
+.question-meta {
+  font-size: 0.87rem;
+}
+
+.question-name {
+  margin: 0 0 6px;
+}
+
+.source-link {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.mode-controls, #modeSelect {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#modeSelect {
+  width: min(100%, 36rem);
+}
+
+.study-hint {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface-alt);
+  border-radius: var(--radius-sm);
+}
+
+.study-hint summary {
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.study-hint[open] summary {
+  margin-bottom: 8px;
+}
+
+.study-trap, .answer-key, .statement-feedback {
+  margin-top: 8px;
+}
+
+.study-trap strong, .answer-key strong {
+  margin-right: 4px;
+}
+
+.statement-feedback {
+  flex: 1 0 100%;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.statement-feedback .btn {
+  display: block;
+  margin-top: 8px;
+}
+
+.answer-feedback {
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+.feedback-ok { color: var(--ok); }
+.feedback-warn { color: var(--warn); }
+.feedback-err { color: var(--err); }
+
+.solution-actions, .review-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.solution-actions {
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.review-filter {
+  cursor: pointer;
+}
+
+.review-filter[hidden], .question-card[hidden], .q-nav-btn[hidden] {
+  display: none;
 }
 
 .q-header {
@@ -1140,6 +1240,7 @@ canvas.math-canvas {
   }
   .exam-sidebar {
     position: static;
+    grid-row: 1;
   }
   .canvas-box {
     height: 360px;
@@ -1162,6 +1263,12 @@ canvas.math-canvas {
   }
   .topbar-actions .btn {
     flex: 1 1 auto;
+  }
+  .question-card {
+    scroll-margin-top: 9rem;
+  }
+  .mode-controls {
+    width: 100%;
   }
 }
 

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phòng Thi Chuẩn Ma trận 2026 — Toán THPTQG</title>
   <link rel="stylesheet" href="../assets/style.css">
+  <link rel="manifest" href="../manifest.json">
 </head>
 <body>
   <header class="topbar">
@@ -28,9 +29,15 @@
           <h2 id="examTitle">Đề thi thử chuẩn Ma trận 2026 (22 câu | 34 lệnh | 90 phút)</h2>
           <p class="muted" style="margin-top: 4px;" id="examRuleText">Phần I: 12 câu × 0,25đ | Phần II: 4 câu ĐS lũy tiến (0,10 – 0,25 – 0,50 – 1,00) | Phần III: 6 câu × 0,50đ (tối đa 4 ký tự).</p>
         </div>
-        <div class="tag-row">
-          <select id="modeSelect" aria-label="Chọn chế độ luyện thi" style="width: auto; min-width: 240px;">
+        <div class="tag-row mode-controls">
+          <select id="modeSelect" aria-label="Chọn chế độ luyện thi">
             <option value="full">Đề chuẩn Ma trận 2026 (22 câu • 90')</option>
+            <optgroup label="Câu vận dụng từ đề trường">
+              <option value="truong_a">Bộ A · Luyện 8 câu có gợi ý (45 phút)</option>
+              <option value="truong_b">Bộ B · Luyện 8 câu có gợi ý (45 phút)</option>
+              <option value="full_truong_a">Đề 22 câu với phần vận dụng bộ A (90 phút)</option>
+              <option value="full_truong_b">Đề 22 câu với phần vận dụng bộ B (90 phút)</option>
+            </optgroup>
             <option value="mhh">Chuyên đề 4 câu Mô hình hóa (MHH)</option>
             <option value="tln_de1">Đề tự luyện TLN số 01 — Chuẩn Ma trận (6 câu • 30')</option>
             <option value="tln_de2">Đề tự luyện TLN số 02 — Chuẩn Ma trận (6 câu • 30')</option>
@@ -38,7 +45,7 @@
             <option value="tln_hot20">Tuyển tập 20 câu TLN Đề "HOT" 2026 (20 câu • 90' • Thang 10)</option>
             <option value="tln_hot_vd">15 câu TLN Vận dụng Đề "HOT" 2026 (C1–C4 • 75')</option>
             <option value="tln_hot_h">5 câu TLN Hiểu Đề "HOT" 2026 (C5–C6 • 25')</option>
-            <option value="cd1">Chủ đề 1: Ứng dụng đạo hàm (8 câu)</option>
+            <option value="cd1">Chủ đề 1: Ứng dụng đạo hàm (9 câu)</option>
             <option value="cd2">Chủ đề 2: Lượng giác, Dãy số, Mũ-Log (3 câu)</option>
             <option value="cd3">Chủ đề 3: Tổ hợp – Xác suất (3 câu)</option>
             <option value="cd4">Chủ đề 4: Vectơ không gian &amp; Oxyz (6 câu)</option>
@@ -58,6 +65,7 @@
             <p id="resultSummarySub">—</p>
           </div>
           <div class="tag-row">
+            <label class="review-filter" hidden><input type="checkbox" id="reviewMissed"> <span id="reviewLabel">Chỉ xem câu cần ôn</span></label>
             <button type="button" class="btn btn-sm" id="btnExportErrMd">Xuất Markdown Nhật ký lỗi</button>
           </div>
         </div>
@@ -122,7 +130,7 @@
 
     <!-- Khu vực làm bài -->
     <div class="exam-layout">
-      <div id="questionsContainer"></div>
+      <div id="questionsContainer" aria-busy="true"></div>
 
       <aside class="exam-sidebar card">
         <h3>Bảng điều hướng</h3>
@@ -169,27 +177,20 @@
   </div>
 
   <script src="../assets/common.js"></script>
-  <script src="data_de_mau.js"></script>
-  <script src="data_tln_van_dung.js"></script>
-  <script src="data_tln_hot_2026.js"></script>
   <script>
     (function () {
       'use strict';
       var C = window.TOAN_COMMON;
       var M = window.TOAN_MATRIX;
-      var BANK = window.TOAN_DE_MAU;
-      var TLN_BANK = window.TOAN_TLN_VANDUNG || {};
-      var HOT_BANK = window.TOAN_TLN_HOT_2026 || {};
       C.initTheme();
 
       var params = new URLSearchParams(window.location.search);
       var currentMode = params.get('mode') || 'full';
       var modeSelect = document.getElementById('modeSelect');
-      if (['full', 'mhh', 'tln_de1', 'tln_de2', 'tln_vd', 'tln_hot20', 'tln_hot_vd', 'tln_hot_h', 'cd1', 'cd2', 'cd3', 'cd4', 'cd5'].indexOf(currentMode) >= 0) {
-        modeSelect.value = currentMode;
-      } else {
-        currentMode = 'full';
-      }
+      modeSelect.value = currentMode;
+      if (!modeSelect.value) currentMode = modeSelect.value = 'full';
+      var modeRequest = 0;
+      var reviewMissed = document.getElementById('reviewMissed');
 
       var state = {
         submitted: false,
@@ -198,7 +199,8 @@
         timerSec: 5400,
         elapsedSec: 0,
         timerHandle: null,
-        modalTarget: null
+        modalTarget: null,
+        missed: new Set()
       };
 
       function getTopicName(id) {
@@ -206,32 +208,35 @@
         return found ? found.ngan : ('Chủ đề ' + id);
       }
 
+      function requiredBanks(mode) {
+        if (mode.startsWith('full_truong_')) return ['data_de_mau.js', 'data_de_truong.js'];
+        if (mode.startsWith('truong_')) return ['data_de_truong.js'];
+        if (mode.startsWith('tln_hot')) return ['data_tln_hot_2026.js'];
+        if (mode.startsWith('tln_')) return ['data_tln_van_dung.js'];
+        return ['data_de_mau.js'];
+      }
+
       function buildItems(mode) {
-        if (mode === 'tln_de1') {
-          return (TLN_BANK.de_tu_luyen_1 || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        function part(items, name) {
+          return items.map(function (q) { return Object.assign({ phan: name }, q); });
         }
-        if (mode === 'tln_de2') {
-          return (TLN_BANK.de_tu_luyen_2 || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        if (mode.startsWith('tln_hot')) {
+          var hot = window.TOAN_TLN_HOT_2026.danh_sach_cau;
+          var levels = { tln_hot_vd: 'VD', tln_hot_h: 'H' };
+          return part(hot.filter(function (q) { return !levels[mode] || q.cap_do === levels[mode]; }), 'TLN');
         }
-        if (mode === 'tln_vd') {
-          return (TLN_BANK.vi_du_chuyen_de || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        if (mode.startsWith('tln_')) {
+          var keys = { tln_de1: 'de_tu_luyen_1', tln_de2: 'de_tu_luyen_2', tln_vd: 'vi_du_chuyen_de' };
+          return part(window.TOAN_TLN_VANDUNG[keys[mode]], 'TLN');
         }
-        if (mode === 'tln_hot20') {
-          return (HOT_BANK.danh_sach_cau || []).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
+        var bank = window.TOAN_DE_MAU;
+        if (mode.includes('truong_')) {
+          var pack = window.TOAN_DE_TRUONG[mode.slice(-1)];
+          if (mode.startsWith('truong_')) return pack;
+          var foundation = bank.phan_3.filter(function (q) { return q.cap_do === 'H'; });
+          return part(bank.phan_1, 'TN').concat(pack, part(foundation, 'TLN'));
         }
-        if (mode === 'tln_hot_vd') {
-          return (HOT_BANK.danh_sach_cau || []).filter(function (q) { return q.cap_do === 'VD'; }).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
-        }
-        if (mode === 'tln_hot_h') {
-          return (HOT_BANK.danh_sach_cau || []).filter(function (q) { return q.cap_do === 'H'; }).map(function (q) { return Object.assign({ phan: 'TLN' }, q); });
-        }
-
-        var all = [];
-        BANK.phan_1.forEach(function (q) { all.push(Object.assign({ phan: 'TN' }, q)); });
-        BANK.phan_2.forEach(function (q) { all.push(Object.assign({ phan: 'DS' }, q)); });
-        BANK.phan_3.forEach(function (q) { all.push(Object.assign({ phan: 'TLN' }, q)); });
-
-        if (mode === 'full') return all;
+        var all = part(bank.phan_1, 'TN').concat(part(bank.phan_2, 'DS'), part(bank.phan_3, 'TLN'));
         if (mode === 'mhh') return all.filter(function (q) { return q.nang_luc === 'MHH'; });
         if (mode.indexOf('cd') === 0) {
           var cdNum = Number(mode.slice(2));
@@ -249,19 +254,25 @@
 
       function startTimer(totalMinutes) {
         if (state.timerHandle) clearInterval(state.timerHandle);
-        state.timerSec = totalMinutes * 60;
+        state.startedAt = Date.now();
+        state.durationSec = totalMinutes * 60;
+        state.timerSec = state.durationSec;
         state.elapsedSec = 0;
         document.getElementById('timerBadge').textContent = formatClock(state.timerSec);
-        state.timerHandle = setInterval(function () {
-          if (state.submitted) return;
-          state.elapsedSec += 1;
-          state.timerSec = Math.max(0, state.timerSec - 1);
-          document.getElementById('timerBadge').textContent = formatClock(state.timerSec);
-          if (state.timerSec === 0) {
-            submitExam(true);
-          }
-        }, 1000);
+        state.timerHandle = setInterval(refreshClock, 1000);
       }
+
+      function updateClock() {
+        if (state.submitted || !state.items.length) return;
+        state.elapsedSec = Math.min(state.durationSec, Math.max(0, Math.floor((Date.now() - state.startedAt) / 1000)));
+        state.timerSec = state.durationSec - state.elapsedSec;
+        document.getElementById('timerBadge').textContent = formatClock(state.timerSec);
+        return state.timerSec === 0;
+      }
+      function refreshClock() {
+        if (updateClock()) submitExam(true);
+      }
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) refreshClock(); });
 
       function countAnswered() {
         var count = 0;
@@ -271,8 +282,8 @@
             var ans = state.answers.p2[q.id] || {};
             if (q.cac_y.every(function (sub) { return typeof ans[sub.y] === 'boolean'; })) count++;
           } else if (q.phan === 'TLN') {
-            var v = (state.answers.p3[q.id] || '').trim();
-            if (v) count++;
+            var v = C.validateShortAnswer(state.answers.p3[q.id]);
+            if (v.valid && !v.empty) count++;
           }
         });
         document.getElementById('progressCounter').textContent = 'Đã trả lời: ' + count + ' / ' + state.items.length + ' câu';
@@ -308,7 +319,8 @@
               var a = state.answers.p2[q.id] || {};
               done = Object.keys(a).length === 4;
             } else {
-              done = Boolean((state.answers.p3[q.id] || '').trim());
+              var v = C.validateShortAnswer(state.answers.p3[q.id]);
+              done = v.valid && !v.empty;
             }
             if (done) btn.classList.add('answered');
           } else {
@@ -349,6 +361,7 @@
           if (!list.length) return;
 
           var head = document.createElement('h2');
+          head.dataset.section = sec.key;
           head.style.margin = '24px 0 14px';
           head.textContent = sec.title;
           container.appendChild(head);
@@ -366,9 +379,11 @@
                 '<span class="badge">' + capBadge + '</span>' +
                 '<span class="badge badge-info">' + q.nang_luc + '</span>' +
               '</div>' +
-              '<span class="muted" style="font-size: 0.85rem;">' + getTopicName(q.chu_de) + ' (' + q.tieu_muc + ')' + (q.nguon ? ' • ' + q.nguon : '') + '</span>' +
+              '<span class="muted question-meta">' + getTopicName(q.chu_de) + ' (' + q.tieu_muc + ')' +
+                (q.nguon ? ' · ' + C.questionSource(q) : '') + '</span>' +
               '</div>';
 
+            if (q.vi_tri) html += '<h3 class="question-name">' + q.nhan + '</h3>';
             html += '<div class="q-stem">' + q.de_bai + '</div>';
             if (q.hinh_svg) {
               html += '<div class="q-figure">' + q.hinh_svg + '</div>';
@@ -377,7 +392,7 @@
             if (q.phan === 'TN') {
               html += '<div class="option-list">';
               ['A', 'B', 'C', 'D'].forEach(function (k) {
-                html += '<button type="button" class="option-btn" data-tn-q="' + q.id + '" data-tn-opt="' + k + '">' +
+                html += '<button type="button" class="option-btn" aria-pressed="false" data-tn-q="' + q.id + '" data-tn-opt="' + k + '">' +
                   '<span class="option-key">' + k + '</span>' +
                   '<span>' + q.lua_chon[k] + '</span>' +
                   '</button>';
@@ -388,8 +403,8 @@
                 html += '<div class="ds-row" data-ds-row="' + q.id + '_' + sub.y + '">' +
                   '<div class="ds-text"><strong>' + sub.y + ')</strong> ' + sub.noi_dung + ' <span class="badge">' + sub.ma_lenh + ' (' + sub.cap_do + ')</span></div>' +
                   '<div class="ds-controls">' +
-                    '<button type="button" class="ds-btn" data-ds-q="' + q.id + '" data-ds-sub="' + sub.y + '" data-ds-val="true">Đúng</button>' +
-                    '<button type="button" class="ds-btn" data-ds-q="' + q.id + '" data-ds-sub="' + sub.y + '" data-ds-val="false">Sai</button>' +
+                    '<button type="button" class="ds-btn" aria-pressed="false" data-ds-q="' + q.id + '" data-ds-sub="' + sub.y + '" data-ds-val="true">Đúng</button>' +
+                    '<button type="button" class="ds-btn" aria-pressed="false" data-ds-q="' + q.id + '" data-ds-sub="' + sub.y + '" data-ds-val="false">Sai</button>' +
                   '</div>' +
                 '</div>';
               });
@@ -401,6 +416,7 @@
               '</div>';
             }
 
+            if (currentMode.startsWith('truong_')) html += C.questionHint(q);
             html += '<div class="solution-box" id="sol-' + q.id + '" style="display: none;"></div>';
             card.innerHTML = html;
             container.appendChild(card);
@@ -419,6 +435,7 @@
             state.answers.p1[qid] = opt;
             document.querySelectorAll('[data-tn-q="' + qid + '"]').forEach(function (b) {
               b.classList.toggle('selected', b === btn);
+              b.setAttribute('aria-pressed', String(b === btn));
             });
             updateNavStates();
           });
@@ -434,6 +451,7 @@
             state.answers.p2[qid][sub] = val;
             document.querySelectorAll('[data-ds-q="' + qid + '"][data-ds-sub="' + sub + '"]').forEach(function (b) {
               b.classList.toggle('active', b === btn);
+              b.setAttribute('aria-pressed', String(b === btn));
             });
             updateNavStates();
           });
@@ -524,6 +542,23 @@
                 if (bVal === sub.dap_an) b.classList.add('ds-ok');
                 else if (bVal === ans[sub.y] && ans[sub.y] !== sub.dap_an) b.classList.add('ds-err');
               });
+              var row = document.querySelector('[data-ds-row="' + q.id + '_' + sub.y + '"]');
+              var feedback = document.createElement('div');
+              feedback.className = 'statement-feedback';
+              var choice = ans[sub.y] === undefined ? 'Bỏ trống' : 'Bạn chọn ' + (ans[sub.y] ? 'Đúng' : 'Sai');
+              var verdict = document.createElement('strong');
+              verdict.textContent = choice + ' · Đáp án ' + (sub.dap_an ? 'Đúng' : 'Sai') + '. ';
+              feedback.append(verdict, sub.giai_thich || '');
+              if (!okSub) {
+                var log = document.createElement('button');
+                log.type = 'button';
+                log.className = 'btn btn-sm';
+                log.dataset.logErr = q.id;
+                log.dataset.logSub = sub.y;
+                log.textContent = 'Ghi lỗi ý ' + sub.y;
+                feedback.appendChild(log);
+              }
+              row.appendChild(feedback);
             });
           } else {
             p3Max += 0.5;
@@ -544,20 +579,12 @@
             }
           }
 
-          var sHtml = '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">' +
+          if (!isFullyCorrect) state.missed.add(q.id);
+          var sHtml = '<div class="solution-actions">' +
             '<span class="badge ' + (isFullyCorrect ? 'badge-ok' : 'badge-err') + '">' + qScoreText + '</span>' +
-            '<button type="button" class="btn btn-sm" data-log-err="' + q.id + '">Đẩy vào Nhật ký lỗi</button>' +
+            (q.phan === 'DS' ? '' : '<button type="button" class="btn btn-sm" data-log-err="' + q.id + '">Đẩy vào Nhật ký lỗi</button>') +
             '</div>';
-
-          if (q.mo_hinh_hoa) {
-            sHtml += '<div class="mhh-box"><h4>5 bước Mô hình hóa (MHH)</h4><ol class="step-list">' +
-              q.mo_hinh_hoa.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
-              '</ol></div>';
-          }
-
-          sHtml += '<h4>Lời giải 6 bước tư duy</h4><ol class="step-list">' +
-            q.loi_giai.map(function (st) { return '<li>' + st + '</li>'; }).join('') +
-            '</ol>';
+          sHtml += C.solutionSteps(q);
 
           solBox.innerHTML = sHtml;
           solBox.style.display = 'block';
@@ -569,7 +596,8 @@
             var qid = btn.getAttribute('data-log-err');
             var q = state.items.filter(function (x) { return x.id === qid; })[0];
             if (!q) return;
-            openErrModal(q);
+            var sub = q.phan === 'DS' && q.cac_y.find(function (item) { return item.y === btn.dataset.logSub; });
+            openErrModal(q, sub, btn);
           });
         });
 
@@ -622,6 +650,8 @@
         }).join('');
 
         document.getElementById('resultSection').style.display = 'block';
+        reviewMissed.parentElement.hidden = !state.missed.size;
+        document.getElementById('reviewLabel').textContent = 'Chỉ xem câu cần ôn (' + state.missed.size + ')';
         document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         C.recordExamResult({
@@ -638,8 +668,22 @@
         });
       }
 
+      reviewMissed.addEventListener('change', function () {
+        var visibleParts = new Set();
+        state.items.forEach(function (q) {
+          var hide = reviewMissed.checked && !state.missed.has(q.id);
+          document.getElementById('card-' + q.id).hidden = hide;
+          document.querySelector('[data-nav-id="' + q.id + '"]').hidden = hide;
+          if (!hide) visibleParts.add(q.phan);
+        });
+        document.querySelectorAll('[data-section]').forEach(function (heading) {
+          heading.hidden = !visibleParts.has(heading.dataset.section);
+        });
+      });
+
       function submitExam(auto) {
-        if (state.submitted) return;
+        if (state.submitted || !state.items.length) return;
+        auto = updateClock() || auto;
         state.submitted = true;
         if (state.timerHandle) clearInterval(state.timerHandle);
         document.getElementById('btnSubmitExam').disabled = true;
@@ -655,10 +699,11 @@
         return '<option value="' + g + '">' + g + '</option>';
       }).join('');
 
-      function openErrModal(q) {
-        state.modalTarget = q;
+      function openErrModal(q, sub, button) {
+        var meta = sub || q;
+        state.modalTarget = { question: q, meta: meta, button: button };
         document.getElementById('errModalMeta').textContent =
-          'Thẻ gắn tự động: [' + q.ma_lenh + '] + [Cấp độ: ' + q.cap_do + '] + [Năng lực: ' + q.nang_luc + ']';
+          'Thẻ gắn tự động: [' + meta.ma_lenh + '] + [Cấp độ: ' + meta.cap_do + '] + [Năng lực: ' + meta.nang_luc + ']';
         document.getElementById('errNoteInput').value = '';
         errModal.classList.add('open');
       }
@@ -668,19 +713,20 @@
       });
 
       document.getElementById('btnSaveErrLog').addEventListener('click', function () {
-        var q = state.modalTarget;
-        if (!q) return;
+        var target = state.modalTarget;
+        if (!target) return;
+        var q = target.question;
         C.addErrorLog({
           chu_de: q.chu_de,
-          ma_lenh: q.ma_lenh,
-          cap_do: q.cap_do,
-          nang_luc: q.nang_luc,
-          tom_tat: q.phan + ' Câu ' + q.so_cau + ' (' + q.tieu_muc + ')',
+          ma_lenh: target.meta.ma_lenh,
+          cap_do: target.meta.cap_do,
+          nang_luc: target.meta.nang_luc,
+          tom_tat: (q.nhan || (q.phan + ' câu ' + q.so_cau)) + (target.meta.y ? ' · ý ' + target.meta.y : '') + ' (' + q.tieu_muc + ')',
           nhom_loi: errGroupSelect.value,
           ghi_chu: document.getElementById('errNoteInput').value
         });
         errModal.classList.remove('open');
-        var triggerBtn = document.querySelector('[data-log-err="' + q.id + '"]');
+        var triggerBtn = target.button;
         if (triggerBtn) {
           triggerBtn.textContent = 'Đã lưu Nhật ký lỗi';
           triggerBtn.classList.add('btn-ok');
@@ -707,24 +753,33 @@
         } catch (e) {}
       });
 
-      function initExam(mode) {
+      async function initExam(mode) {
+        var request = ++modeRequest;
         currentMode = mode;
+        clearInterval(state.timerHandle);
         state.submitted = false;
         state.answers = { p1: {}, p2: {}, p3: {} };
-        state.items = buildItems(mode);
+        state.items = [];
+        state.missed.clear();
+        reviewMissed.checked = false;
+        state.modalTarget = null;
+        errModal.classList.remove('open');
         document.getElementById('resultSection').style.display = 'none';
-        document.getElementById('btnSubmitExam').disabled = false;
-        document.getElementById('btnSubmitExam').textContent = 'Nộp bài thi & Chấm điểm';
-
-        var minutes = mode === 'full' ? 90
-          : (mode === 'tln_hot20' ? 90
-          : (mode === 'tln_hot_vd' ? 75
-          : (mode === 'tln_vd' ? 60
-          : ((mode === 'tln_de1' || mode === 'tln_de2') ? 30
-          : (mode === 'tln_hot_h' ? 25
-          : Math.max(15, state.items.length * 5))))));
+        var submit = document.getElementById('btnSubmitExam');
+        submit.disabled = true;
+        submit.textContent = 'Nộp bài thi & Chấm điểm';
+        var container = document.getElementById('questionsContainer');
+        container.setAttribute('aria-busy', 'true');
+        container.textContent = 'Đang mở bộ câu hỏi…';
+        document.getElementById('navGrid').replaceChildren();
+        document.getElementById('progressCounter').textContent = '';
+        document.getElementById('timerBadge').textContent = '—';
         var titleMap = {
           full: 'Đề thi thử chuẩn Ma trận 2026 (22 câu | 34 lệnh | 90 phút)',
+          truong_a: 'Vận dụng từ đề trường · Bộ A',
+          truong_b: 'Vận dụng từ đề trường · Bộ B',
+          full_truong_a: 'Đề 22 câu · Phần vận dụng bộ A',
+          full_truong_b: 'Đề 22 câu · Phần vận dụng bộ B',
           mhh: 'Luyện tập chuyên sâu: 4 câu Mô hình hóa (MHH)',
           tln_de1: 'Đề tự luyện Trả lời ngắn số 01 (6 câu | 4 VD + 2 Hiểu | 30 phút)',
           tln_de2: 'Đề tự luyện Trả lời ngắn số 02 (6 câu | 4 VD + 2 Hiểu | 30 phút)',
@@ -739,13 +794,39 @@
           cd5: 'Luyện theo Chủ đề 5: Quan hệ vuông góc 3D'
         };
         document.getElementById('examTitle').textContent = titleMap[mode] || titleMap.full;
+        var ruleText = document.getElementById('examRuleText');
+        ruleText.textContent = '';
+        try {
+          await Promise.all(requiredBanks(mode).map(C.loadQuestionBank));
+          if (request !== modeRequest) return;
+          state.items = buildItems(mode);
+        } catch (err) {
+          if (request !== modeRequest) return;
+          container.textContent = 'Chưa tải được câu hỏi. Bấm “Làm lại từ đầu” để thử tải lại.';
+          container.setAttribute('aria-busy', 'false');
+          return;
+        }
+        var durations = { full: 90, full_truong_a: 90, full_truong_b: 90, truong_a: 45, truong_b: 45,
+          tln_hot20: 90, tln_hot_vd: 75, tln_hot_h: 25, tln_vd: 60, tln_de1: 30, tln_de2: 30 };
+        var minutes = durations[mode] || Math.max(15, state.items.length * 5);
+        var counts = { TN: 0, DS: 0, TLN: 0 };
+        state.items.forEach(function (q) { counts[q.phan]++; });
+        var parts = [];
+        if (counts.TN) parts.push(counts.TN + ' câu trắc nghiệm × 0,25đ');
+        if (counts.DS) parts.push(counts.DS + ' câu đúng/sai chấm lũy tiến');
+        if (counts.TLN) parts.push(counts.TLN + ' câu trả lời ngắn × 0,50đ');
+        ruleText.textContent = minutes + ' phút · ' + parts.join(' · ') + '.' +
+          (mode.startsWith('full_truong_') ? ' 12 câu trắc nghiệm và 2 câu Hiểu dùng chung với đề mẫu.' : '');
         renderQuestions();
         renderNav();
         startTimer(minutes);
+        container.setAttribute('aria-busy', 'false');
+        submit.disabled = false;
       }
 
       modeSelect.addEventListener('change', function () {
         initExam(modeSelect.value);
+        try { history.replaceState(null, '', '?mode=' + encodeURIComponent(modeSelect.value)); } catch (e) {}
       });
       document.getElementById('btnResetExam').addEventListener('click', function () {
         initExam(currentMode);
