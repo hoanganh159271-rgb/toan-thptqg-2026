@@ -213,6 +213,83 @@
       " câu sai hoặc được bạn lưu lại. Mỗi câu có gợi ý và giải thích.</p></a></div>"
     );
   }
+  function clipRange(clip) {
+    return clock(clip.start * 1000) + "–" + clock(clip.end * 1000);
+  }
+  function embedUrl(id, start = 0, end = 0) {
+    const params = new URLSearchParams({
+      start: String(start),
+      autoplay: "1",
+      rel: "0",
+      playsinline: "1",
+    });
+    if (end > start) params.set("end", String(end));
+    return "https://www.youtube-nocookie.com/embed/" + id + "?" + params;
+  }
+  function videoFrame(id, start, end, title) {
+    const iframe = document.createElement("iframe");
+    iframe.className = "video";
+    iframe.title = title;
+    iframe.src = embedUrl(id, start, end);
+    iframe.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+    iframe.allowFullscreen = true;
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    return iframe;
+  }
+  function lessonMedia(lesson, part, index) {
+    const stageId = "clip-" + lesson.id + "-" + index;
+    return (
+      '<div class="lesson-media"><h3>Xem đoạn giảng phần này</h3><div class="clip-options">' +
+      part.clips
+        .map(
+          (clip, n) =>
+            '<div class="clip-row"><button class="clip-play" data-action="clip" data-id="' +
+            lesson.id +
+            '" data-part="' +
+            index +
+            '" data-clip="' +
+            n +
+            '" aria-pressed="false" aria-controls="' +
+            stageId +
+            '"><span class="clip-icon" aria-hidden="true">▶</span><span class="clip-copy"><span>' +
+            esc(clip.title) +
+            "</span><small>" +
+            clipRange(clip) +
+            " · " +
+            (clip.video === "EOyxtq2JKRU" ? "Bài 12" : "Bài 13") +
+            '</small></span></button><a class="clip-external" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=' +
+            clip.video +
+            "&t=" +
+            clip.start +
+            's" aria-label="Mở YouTube · ' +
+            esc(clip.title) +
+            '">YouTube ↗</a></div>',
+        )
+        .join("") +
+      '</div><div class="clip-stage" id="' +
+      stageId +
+      '" hidden><p class="clip-now" role="status"></p><div class="clip-screen"></div><button class="button small" data-action="close-clip">Đóng video</button></div>' +
+      (part.videoNote
+        ? '<p class="clip-note">' + esc(part.videoNote) + "</p>"
+        : "") +
+      "</div>"
+    );
+  }
+  function closeLessonVideos(restoreFocus = false) {
+    const active = main.querySelector(
+      '[data-action="clip"][aria-pressed="true"]',
+    );
+    main
+      .querySelectorAll(".clip-screen")
+      .forEach((screen) => screen.replaceChildren());
+    main
+      .querySelectorAll(".clip-stage")
+      .forEach((stage) => (stage.hidden = true));
+    main
+      .querySelectorAll('[data-action="clip"]')
+      .forEach((b) => b.setAttribute("aria-pressed", "false"));
+    if (restoreFocus) active?.focus();
+  }
   function learn(id) {
     if (!id)
       return (
@@ -242,13 +319,27 @@
       '<div class="reading-layout"><article><p class="lesson-intro">' +
       l.intro +
       "</p>" +
+      '<nav class="part-nav" aria-label="Các mục trong bài">' +
+      l.parts
+        .map(
+          (p, i) =>
+            '<button data-action="lesson-part" data-id="' +
+            i +
+            '"><span>' +
+            (i + 1) +
+            "</span>" +
+            esc(p.title) +
+            "</button>",
+        )
+        .join("") +
+      '</nav><p class="lesson-media-help">Mỗi mục có sơ đồ và đoạn giảng riêng. Bấm ▶ để xem ngay từ mốc đã chọn. Video cần Internet.</p>' +
       V.render(l.visual) +
       l.parts
         .map(
           (p, i) =>
             '<section class="lesson-part" id="part-' +
             i +
-            '"><h2>' +
+            '"><h2 tabindex="-1">' +
             p.title +
             "</h2><p>" +
             p.text +
@@ -256,7 +347,9 @@
             V.render(p.visual) +
             '<div class="example-box"><strong>Nhìn qua một ví dụ</strong>' +
             p.example +
-            "</div></section>",
+            "</div>" +
+            lessonMedia(l, p, i) +
+            "</section>",
         )
         .join("") +
       '<section class="card remember"><h3>Chốt lại để nhớ</h3><ul>' +
@@ -1034,7 +1127,7 @@
         )
         .join("") +
       "</div>" +
-      '<p class="source-links">Các mốc thời gian được đối chiếu từ mô tả hai video. Phần kiến thức trên web được biên soạn từ tài liệu bạn gửi, theo phạm vi Bài 12–14 Kết nối tri thức. Chưa trích xuất được phụ đề đầy đủ để đối chiếu từng lời giảng.</p>' +
+      '<p class="source-links">32 mục bài học có 41 đoạn giảng mở đúng mốc, kèm sơ đồ ngay trong bài. Mốc nội dung được đối chiếu với các chương và bản chép lời tự động trên YouTube. Phụ đề tự động có thể nhận sai tên chất; công thức và lời giải trên web được biên soạn từ tài liệu bạn gửi, theo phạm vi Bài 12–14 Kết nối tri thức.</p>' +
       '<div class="section-heading"><h2>9 trang tài liệu gốc</h2>' +
       button("Luyện theo tài liệu", "#practice?source=doc") +
       '</div><p class="muted" style="margin-bottom:18px">Nhấn vào ảnh để phóng lớn. 48 câu được giữ theo nhóm và số câu của bản gửi; các chỗ làm rõ được ghi ngay dưới câu.</p>' +
@@ -1285,14 +1378,39 @@
     }
     if (action === "video") {
       const holder = main.querySelector('[data-video="' + id + '"]');
-      const iframe = document.createElement("iframe");
-      iframe.className = "video";
-      iframe.title = "Bài giảng " + D.videos.find((v) => v.id === id).title;
-      iframe.src = "https://www.youtube-nocookie.com/embed/" + id;
-      iframe.allow = "accelerometer; encrypted-media; picture-in-picture";
-      iframe.allowFullscreen = true;
-      holder.replaceWith(iframe);
+      const video = D.videos.find((v) => v.id === id);
+      if (holder && video)
+        holder.replaceWith(videoFrame(id, 0, 0, video.title));
     }
+    if (action === "lesson-part") {
+      const part = document.getElementById("part-" + id);
+      part?.scrollIntoView({ block: "start" });
+      part?.querySelector("h2").focus({ preventScroll: true });
+    }
+    if (action === "clip") {
+      const lesson = lessons.get(id);
+      const part = lesson?.parts[Number(b.dataset.part)];
+      const clip = part?.clips[Number(b.dataset.clip)];
+      const stage = document.getElementById(b.getAttribute("aria-controls"));
+      if (!clip || !stage) return;
+      closeLessonVideos();
+      b.setAttribute("aria-pressed", "true");
+      stage.hidden = false;
+      stage.querySelector(".clip-now").textContent =
+        clip.title + " · " + clipRange(clip);
+      stage
+        .querySelector(".clip-screen")
+        .append(
+          videoFrame(
+            clip.video,
+            clip.start,
+            clip.end,
+            part.title + " · " + clipRange(clip),
+          ),
+        );
+      stage.scrollIntoView({ block: "nearest" });
+    }
+    if (action === "close-clip") closeLessonVideos(true);
     if (action === "export") {
       const a = document.createElement("a"),
         url = URL.createObjectURL(

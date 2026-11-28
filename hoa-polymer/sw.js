@@ -1,6 +1,6 @@
 /* Bộ nhớ đệm riêng cho website Hóa, gồm bài học và các trang tài liệu. */
 const PREFIX = "hoa-polymer-kntt-";
-const CACHE = PREFIX + "v2";
+const CACHE = PREFIX + "v3";
 const ASSETS = [
   "./",
   "./index.html",

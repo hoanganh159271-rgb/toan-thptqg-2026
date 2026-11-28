@@ -27,7 +27,7 @@ let app=fs.readFileSync(root+'/assets/app.js','utf8');
 const end='  render();\n})();';
 if(!app.endsWith(end+'\n'))throw new Error('Update verifier hook after changing app entry.');
 app=app.slice(0,-(end.length+1))+
- 'window.testAPI={correct,answerComplete,quizPoints,startTest,configs,normalize,state:()=>store};})();';
+ 'window.testAPI={correct,answerComplete,quizPoints,startTest,configs,normalize,learn,embedUrl,state:()=>store};})();';
 vm.runInContext(app,sandbox);
 const api=sandbox.testAPI, data=sandbox.POLYMER_DATA;
 for(const q of data.questions){
@@ -63,7 +63,18 @@ for(const kind of Object.keys(api.configs)){
 }
 for(const l of data.lessons){
  for(const p of l.parts)if(!sandbox.POLYMER_VISUALS.render(p.visual))throw Error('Lesson illustration');
+ const html=api.learn(l.id);
+ const clipCount=l.parts.reduce((n,p)=>n+p.clips.length,0);
+ if(html.includes('<iframe'))throw Error('Video loaded before learner clicks '+l.id);
+ if((html.match(/data-action="clip"/g)||[]).length!==clipCount)throw Error('Missing clip controls '+l.id);
+ for(const p of l.parts)for(const c of p.clips){
+  const url=new URL(api.embedUrl(c.video,c.start,c.end));
+  if(url.hostname!=='www.youtube-nocookie.com'||!url.pathname.endsWith('/'+c.video))throw Error('Wrong video');
+  if(Number(url.searchParams.get('start'))!==c.start||Number(url.searchParams.get('end'))!==c.end)throw Error('Wrong absolute timestamps');
+  if(!html.includes('watch?v='+c.video+'&t='+c.start+'s'))throw Error('Missing YouTube fallback');
+ }
 }
+if(new URL(api.embedUrl(data.videos[0].id)).searchParams.has('end'))throw Error('Full video cut short');
 console.log(JSON.stringify(data));
 """
 result = subprocess.run(["node", "-e", node, str(ROOT)], check=True, capture_output=True, text=True)
@@ -73,6 +84,20 @@ assert len(questions) == 72
 assert Counter(q["source"] for q in questions.values()) == {"doc": 48, "extra": 24}
 assert Counter(q["type"] for q in questions.values()) == {"mc": 43, "tf": 10, "num": 17, "write": 2}
 assert len(data["lessons"]) == 8
+durations = {
+    v["id"]: sum(int(part) * 60 ** i for i, part in enumerate(reversed(v["duration"].split(":"))))
+    for v in data["videos"]
+}
+clips = []
+for lesson in data["lessons"]:
+    for part in lesson["parts"]:
+        assert part["clips"] and part["visual"], (lesson["id"], part["title"])
+        for clip in part["clips"]:
+            assert clip["title"] and clip["video"] in durations
+            assert isinstance(clip["start"], int) and isinstance(clip["end"], int)
+            assert 0 <= clip["start"] < clip["end"] <= durations[clip["video"]], clip
+            clips.append(clip)
+assert len(clips) == 41
 for q in questions.values():
     assert q["hint"] and len(q["steps"]) >= 3 and q["visual"]
     if q["source"] == "doc":
@@ -135,5 +160,6 @@ for file in ROOT.rglob("*.html"):
 print("PASS 48 câu tài liệu + 24 câu bổ sung, đủ lời giải và minh họa.")
 print("PASS 19 cấu tạo/khối lượng mắt xích và 17 đáp án số được kiểm tra độc lập.")
 print("PASS 8 bài, 32 phần có minh họa và 9 trang tài liệu gốc.")
+print("PASS 41 đoạn video cho 32 mục, đúng ID/mốc đầu/mốc cuối, có liên kết dự phòng, chỉ tải khi bấm.")
 print("PASS điểm tối đa 10, điểm từng ý, nhập dấu phẩy/chấm và 90 lượt sinh đề.")
 print("PASS bộ nhớ đệm chứa đủ tệp cục bộ và không có script CDN.")

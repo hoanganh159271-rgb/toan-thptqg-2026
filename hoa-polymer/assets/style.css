@@ -723,6 +723,9 @@ footer {
   gap: 24px;
   align-items: start;
 }
+.reading-layout > article {
+  min-width: 0;
+}
 .reading-sidebar {
   position: sticky;
   top: 24px;
@@ -753,6 +756,9 @@ footer {
 }
 .lesson-part {
   margin: 25px 0;
+  scroll-margin-top: 100px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
 }
 .lesson-part h2 {
   margin-bottom: 11px;
@@ -760,6 +766,127 @@ footer {
 }
 .lesson-part p {
   color: var(--muted);
+}
+.part-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 12px;
+}
+.part-nav button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  text-align: left;
+  font-size: 0.875rem;
+}
+.part-nav button:hover {
+  border-color: var(--green2);
+}
+.part-nav button span {
+  color: var(--green);
+  font-weight: 700;
+}
+.lesson-media-help {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin-bottom: 20px;
+}
+.lesson-media {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.lesson-media h3 {
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+.clip-options {
+  display: grid;
+  gap: 9px;
+}
+.clip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+.clip-play {
+  flex: 1 1 240px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  border-radius: 9px;
+  background: var(--soft);
+  padding: 12px;
+  text-align: left;
+}
+.clip-play:hover,
+.clip-play[aria-pressed="true"] {
+  background: var(--pale);
+  box-shadow: inset 0 0 0 1px var(--green2);
+}
+.clip-icon {
+  flex: 0 0 28px;
+  display: grid;
+  place-items: center;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--green);
+  background: var(--surface);
+  font-size: 0.75rem;
+}
+.clip-copy {
+  min-width: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.clip-copy small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.clip-external {
+  margin-left: auto;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--green);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.clip-stage {
+  margin-top: 18px;
+  scroll-margin-top: 100px;
+}
+.clip-stage[hidden] {
+  display: none;
+}
+.lesson-part .clip-now,
+.lesson-part .clip-note {
+  font-size: 0.875rem;
+}
+.clip-now {
+  color: var(--green);
+  font-weight: 600;
+}
+.clip-screen .video {
+  display: block;
+  margin: 10px 0 12px;
+}
+.clip-note {
+  margin-top: 12px;
 }
 .example-box {
   margin-top: 14px;
@@ -1870,7 +1997,10 @@ th {
   .actions,
   .q-bottom,
   .bookmark,
-  .quiz-aside {
+  .quiz-aside,
+  .part-nav,
+  .lesson-media,
+  .lesson-media-help {
     display: none !important;
   }
   .main-shell {

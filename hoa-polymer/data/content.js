@@ -1972,18 +1972,42 @@ window.POLYMER_DATA = {
           example:
             "Ethylene CH₂=CH₂ là monomer. Đoạn –CH₂–CH₂– là mắt xích của PE.",
           visual: "PE",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 15,
+              end: 108,
+              title: "Từ phân tử nhỏ đến mắt xích lặp lại",
+            },
+          ],
         },
         {
           title: "Hệ số polymer hóa",
           text: "n biểu thị số mắt xích trong một mạch. Với polymer rất dài, thường bỏ qua nhóm cuối và dùng n ≈ M trung bình / M mắt xích. n trung bình có thể không nguyên trước khi làm tròn.",
           example: "PVC có M = 35 000; M mắt xích = 62,5. Suy ra n = 560.",
           visual: "degree",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 1841,
+              end: 1993,
+              title: "Tính số mắt xích bằng M chia M₀",
+            },
+          ],
         },
         {
           title: "Nhìn nhóm thế để gọi tên",
           text: "Với monomer CH₂=CH–R, trùng hợp cho [–CH₂–CH(R)–]ₙ. R vẫn gắn vào carbon đó. Tên đơn giản là poly + tên monomer.",
           example: "R là CH₃ cho PP; Cl cho PVC; C₆H₅ cho PS; CN cho PAN.",
           visual: "PP",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 441,
+              end: 573,
+              title: "Giữ nhóm thế khi viết PP, PS, PVC, PAN và PMMA",
+            },
+          ],
         },
         {
           title: "Nguồn gốc và dạng mạch",
@@ -1991,6 +2015,16 @@ window.POLYMER_DATA = {
           example:
             "Amylose chủ yếu mạch không phân nhánh, amylopectin phân nhánh; cao su lưu hóa có cầu nối giữa mạch.",
           visual: "origin",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 730,
+              end: 813,
+              title: "Phân loại tơ theo nguồn gốc",
+            },
+          ],
+          videoNote:
+            "Video minh họa phân loại theo nguồn gốc qua các loại tơ. Các dạng mạch được phân biệt trong sơ đồ bên trên.",
         },
       ],
       summary: [
@@ -2016,6 +2050,20 @@ window.POLYMER_DATA = {
           example:
             "Ethylene tạo PE. Butadiene + styrene tạo buna-S; butadiene + acrylonitrile tạo buna-N.",
           visual: "addition",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 308,
+              end: 652,
+              title: "Điều kiện và cách viết phản ứng trùng hợp",
+            },
+            {
+              video: "0Y3sKdRggB8",
+              start: 866,
+              end: 941,
+              title: "Đồng trùng hợp tạo buna-S và buna-N",
+            },
+          ],
         },
         {
           title: "Trùng ngưng",
@@ -2023,6 +2071,14 @@ window.POLYMER_DATA = {
           example:
             "Nylon-6,6 từ diamine 6C và diacid 6C. Lapsan từ ethylene glycol và terephthalic acid.",
           visual: "condensation",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 699,
+              end: 803,
+              title: "Nhận ra monomer có thể trùng ngưng",
+            },
+          ],
         },
         {
           title: "Capron có hai con đường",
@@ -2030,6 +2086,20 @@ window.POLYMER_DATA = {
           example:
             "Trong câu hỏi “có thể tạo bằng trùng hợp”, cần tính cả capron nếu monomer được phép là caprolactam.",
           visual: "N6",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 652,
+              end: 699,
+              title: "Mở vòng caprolactam tạo capron",
+            },
+            {
+              video: "EOyxtq2JKRU",
+              start: 803,
+              end: 863,
+              title: "Trùng ngưng amino acid tạo capron",
+            },
+          ],
         },
         {
           title: "Viết phương trình có kiểm tra",
@@ -2037,6 +2107,20 @@ window.POLYMER_DATA = {
           example:
             "Sơ đồ mắt xích thường ghi nH₂O hoặc 2nH₂O khi bỏ qua nhóm cuối. Một mạch hữu hạn cần đếm chính xác số mối nối.",
           visual: "GLUE",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 441,
+              end: 573,
+              title: "Viết mắt xích từ monomer vinyl",
+            },
+            {
+              video: "EOyxtq2JKRU",
+              start: 803,
+              end: 963,
+              title: "Tạo liên kết amide, ester và tách nước",
+            },
+          ],
         },
       ],
       summary: [
@@ -2061,6 +2145,14 @@ window.POLYMER_DATA = {
           text: "Hầu hết polymer là chất rắn, không bay hơi. Chúng có thể mềm ra trong một khoảng nhiệt độ hoặc phân hủy khi gia nhiệt. Polymer nhiệt dẻo có thể mềm, nóng chảy để gia công; polymer nhiệt rắn sau đóng rắn có mạng bền và thường phân hủy khi đun nóng.",
           example: "PE, PP thường được gia công nhiệt. PPF đóng rắn tạo mạng.",
           visual: "thermal",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 108,
+              end: 179,
+              title: "Nhiệt dẻo, nhiệt rắn và tính chất vật lí",
+            },
+          ],
         },
         {
           title: "Cắt mạch",
@@ -2068,6 +2160,14 @@ window.POLYMER_DATA = {
           example:
             "Cellulose có mắt xích C₆H₁₀O₅; khi thủy phân hoàn toàn nhận nước để tạo glucose C₆H₁₂O₆.",
           visual: "hydrolysis",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 179,
+              end: 227,
+              title: "Nhận diện phản ứng cắt mạch",
+            },
+          ],
         },
         {
           title: "Giữ nguyên mạch",
@@ -2075,6 +2175,14 @@ window.POLYMER_DATA = {
           example:
             "Cộng bromine vào nối đôi của cao su buna có thể giữ nguyên mạch carbon.",
           visual: "retained",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 260,
+              end: 308,
+              title: "Phản ứng giữ nguyên mạch polymer",
+            },
+          ],
         },
         {
           title: "Tăng mạch và liên kết ngang",
@@ -2082,6 +2190,20 @@ window.POLYMER_DATA = {
           example:
             "So sánh sợi rời và mạng có các cầu nối trong hình tương tác.",
           visual: "crosslink",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 227,
+              end: 260,
+              title: "Tăng mạch và khâu mạch",
+            },
+            {
+              video: "0Y3sKdRggB8",
+              start: 1072,
+              end: 1123,
+              title: "Cầu sulfur trong cao su lưu hóa",
+            },
+          ],
         },
       ],
       summary: [
@@ -2107,12 +2229,30 @@ window.POLYMER_DATA = {
           example:
             "Một ống PVC cứng và một tấm PVC mềm có thể khác nhau về phụ gia và cách gia công.",
           visual: "plastics",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 21,
+              end: 83,
+              title: "Tính dẻo và thành phần của chất dẻo",
+            },
+          ],
         },
         {
           title: "Những tên thường gặp",
           text: "PE, PP, PVC, PS, PMMA, PTFE và PPF là những ví dụ quan trọng. Nhìn monomer và nhóm thế để phân biệt. PMMA có tên ứng dụng “thủy tinh hữu cơ”.",
           example: "PVC có Cl, PTFE có F; PMMA có nhóm ester ở nhóm thế.",
           visual: "PMMA",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 83,
+              end: 227,
+              title: "Cấu tạo và ứng dụng các chất dẻo quen thuộc",
+            },
+          ],
+          videoNote:
+            "Đoạn giảng tập trung vào PE, PP, PVC, PS, PMMA và PPF. Đối chiếu thêm PTFE trong mục Tra cứu polymer.",
         },
         {
           title: "Vai trò của nền và cốt",
@@ -2120,6 +2260,14 @@ window.POLYMER_DATA = {
           example:
             "Epoxy–carbon gồm nền epoxy và cốt sợi carbon. Composite bột gỗ dùng cho tấm ốp và sàn.",
           visual: "composite",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 292,
+              end: 370,
+              title: "Nền và cốt của vật liệu composite",
+            },
+          ],
         },
         {
           title: "Vì sao chọn vật liệu tổ hợp?",
@@ -2127,6 +2275,14 @@ window.POLYMER_DATA = {
           example:
             "Trong bài tập của chương, phạm vi thường là composite nền polymer.",
           visual: "composite",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 353,
+              end: 388,
+              title: "Cấu trúc, ưu điểm và ứng dụng composite",
+            },
+          ],
         },
       ],
       summary: [
@@ -2152,12 +2308,28 @@ window.POLYMER_DATA = {
           example:
             "Sợi bông và tơ tằm cùng thuộc tơ thiên nhiên nhưng khác thành phần hóa học.",
           visual: "CELL",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 730,
+              end: 763,
+              title: "Bông, len và tơ tằm trong nhóm tơ thiên nhiên",
+            },
+          ],
         },
         {
           title: "Tơ nhân tạo/bán tổng hợp",
           text: "Visco là cellulose tái sinh; cellulose acetate là sản phẩm biến đổi hóa học từ cellulose. Cả hai được xếp vào nhóm này theo phân loại phổ thông.",
           example: "Nguồn cellulose → chế biến hóa học → kéo/tạo sợi.",
           visual: "fibers",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 443,
+              end: 492,
+              title: "Từ cellulose đến visco và cellulose acetate",
+            },
+          ],
         },
         {
           title: "Tơ tổng hợp",
@@ -2165,6 +2337,14 @@ window.POLYMER_DATA = {
           example:
             "Nitron/olon là PAN từ CH₂=CH–CN. Nylon-6,6 từ diamine và diacid.",
           visual: "PAN",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 492,
+              end: 707,
+              title: "Nitron, capron, nylon-6,6 và lapsan",
+            },
+          ],
         },
         {
           title: "Đọc tên để tránh nhầm",
@@ -2172,6 +2352,20 @@ window.POLYMER_DATA = {
           example:
             "Đếm 5 CH₂ + 1 CO được 6 C của capron; enang có 6 CH₂ + 1 CO được 7 C.",
           visual: "N6",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 514,
+              end: 574,
+              title: "Vì sao capron còn gọi là nylon-6?",
+            },
+            {
+              video: "0Y3sKdRggB8",
+              start: 599,
+              end: 643,
+              title: "Hai số 6 trong tên nylon-6,6",
+            },
+          ],
         },
       ],
       summary: [
@@ -2197,6 +2391,20 @@ window.POLYMER_DATA = {
           example:
             "Isoprene có nhóm CH₃; chloroprene có Cl ở vị trí tương ứng.",
           visual: "ISOPRENE",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 815,
+              end: 866,
+              title: "Tính đàn hồi của cao su",
+            },
+            {
+              video: "0Y3sKdRggB8",
+              start: 1002,
+              end: 1072,
+              title: "Isoprene và cao su thiên nhiên",
+            },
+          ],
         },
         {
           title: "Buna-S, buna-N và lưu hóa",
@@ -2204,12 +2412,46 @@ window.POLYMER_DATA = {
           example:
             "Sulfur giúp lưu hóa nhưng không thay thế styrene trong nguyên liệu tạo buna-S.",
           visual: "BS",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 866,
+              end: 941,
+              title: "Hai monomer tạo buna-S, buna-N",
+            },
+            {
+              video: "0Y3sKdRggB8",
+              start: 1072,
+              end: 1179,
+              title: "Lưu hóa và cách nhớ S, N trong tên cao su",
+            },
+          ],
         },
         {
           title: "Ba kiểu keo trong tài liệu",
           text: "Nhựa vá săm là cao su hòa tan trong dung môi hữu cơ. Epoxy dùng nhựa với chất đóng rắn amine để tạo mạng. Keo urea–formaldehyde tạo từ trùng ngưng và dùng cho gỗ, ván ép.",
           example: "Kết dính dựa trên lớp màng liên kết bề mặt các vật liệu.",
           visual: "glue",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 1196,
+              end: 1286,
+              title: "Keo epoxy hai thành phần",
+            },
+            {
+              video: "0Y3sKdRggB8",
+              start: 1286,
+              end: 1339,
+              title: "Keo urea–formaldehyde",
+            },
+            {
+              video: "0Y3sKdRggB8",
+              start: 1339,
+              end: 1368,
+              title: "Nhựa vá săm trong dung môi hữu cơ",
+            },
+          ],
         },
         {
           title: "Keo 502 trong bài tập",
@@ -2217,6 +2459,14 @@ window.POLYMER_DATA = {
           example:
             "Trùng hợp CH₂=C(CN)–COOCH₃ không tách nước. Hơi ẩm hỗ trợ khơi mào.",
           visual: "GLUE",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 1579,
+              end: 1667,
+              title: "Viết phương trình trùng hợp monomer của keo 502",
+            },
+          ],
         },
       ],
       summary: [
@@ -2241,12 +2491,30 @@ window.POLYMER_DATA = {
           text: "Viết công thức một mắt xích, tính M₀ rồi dùng n ≈ M/M₀. Chỉ làm tròn khi câu hỏi yêu cầu.",
           example: "Cellulose: M₀ = 162. Với M = 590 000, n ≈ 3 642.",
           visual: "degree",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 1841,
+              end: 1993,
+              title: "Bài mẫu tính n của nylon-6,6 và cao su",
+            },
+          ],
         },
         {
           title: "Khối lượng trùng hợp",
           text: "Khi bỏ qua nhóm cuối và không có sản phẩm phụ, khối lượng polymer lý thuyết bằng phần monomer đã phản ứng. Đi xuôi nhân hiệu suất, đi ngược chia hiệu suất.",
           example: "100 kg vinyl chloride, hiệu suất 80%, cho 80 kg PVC.",
           visual: "PE",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 2354,
+              end: 2460,
+              title: "Bài mẫu đổi mol mắt xích ra khối lượng polymer",
+            },
+          ],
+          videoNote:
+            "Video dùng một bài mẫu khác để minh họa bước đổi mol mắt xích ra khối lượng. Ví dụ PVC ngay trên áp dụng cùng nguyên tắc.",
         },
         {
           title: "Nhiều bước chuyển hóa",
@@ -2254,6 +2522,16 @@ window.POLYMER_DATA = {
           example:
             "2 ethanol tạo 1 butadiene. 54 g buna ở H tổng 40% cần 230 g ethanol.",
           visual: "ethanol",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 2025,
+              end: 2460,
+              title: "Bài mẫu chuyển hóa nhiều bước có hiệu suất",
+            },
+          ],
+          videoNote:
+            "Video dùng bài sản xuất PS. Với bài ethanol → buna trong ví dụ, hãy theo tỉ lệ mol và sơ đồ riêng bên trên.",
         },
         {
           title: "Bài khí và composite",
@@ -2261,6 +2539,16 @@ window.POLYMER_DATA = {
           example:
             "495,8 m³ khí × 80% CH₄ → 16 kmol CH₄ → tối đa 8 kmol mắt xích PVC trước hiệu suất.",
           visual: "methane",
+          clips: [
+            {
+              video: "EOyxtq2JKRU",
+              start: 2199,
+              end: 2253,
+              title: "Đổi m³ khí sang mol ở 25 °C, 1 bar",
+            },
+          ],
+          videoNote:
+            "Đoạn video giải thích phần đổi thể tích khí. Phần khối lượng nền, cốt composite xem bằng sơ đồ và bài luyện phía dưới.",
         },
       ],
       summary: [
@@ -2286,6 +2574,14 @@ window.POLYMER_DATA = {
           example:
             "Kí hiệu loại nhựa giúp nhận diện vật liệu, tự nó không xác nhận mọi cách dùng với thực phẩm hoặc nhiệt.",
           visual: "plastics",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 161,
+              end: 227,
+              title: "Ứng dụng của các chất dẻo thường gặp",
+            },
+          ],
         },
         {
           title: "Rác tích lũy và phân mảnh",
@@ -2293,6 +2589,16 @@ window.POLYMER_DATA = {
           example:
             "Một vật dụng vỡ thành mảnh nhỏ không có nghĩa là đã phân hủy hoàn toàn.",
           visual: "environment",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 227,
+              end: 267,
+              title: "Tác động của rác thải nhựa",
+            },
+          ],
+          videoNote:
+            "Video nêu tác động của rác nhựa. Sơ đồ bên trên làm rõ thêm sự khác nhau giữa phân mảnh và phân hủy hoàn toàn.",
         },
         {
           title: "Hạn chế đốt không kiểm soát",
@@ -2300,6 +2606,14 @@ window.POLYMER_DATA = {
           example:
             "Ưu tiên ví dụ quan sát qua tài liệu và thí nghiệm do giáo viên tổ chức.",
           visual: "comparison",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 235,
+              end: 267,
+              title: "Ô nhiễm khi xử lí rác thải nhựa không phù hợp",
+            },
+          ],
         },
         {
           title: "Thực hành quyết định",
@@ -2307,6 +2621,14 @@ window.POLYMER_DATA = {
           example:
             "“Có thể tái chế về mặt kỹ thuật” và “được thu gom tái chế tại địa phương” cần kiểm tra riêng.",
           visual: "environment",
+          clips: [
+            {
+              video: "0Y3sKdRggB8",
+              start: 267,
+              end: 292,
+              title: "Giảm dùng, tái sử dụng và phân loại nhựa",
+            },
+          ],
         },
       ],
       summary: [
