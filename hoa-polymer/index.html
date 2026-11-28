@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0c614e" />
+    <meta
+      name="description"
+      content="Học chương Polymer Hóa 12 Kết nối tri thức với sơ đồ tương tác, 72 bài có giải thích, tài liệu gốc và đề kiểm tra ngắn."
+    />
+    <title>Polymer · Hóa học 12</title>
+    <link rel="icon" href="assets/icon.png" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="assets/style.css" />
+    <script defer src="data/content.js"></script>
+    <script defer src="assets/visuals.js"></script>
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Tới nội dung</a>
+    <aside class="sidebar">
+      <a class="brand" href="#home" aria-label="Polymer, trang chủ"
+        ><span class="brand-mark">P<span>•</span></span
+        ><span
+          >polymer<span class="brand-dot">.</span
+          ><small>Hóa học 12</small></span
+        ></a
+      >
+      <div class="course-label">
+        Kết nối tri thức<small>Chương 4 · Bài 12–14</small>
+      </div>
+      <nav aria-label="Điều hướng chính">
+        <a href="#home" data-nav="home"
+          ><span class="nav-symbol">⌂</span>Tổng quan</a
+        >
+        <a href="#learn" data-nav="learn"
+          ><span class="nav-symbol">▤</span>Bài học</a
+        >
+        <a href="#atlas" data-nav="atlas"
+          ><span class="nav-symbol">⬡</span>Tra cứu polymer</a
+        >
+        <a href="#practice" data-nav="practice"
+          ><span class="nav-symbol">✎</span>Luyện tập
+          <span class="nav-count">72</span></a
+        >
+        <a href="#test" data-nav="test"
+          ><span class="nav-symbol">◷</span>Kiểm tra nhanh</a
+        >
+        <a href="#review" data-nav="review"
+          ><span class="nav-symbol">↻</span>Câu cần ôn
+          <span id="reviewCount" class="nav-count">0</span></a
+        >
+        <a href="#sources" data-nav="sources"
+          ><span class="nav-symbol">▧</span>Video & tài liệu</a
+        >
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="progress-heading">
+          <span>Bài học đã hoàn thành</span><strong id="learnCount">0/8</strong>
+        </div>
+        <div class="progress-track"><span id="learnProgress"></span></div>
+        <a href="#settings" class="data-link">Tiến độ & sao lưu</a>
+      </div>
+    </aside>
+    <div class="main-shell">
+      <header class="topbar">
+        <a class="mobile-brand" href="#home">polymer<span>.</span></a>
+        <div class="breadcrumb" id="breadcrumb">Không gian học tập</div>
+        <div class="top-actions">
+          <span class="offline-state" id="connectionState"
+            ><span></span>Sẵn sàng học</span
+          >
+          <button
+            class="icon-button"
+            id="themeButton"
+            aria-label="Đổi chế độ sáng tối"
+            title="Đổi chế độ sáng tối"
+          >
+            ◐
+          </button>
+          <a class="avatar" href="#settings" aria-label="Xem tiến độ học tập"
+            >H<span>12</span></a
+          >
+        </div>
+      </header>
+      <nav class="mobile-nav" aria-label="Điều hướng trên điện thoại">
+        <a href="#home">Tổng quan</a><a href="#learn">Bài học</a
+        ><a href="#atlas">Tra cứu</a><a href="#practice">Luyện tập</a
+        ><a href="#test">Kiểm tra</a><a href="#review">Cần ôn</a
+        ><a href="#sources">Tài liệu</a>
+      </nav>
+      <main id="main" tabindex="-1"></main>
+      <footer>
+        Hóa 12 · Kết nối tri thức
+        <span>Học theo cấu tạo, hiểu từ bản chất.</span>
+      </footer>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+    <noscript
+      ><p>
+        Bật JavaScript để làm bài và xem các sơ đồ tương tác. Tài liệu ảnh nằm
+        trong thư mục tai-lieu.
+      </p></noscript
+    >
+  </body>
+</html>

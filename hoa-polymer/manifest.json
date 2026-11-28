@@ -1,0 +1,14 @@
+{
+  "name": "Polymer · Hóa học 12",
+  "short_name": "Polymer",
+  "description": "Học, minh họa và luyện chương Polymer Hóa 12 Kết nối tri thức.",
+  "lang": "vi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f9f8",
+  "theme_color": "#0c614e",
+  "icons": [
+    { "src": "assets/icon.png", "sizes": "192x192", "type": "image/png" }
+  ]
+}

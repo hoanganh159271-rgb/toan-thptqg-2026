@@ -755,7 +755,10 @@ def check_zero_cdn_and_offline():
     ]
     violations = []
     scanned = 0
-    for root, _, files in os.walk(ROOT_DIR):
+    for root, directories, files in os.walk(ROOT_DIR):
+        # Web Hóa độc lập có bộ kiểm tra riêng tại hoa-polymer/verify.py.
+        if root == ROOT_DIR:
+            directories[:] = [name for name in directories if name != "hoa-polymer"]
         for fn in files:
             if fn.endswith((".html", ".css", ".js")):
                 path = os.path.join(root, fn)
