@@ -251,6 +251,10 @@ window.POLYMER_DATA = {
       note: "",
       source: "doc",
       concept: "chlorine-plastic",
+      lessonRef: {
+        lesson: "plastics",
+        part: 1,
+      },
     },
     {
       id: "SGK-2",
@@ -272,6 +276,10 @@ window.POLYMER_DATA = {
       note: "",
       source: "doc",
       concept: "styrene-PS",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 3,
+      },
     },
     {
       id: "SGK-3",
@@ -293,6 +301,10 @@ window.POLYMER_DATA = {
       note: "",
       source: "doc",
       concept: "ethylene-PE",
+      lessonRef: {
+        lesson: "basics",
+        part: 0,
+      },
     },
     {
       id: "SGK-4",
@@ -312,6 +324,10 @@ window.POLYMER_DATA = {
       source: "doc",
       trap: "Kiểm tra đủ nguyên tử, nhóm thế và liên kết đi ra ngoài ngoặc.",
       note: "Bài viết phương trình được tự đối chiếu bằng lời giải mẫu.",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 3,
+      },
     },
     {
       id: "SGK-5",
@@ -337,6 +353,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "rubber",
+        part: 1,
+      },
     },
     {
       id: "SGK-6",
@@ -355,6 +375,10 @@ window.POLYMER_DATA = {
       source: "doc",
       trap: "Kiểm tra đủ nguyên tử, nhóm thế và liên kết đi ra ngoài ngoặc.",
       note: "Bài viết phương trình được tự đối chiếu bằng lời giải mẫu.",
+      lessonRef: {
+        lesson: "rubber",
+        part: 3,
+      },
     },
     {
       id: "DC-1",
@@ -380,6 +404,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "basics",
+        part: 0,
+      },
     },
     {
       id: "DC-2",
@@ -401,6 +429,10 @@ window.POLYMER_DATA = {
       note: "",
       source: "doc",
       concept: "ethylene-PE",
+      lessonRef: {
+        lesson: "basics",
+        part: 0,
+      },
     },
     {
       id: "DC-3",
@@ -421,6 +453,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "basics",
+        part: 2,
+      },
     },
     {
       id: "DC-4",
@@ -446,6 +482,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 3,
+      },
     },
     {
       id: "DC-5",
@@ -471,6 +511,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "Bản gốc đồng thời có “hệ số polymer hóa” và “hệ số trùng hợp”. Hai tên thường được dùng gần nghĩa. Ở câu hỏi tổng quát này ưu tiên B theo thuật ngữ của tài liệu.",
       source: "doc",
+      lessonRef: {
+        lesson: "basics",
+        part: 1,
+      },
     },
     {
       id: "DC-6",
@@ -496,6 +540,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "fibers",
+        part: 3,
+      },
     },
     {
       id: "DC-7",
@@ -516,6 +564,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "Đã làm rõ “không tách phân tử nhỏ” vì câu gốc chỉ nói tạo phân tử lớn nên mô tả chưa đủ để phân biệt hai phương pháp.",
       source: "doc",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 0,
+      },
     },
     {
       id: "DC-8",
@@ -536,6 +588,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 1,
+      },
     },
     {
       id: "DC-9",
@@ -557,6 +613,10 @@ window.POLYMER_DATA = {
       note: "",
       source: "doc",
       concept: "PVC-degree-35000",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
     },
     {
       id: "DC-DS1",
@@ -597,6 +657,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "basics",
+        part: 2,
+      },
     },
     {
       id: "DC-DS2",
@@ -637,6 +701,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 3,
+      },
     },
     {
       id: "DC-S1",
@@ -657,6 +725,11 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      examGroup: "classification",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 0,
+      },
     },
     {
       id: "DC-S2",
@@ -677,6 +750,11 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      examGroup: "degree",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
     },
     {
       id: "DC-S3",
@@ -697,6 +775,11 @@ window.POLYMER_DATA = {
       trap: "Đi ngược quy trình phải chia cho hiệu suất từng bước.",
       note: "",
       source: "doc",
+      examGroup: "multistep",
+      lessonRef: {
+        lesson: "calculations",
+        part: 2,
+      },
     },
     {
       id: "CD-1",
@@ -717,6 +800,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "plastics",
+        part: 1,
+      },
     },
     {
       id: "CD-2",
@@ -737,6 +824,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "plastics",
+        part: 1,
+      },
     },
     {
       id: "CD-3",
@@ -757,6 +848,10 @@ window.POLYMER_DATA = {
       trap: "Vật liệu có thể chứa nhiều phụ gia. Hiện tượng nhiệt không tự xác nhận thành phần của mọi mẫu thực tế.",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "environment",
+        part: 2,
+      },
     },
     {
       id: "CD-4",
@@ -778,6 +873,10 @@ window.POLYMER_DATA = {
       note: "",
       source: "doc",
       concept: "chlorine-plastic",
+      lessonRef: {
+        lesson: "plastics",
+        part: 1,
+      },
     },
     {
       id: "CD-5",
@@ -799,6 +898,10 @@ window.POLYMER_DATA = {
       note: "",
       source: "doc",
       concept: "styrene-PS",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 3,
+      },
     },
     {
       id: "CD-6",
@@ -819,6 +922,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 1,
+      },
     },
     {
       id: "CD-7",
@@ -844,6 +951,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "Nylon-6,6 còn có ứng dụng nhựa kỹ thuật. Câu được giải theo cách phân nhóm vật liệu tiêu biểu của chương trong tài liệu.",
       source: "doc",
+      lessonRef: {
+        lesson: "plastics",
+        part: 1,
+      },
     },
     {
       id: "CD-8",
@@ -869,6 +980,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "Đã giới hạn “composite nền polymer” để phù hợp chương học. Composite trong kỹ thuật còn có thể có nền kim loại hoặc gốm.",
       source: "doc",
+      lessonRef: {
+        lesson: "plastics",
+        part: 3,
+      },
     },
     {
       id: "CD-9",
@@ -894,6 +1009,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "plastics",
+        part: 0,
+      },
     },
     {
       id: "CD-DS1",
@@ -934,6 +1053,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "environment",
+        part: 1,
+      },
     },
     {
       id: "CD-DS2",
@@ -974,6 +1097,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "plastics",
+        part: 2,
+      },
     },
     {
       id: "CD-S1",
@@ -994,6 +1121,11 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      examGroup: "classification",
+      lessonRef: {
+        lesson: "plastics",
+        part: 1,
+      },
     },
     {
       id: "CD-S2",
@@ -1015,6 +1147,11 @@ window.POLYMER_DATA = {
       note: "",
       source: "doc",
       concept: "PVC-degree-35000",
+      examGroup: "degree",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
     },
     {
       id: "CD-S3",
@@ -1035,6 +1172,11 @@ window.POLYMER_DATA = {
       trap: "25 °C và 1 bar tương ứng 24,79 L/mol trong dạng bài này, không lấy 22,4.",
       note: "",
       source: "doc",
+      examGroup: "multistep",
+      lessonRef: {
+        lesson: "calculations",
+        part: 3,
+      },
     },
     {
       id: "TC-1",
@@ -1055,6 +1197,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "fibers",
+        part: 2,
+      },
     },
     {
       id: "TC-2",
@@ -1080,6 +1226,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "fibers",
+        part: 0,
+      },
     },
     {
       id: "TC-3",
@@ -1100,6 +1250,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "fibers",
+        part: 1,
+      },
     },
     {
       id: "TC-4",
@@ -1120,6 +1274,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "fibers",
+        part: 1,
+      },
     },
     {
       id: "TC-5",
@@ -1145,6 +1303,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 0,
+      },
     },
     {
       id: "TC-6",
@@ -1170,6 +1332,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "Phương án A trong ảnh có kí hiệu nguyên tử không chuẩn. Đã giữ dấu hiệu sai; công thức đúng được vẽ lại rõ ở B.",
       source: "doc",
+      lessonRef: {
+        lesson: "rubber",
+        part: 0,
+      },
     },
     {
       id: "TC-7",
@@ -1190,6 +1356,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "basics",
+        part: 3,
+      },
     },
     {
       id: "TC-8",
@@ -1210,6 +1380,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "fibers",
+        part: 2,
+      },
     },
     {
       id: "TC-9",
@@ -1230,6 +1404,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "fibers",
+        part: 1,
+      },
     },
     {
       id: "TC-DS1",
@@ -1270,6 +1448,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "fibers",
+        part: 2,
+      },
     },
     {
       id: "TC-DS2",
@@ -1310,6 +1492,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      lessonRef: {
+        lesson: "rubber",
+        part: 2,
+      },
     },
     {
       id: "TC-S1",
@@ -1330,6 +1516,11 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "doc",
+      examGroup: "classification",
+      lessonRef: {
+        lesson: "fibers",
+        part: 2,
+      },
     },
     {
       id: "TC-S2",
@@ -1350,6 +1541,11 @@ window.POLYMER_DATA = {
       trap: "Cụm “có thể” cho phép xét con đường mở vòng của capron.",
       note: "",
       source: "doc",
+      examGroup: "classification",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 2,
+      },
     },
     {
       id: "TC-S3",
@@ -1370,6 +1566,11 @@ window.POLYMER_DATA = {
       trap: "Glucose có M = 180, còn gốc trong cellulose có M = 162.",
       note: "",
       source: "doc",
+      examGroup: "degree",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
     },
     {
       id: "KT-M1",
@@ -1395,6 +1596,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "fibers",
+        part: 3,
+      },
     },
     {
       id: "KT-M2",
@@ -1415,6 +1620,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "fibers",
+        part: 2,
+      },
     },
     {
       id: "KT-M3",
@@ -1435,6 +1644,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 2,
+      },
     },
     {
       id: "KT-M4",
@@ -1460,6 +1673,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 3,
+      },
     },
     {
       id: "KT-M5",
@@ -1480,6 +1697,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "rubber",
+        part: 0,
+      },
     },
     {
       id: "KT-M6",
@@ -1505,6 +1726,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "properties",
+        part: 3,
+      },
     },
     {
       id: "KT-M7",
@@ -1525,6 +1750,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "plastics",
+        part: 2,
+      },
     },
     {
       id: "KT-M8",
@@ -1545,6 +1774,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "fibers",
+        part: 2,
+      },
     },
     {
       id: "KT-M9",
@@ -1565,6 +1798,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "properties",
+        part: 1,
+      },
     },
     {
       id: "KT-M10",
@@ -1590,6 +1827,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "properties",
+        part: 0,
+      },
     },
     {
       id: "KT-M11",
@@ -1610,6 +1851,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "properties",
+        part: 2,
+      },
     },
     {
       id: "KT-M12",
@@ -1635,6 +1880,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "rubber",
+        part: 2,
+      },
     },
     {
       id: "KT-D1",
@@ -1675,6 +1924,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 2,
+      },
     },
     {
       id: "KT-D2",
@@ -1715,6 +1968,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "calculations",
+        part: 1,
+      },
     },
     {
       id: "KT-D3",
@@ -1755,6 +2012,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "fibers",
+        part: 2,
+      },
     },
     {
       id: "KT-D4",
@@ -1795,6 +2056,10 @@ window.POLYMER_DATA = {
       trap: "",
       note: "",
       source: "extra",
+      lessonRef: {
+        lesson: "plastics",
+        part: 3,
+      },
     },
     {
       id: "KT-S1",
@@ -1808,13 +2073,18 @@ window.POLYMER_DATA = {
       steps: [
         "Mắt xích styrene là C₈H₈ nên M₀ = 104.",
         "n = 26 000 / 104 = 250.",
-        "Kiểm tra đơn vị và chỉ làm tròn ở kết quả cuối.",
+        "Thử lại: 250×104 = 26 000, khớp phân tử khối đề cho.",
       ],
       visual: "PS",
       unit: "",
       trap: "",
       note: "",
       source: "extra",
+      examGroup: "degree",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
     },
     {
       id: "KT-S2",
@@ -1828,13 +2098,18 @@ window.POLYMER_DATA = {
       steps: [
         "M₀(C₅H₈O₂) = 5×12 + 8 + 2×16 = 100.",
         "n = 120 000/100 = 1 200.",
-        "Kiểm tra đơn vị và chỉ làm tròn ở kết quả cuối.",
+        "Thử lại: 1 200×100 = 120 000. Không bỏ nhóm ester khi tính M₀.",
       ],
       visual: "PMMA",
       unit: "",
       trap: "",
       note: "",
       source: "extra",
+      examGroup: "degree",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
     },
     {
       id: "KT-S3",
@@ -1848,13 +2123,18 @@ window.POLYMER_DATA = {
       steps: [
         "Trùng hợp không tách phân tử nhỏ nên khối lượng lý thuyết được bảo toàn.",
         "m PE = 28×0,75 = 21 kg.",
-        "Kiểm tra đơn vị và chỉ làm tròn ở kết quả cuối.",
+        "21 kg nhỏ hơn 28 kg lý thuyết, phù hợp hiệu suất dưới 100%.",
       ],
       visual: "PE",
       unit: "kg",
       trap: "",
       note: "",
       source: "extra",
+      examGroup: "yield",
+      lessonRef: {
+        lesson: "calculations",
+        part: 1,
+      },
     },
     {
       id: "KT-S4",
@@ -1868,13 +2148,18 @@ window.POLYMER_DATA = {
       steps: [
         "Khối lượng sản phẩm bằng nguyên liệu nhân 0,80.",
         "m nguyên liệu = 100/0,80 = 125 kg.",
-        "Kiểm tra đơn vị và chỉ làm tròn ở kết quả cuối.",
+        "Thử xuôi: 125×0,80 = 100 kg PVC. Nguyên liệu lớn hơn sản phẩm.",
       ],
       visual: "PVC",
       unit: "kg",
       trap: "",
       note: "",
       source: "extra",
+      examGroup: "yield",
+      lessonRef: {
+        lesson: "calculations",
+        part: 1,
+      },
     },
     {
       id: "KT-S5",
@@ -1888,13 +2173,18 @@ window.POLYMER_DATA = {
       steps: [
         "M mắt xích = 62,5, khối lượng Cl trong đó là 35,5.",
         "%Cl = 35,5/62,5×100 = 56,8%.",
-        "Kiểm tra đơn vị và chỉ làm tròn ở kết quả cuối.",
+        "n bị triệt tiêu trong tỉ số khối lượng Cl và PVC, nên không cần biết độ dài mạch.",
       ],
       visual: "PVC",
       unit: "%",
       trap: "",
       note: "",
       source: "extra",
+      examGroup: "composition",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
     },
     {
       id: "KT-S6",
@@ -1908,13 +2198,18 @@ window.POLYMER_DATA = {
       steps: [
         "Một cặp monomer có M = 116 + 146. Theo sơ đồ mắt xích, mất 2H₂O.",
         "M₀ = 116 + 146 − 36 = 226.",
-        "Kiểm tra đơn vị và chỉ làm tròn ở kết quả cuối.",
+        "Kiểm tra bằng C₁₂H₂₂N₂O₂: 144 + 22 + 28 + 32 = 226.",
       ],
       visual: "N66",
       unit: "amu",
       trap: "",
       note: "",
       source: "extra",
+      examGroup: "repeatMass",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
     },
     {
       id: "KT-S7",
@@ -1928,13 +2223,18 @@ window.POLYMER_DATA = {
       steps: [
         "Khối lượng cốt bằng tổng khối lượng nhân phần khối lượng.",
         "m = 2×0,60 = 1,2 kg = 1 200 g.",
-        "Kiểm tra đơn vị và chỉ làm tròn ở kết quả cuối.",
+        "Phần nền còn lại là 2 − 1,2 = 0,8 kg. Đề hỏi gam của cốt nên điền 1 200.",
       ],
       visual: "composite",
       unit: "g",
       trap: "",
       note: "",
       source: "extra",
+      examGroup: "composition",
+      lessonRef: {
+        lesson: "plastics",
+        part: 2,
+      },
     },
     {
       id: "KT-S8",
@@ -1948,13 +2248,318 @@ window.POLYMER_DATA = {
       steps: [
         "PET và nylon-6,6 có monomer hai nhóm chức, tạo polymer kèm nước.",
         "PE, PAN, PVC và PMMA dùng trùng hợp. Có 2 loại trùng ngưng.",
-        "Kiểm tra đơn vị và chỉ làm tròn ở kết quả cuối.",
+        "Sản phẩm có nhóm ester chưa đủ để gọi trùng ngưng: PMMA có ester ở nhóm thế nhưng được tạo bằng trùng hợp.",
       ],
       visual: "condensation",
       unit: "",
       trap: "",
       note: "",
       source: "extra",
+      examGroup: "classification",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 1,
+      },
+    },
+    {
+      id: "TX-N1",
+      topic: "calculations",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 1",
+      type: "num",
+      text: "PE có phân tử khối trung bình 28 000 amu. Tính hệ số polymer hóa, bỏ qua nhóm cuối mạch.",
+      answer: "1000",
+      hint: "Mắt xích PE là C₂H₄.",
+      steps: [
+        "M₀ = 2×12 + 4×1 = 28 amu.",
+        "n = 28 000/28 = 1 000.",
+        "Thử lại: 1 000×28 = 28 000. Số mắt xích không có đơn vị gam.",
+      ],
+      visual: "PE",
+      unit: "",
+      trap: "Dùng khối lượng cả mắt xích, không chỉ khối lượng hai nguyên tử C.",
+      note: "",
+      source: "extra",
+      examGroup: "degree",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
+    },
+    {
+      id: "TX-N2",
+      topic: "calculations",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 2",
+      type: "num",
+      text: "PAN có phân tử khối trung bình 53 000 amu. Tính hệ số polymer hóa, bỏ qua nhóm cuối mạch.",
+      answer: "1000",
+      hint: "Đếm cả C và N trong nhóm CN.",
+      steps: [
+        "Mắt xích –CH₂–CH(CN)– có công thức C₃H₃N.",
+        "M₀ = 3×12 + 3 + 14 = 53 amu.",
+        "n = 53 000/53 = 1 000. Nếu bỏ C của CN, M₀ sẽ sai.",
+      ],
+      visual: "PAN",
+      unit: "",
+      trap: "Nhóm CN góp thêm một C và một N.",
+      note: "",
+      source: "extra",
+      examGroup: "degree",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
+    },
+    {
+      id: "TX-N3",
+      topic: "calculations",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 3",
+      type: "num",
+      text: "Tính khối lượng một mắt xích capron (nylon-6), theo amu. Dùng C = 12, H = 1, N = 14, O = 16.",
+      answer: "113",
+      hint: "Mắt xích là –NH–(CH₂)₅–CO–.",
+      steps: [
+        "Đếm được C₆H₁₁NO: 5 C từ CH₂ và 1 C từ CO.",
+        "M₀ = 6×12 + 11 + 14 + 16 = 113 amu.",
+        "Cũng có thể kiểm tra bằng M amino acid 131 trừ M nước 18: 131 − 18 = 113.",
+      ],
+      visual: "N6",
+      unit: "amu",
+      trap: "Không dùng M = 131 của amino acid ban đầu làm M mắt xích.",
+      note: "",
+      source: "extra",
+      examGroup: "repeatMass",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
+    },
+    {
+      id: "TX-N4",
+      topic: "synthesis",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 4",
+      type: "num",
+      text: "Một mắt xích PET hình thành từ ethylene glycol (M = 62) và terephthalic acid (M = 166), tách tương ứng 2H₂O trong sơ đồ mắt xích. Tính M mắt xích theo amu.",
+      answer: "192",
+      hint: "Lấy tổng M hai monomer trừ M của hai phân tử nước.",
+      steps: [
+        "Tổng M của cặp monomer là 62 + 166 = 228.",
+        "Hai H₂O có khối lượng 2×18 = 36.",
+        "M₀ = 228 − 36 = 192 amu, tương ứng C₁₀H₈O₄.",
+      ],
+      visual: "PET",
+      unit: "amu",
+      trap: "Đây là sơ đồ mắt xích bỏ qua nhóm cuối, không phải đếm nước cho một mạch hữu hạn cụ thể.",
+      note: "",
+      source: "extra",
+      examGroup: "repeatMass",
+      lessonRef: {
+        lesson: "synthesis",
+        part: 1,
+      },
+    },
+    {
+      id: "TX-N5",
+      topic: "calculations",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 5",
+      type: "num",
+      text: "Trùng hợp 40 kg ethylene với hiệu suất 80%, bỏ qua nhóm cuối. Thu được bao nhiêu kg PE?",
+      answer: "32",
+      hint: "Đi từ nguyên liệu đến sản phẩm thì nhân hiệu suất.",
+      steps: [
+        "Trùng hợp không tách sản phẩm nhỏ nên 40 kg ethylene tạo tối đa 40 kg PE.",
+        "H = 80% = 0,80.",
+        "m PE = 40×0,80 = 32 kg, nhỏ hơn mức lý thuyết 40 kg.",
+      ],
+      visual: "PE",
+      unit: "kg",
+      trap: "Không chia cho hiệu suất khi đang tính lượng sản phẩm thu được.",
+      note: "",
+      source: "extra",
+      examGroup: "yield",
+      lessonRef: {
+        lesson: "calculations",
+        part: 1,
+      },
+    },
+    {
+      id: "TX-N6",
+      topic: "calculations",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 6",
+      type: "num",
+      text: "Cần thu 60 kg PVC với hiệu suất trùng hợp 75%. Tính khối lượng vinyl chloride ban đầu theo kg.",
+      answer: "80",
+      hint: "Đặt 0,75m = 60.",
+      steps: [
+        "Vinyl chloride trùng hợp không tách nước trong mô hình bài học.",
+        "m nguyên liệu = 60/0,75 = 80 kg.",
+        "Thử xuôi: 80×0,75 = 60 kg PVC.",
+      ],
+      visual: "PVC",
+      unit: "kg",
+      trap: "Nguyên liệu cần nhiều hơn sản phẩm khi H < 100%.",
+      note: "",
+      source: "extra",
+      examGroup: "yield",
+      lessonRef: {
+        lesson: "calculations",
+        part: 1,
+      },
+    },
+    {
+      id: "TX-N7",
+      topic: "calculations",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 7",
+      type: "num",
+      text: "Từ 230 g ethanol điều chế butadiene với hiệu suất 50%, sau đó trùng hợp thành buna với hiệu suất 60%. Tính khối lượng buna thu được (g), bỏ qua nhóm cuối.",
+      answer: "40.5",
+      hint: "Dùng tỉ lệ 2 ethanol → 1 butadiene.",
+      steps: [
+        "Hai mol ethanol (92 g) tạo tối đa một mol mắt xích buna (54 g).",
+        "H toàn bộ = 0,50×0,60 = 0,30.",
+        "m buna = 230×54/92×0,30 = 40,5 g. Có thể nhập 40,5 hoặc 40.5.",
+      ],
+      visual: "ethanol",
+      unit: "g",
+      trap: "Phải dùng cả tỉ lệ khối lượng 54/92 và tích hiệu suất.",
+      note: "",
+      source: "extra",
+      examGroup: "multistep",
+      lessonRef: {
+        lesson: "calculations",
+        part: 2,
+      },
+    },
+    {
+      id: "TX-N8",
+      topic: "calculations",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 8",
+      type: "num",
+      text: "Từ 74,37 m³ CH₄ tinh khiết (25 °C, 1 bar), theo sơ đồ CH₄ → C₂H₂ → C₂H₃Cl → PVC, hiệu suất toàn quá trình 80%. Tính kg PVC, dùng Vₘ = 24,79 L/mol.",
+      answer: "75",
+      hint: "Đổi sang L, rồi dùng 2CH₄ tương ứng 1 mắt xích PVC.",
+      steps: [
+        "n CH₄ = 74 370/24,79 = 3 000 mol.",
+        "n mắt xích PVC lý thuyết = 3 000/2 = 1 500 mol.",
+        "m PVC = 1 500×62,5×0,80 = 75 000 g = 75 kg. Hiệu suất toàn bộ chỉ nhân một lần.",
+      ],
+      visual: "methane",
+      unit: "kg",
+      trap: "Không lấy 3 000 mol CH₄ thành 3 000 mol mắt xích PVC.",
+      note: "",
+      source: "extra",
+      examGroup: "multistep",
+      lessonRef: {
+        lesson: "calculations",
+        part: 3,
+      },
+    },
+    {
+      id: "TX-N9",
+      topic: "calculations",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 9",
+      type: "num",
+      text: "Mắt xích PAN có công thức C₃H₃N. Tính phần trăm khối lượng N, làm tròn đến hàng phần mười.",
+      answer: "26.4",
+      hint: "M₀ = 53 và khối lượng N trong một mắt xích là 14.",
+      steps: [
+        "M₀ = 3×12 + 3 + 14 = 53.",
+        "%N = 14/53×100 = 26,415…%.",
+        "Làm tròn đến một chữ số thập phân: 26,4%.",
+      ],
+      visual: "PAN",
+      unit: "%",
+      trap: "Phần trăm khối lượng dùng khối lượng nguyên tử, không dùng tỉ lệ đếm số nguyên tử N.",
+      note: "",
+      source: "extra",
+      examGroup: "composition",
+      lessonRef: {
+        lesson: "calculations",
+        part: 0,
+      },
+    },
+    {
+      id: "TX-N10",
+      topic: "plastics",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 10",
+      type: "num",
+      text: "Tấm composite nặng 3,2 kg có 37,5% khối lượng cốt sợi thủy tinh. Tính khối lượng cốt theo gam.",
+      answer: "1200",
+      hint: "Tính khối lượng theo kg trước rồi đổi sang g.",
+      steps: [
+        "37,5% = 0,375.",
+        "m cốt = 3,2×0,375 = 1,2 kg.",
+        "1,2 kg = 1 200 g. Đây là khối lượng cốt, không phải khối lượng nền.",
+      ],
+      visual: "composite",
+      unit: "g",
+      trap: "Đề hỏi gam nên kết quả 1,2 kg phải đổi thành 1 200 g.",
+      note: "",
+      source: "extra",
+      examGroup: "composition",
+      lessonRef: {
+        lesson: "plastics",
+        part: 2,
+      },
+    },
+    {
+      id: "TX-N11",
+      topic: "basics",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 11",
+      type: "num",
+      text: "Trong PE, cellulose, tinh bột, protein, nylon-6,6 và cao su thiên nhiên, có bao nhiêu polymer thiên nhiên?",
+      answer: "4",
+      hint: "Đánh dấu từng chất có nguồn gốc tự nhiên.",
+      steps: [
+        "Cellulose, tinh bột, protein và cao su thiên nhiên là polymer thiên nhiên.",
+        "PE và nylon-6,6 là polymer tổng hợp.",
+        "Có 4 polymer thiên nhiên trong danh sách.",
+      ],
+      visual: "origin",
+      unit: "",
+      trap: "Nguồn gốc thiên nhiên và dạng mạch là hai cách phân loại khác nhau.",
+      note: "",
+      source: "extra",
+      examGroup: "classification",
+      lessonRef: {
+        lesson: "basics",
+        part: 3,
+      },
+    },
+    {
+      id: "TX-N12",
+      topic: "fibers",
+      page: null,
+      label: "Bổ sung · KTTX · Câu 12",
+      type: "num",
+      text: "Trong nylon-6, nylon-6,6, lapsan và nitron, có bao nhiêu tơ thuộc polyamide?",
+      answer: "2",
+      hint: "Tìm liên kết –CO–NH– trong mạch.",
+      steps: [
+        "Nylon-6 và nylon-6,6 có liên kết amide trong mạch.",
+        "Lapsan là polyester; nitron là PAN, không phải polyamide.",
+        "Có 2 tơ polyamide. Có N trong công thức chưa đủ để xếp polyamide.",
+      ],
+      visual: "fibers",
+      unit: "",
+      trap: "PAN có nhóm CN nhưng không có liên kết amide trong mạch chính.",
+      note: "",
+      source: "extra",
+      examGroup: "classification",
+      lessonRef: {
+        lesson: "fibers",
+        part: 2,
+      },
     },
   ],
   lessons: [

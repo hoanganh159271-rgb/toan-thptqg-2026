@@ -754,6 +754,185 @@ footer {
   max-width: 850px;
   margin: 14px 0 22px;
 }
+.lesson-goals {
+  background: var(--pale);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.lesson-goals h2 {
+  font-size: 1.1rem;
+}
+.lesson-goals ul,
+.exam-prep ul {
+  padding-left: 22px;
+  margin: 12px 0;
+}
+.lesson-goals li + li,
+.exam-prep li + li {
+  margin-top: 7px;
+}
+.lesson-terms {
+  margin-top: 15px;
+}
+.lesson-terms dl {
+  margin-top: 12px;
+}
+.lesson-terms dt {
+  font-weight: 700;
+  color: var(--green);
+}
+.lesson-terms dd {
+  margin: 3px 0 12px;
+}
+.explain-block {
+  margin-top: 18px;
+}
+.explain-block h3,
+.worked-example summary {
+  font-size: 1rem;
+}
+.explain-block ol,
+.worked-example ol {
+  padding-left: 24px;
+  margin: 12px 0;
+}
+.explain-block li + li,
+.worked-example li + li {
+  margin-top: 10px;
+}
+.worked-example {
+  background: var(--soft);
+  border-left: 3px solid var(--green2);
+  border-radius: 10px;
+  padding: 17px 19px;
+  margin-top: 18px;
+}
+.worked-example summary {
+  color: var(--green);
+  font-weight: 700;
+  min-height: 32px;
+}
+.worked-example p {
+  margin-top: 10px;
+}
+.lesson-trap {
+  margin-top: 15px;
+}
+.lesson-trap p {
+  margin: 5px 0 0;
+}
+.checkpoint {
+  min-inline-size: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 15px;
+  margin: 20px 0 0;
+}
+.checkpoint legend {
+  font-weight: 700;
+  color: var(--green);
+  padding: 0 6px;
+  font-size: 0.95rem;
+}
+.checkpoint-choices {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.checkpoint-choices button {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: left;
+  background: var(--surface);
+}
+.checkpoint-choices button:hover {
+  background: var(--soft);
+}
+.checkpoint-choices .checkpoint-right {
+  border-color: var(--right);
+  color: var(--right);
+  background: var(--pale);
+}
+.checkpoint-choices .checkpoint-wrong {
+  border-color: var(--wrong);
+  color: var(--wrong);
+}
+.checkpoint-feedback {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.checkpoint-feedback.good {
+  color: var(--right);
+}
+.checkpoint-feedback.bad {
+  color: var(--wrong);
+}
+.lesson-back {
+  margin-top: 12px;
+  white-space: normal;
+  text-align: left;
+}
+.test-overview {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.test-overview > * {
+  min-width: 0;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.exam-structure {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+.exam-structure caption {
+  text-align: left;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.exam-structure th,
+.exam-structure td {
+  border-bottom: 1px solid var(--border);
+  padding: 12px 8px;
+  text-align: left;
+}
+.exam-structure thead,
+.exam-structure tbody tr:last-child {
+  background: var(--pale);
+}
+.exam-prep h3:not(:first-child) {
+  margin-top: 20px;
+}
+.exam-prep p + p {
+  margin-top: 14px;
+}
+.exam-section {
+  margin: 8px 0 18px;
+  font-size: 1.15rem;
+  color: var(--green);
+  padding: 14px 17px;
+  background: var(--pale);
+  border-radius: 10px;
+}
+.exam-breakdown {
+  margin: 16px 0 24px;
+  font-weight: 700;
+}
+@media (max-width: 850px) {
+  .test-overview {
+    grid-template-columns: 1fr;
+  }
+}
 .lesson-part {
   margin: 25px 0;
   scroll-margin-top: 100px;
@@ -1999,6 +2178,7 @@ th {
   .bookmark,
   .quiz-aside,
   .part-nav,
+  .checkpoint,
   .lesson-media,
   .lesson-media-help {
     display: none !important;

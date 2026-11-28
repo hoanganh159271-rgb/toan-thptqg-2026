@@ -1,6 +1,7 @@
 (function () {
   "use strict";
   const D = window.POLYMER_DATA,
+    G = window.POLYMER_GUIDES,
     V = window.POLYMER_VISUALS,
     esc = V.escape;
   const main = document.getElementById("main");
@@ -80,7 +81,16 @@
           s.quiz.score <= 10)) &&
       s.quiz.answers &&
       typeof s.quiz.answers === "object" &&
-      ["quick", "class", "mixed"].includes(s.quiz.kind)
+      ["quick", "class", "mixed", "regular45"].includes(s.quiz.kind) &&
+      (s.quiz.kind !== "regular45" ||
+        (s.quiz.ids.length === 20 &&
+          s.quiz.ids
+            .slice(0, 14)
+            .every((id) => questions.get(id).type === "mc") &&
+          s.quiz.ids
+            .slice(14)
+            .every((id) => questions.get(id).type === "num") &&
+          s.quiz.end - s.quiz.start === 45 * 60000))
     )
       out.quiz = s.quiz;
     return out;
@@ -196,7 +206,9 @@
       ) +
       button("Luyện tập ngay", "#practice") +
       '</div></div><div class="hero-visual"><canvas data-hero role="img" aria-label="Minh họa một đoạn chuỗi carbon và các nguyên tử hydrogen"></canvas><div class="hero-element"><small>6</small><strong>C</strong><small>Carbon</small></div><span class="hero-caption">Từ phân tử nhỏ, thành mạch dài</span><div class="hero-formula">n CH₂=CH₂ &nbsp; ⟶ &nbsp; [–CH₂–CH₂–]ₙ</div></div></section>' +
-      '<div class="hero-metrics"><div class="metric"><strong>8</strong><span>Bài học<br>có minh họa</span></div><div class="metric"><strong>72</strong><span>Câu luyện tập<br>có giải thích</span></div><div class="metric"><strong>2</strong><span>Video bài giảng<br>theo từng phần</span></div><div class="metric"><strong>' +
+      '<div class="hero-metrics"><div class="metric"><strong>8</strong><span>Bài học<br>có minh họa</span></div><div class="metric"><strong>' +
+      D.questions.length +
+      '</strong><span>Câu luyện tập<br>có giải thích</span></div><div class="metric"><strong>2</strong><span>Video bài giảng<br>theo từng phần</span></div><div class="metric"><strong>' +
       mastered +
       "</strong><span>Câu đã làm đúng<br>trong lần gần nhất</span></div></div>" +
       '<div class="section-heading"><h2>Học từ gốc, nhớ có hệ thống</h2><a class="button text" href="#learn">Xem 8 bài học</a></div><div class="grid three">' +
@@ -205,7 +217,7 @@
       '<div class="section-heading"><h2>Chọn phần bạn muốn luyện</h2><a class="button text" href="#atlas">Tra cứu 19 polymer</a></div><div class="grid three">' +
       D.lessons.slice(3, 6).map(lessonCard).join("") +
       "</div>" +
-      '<div class="section-heading"><h2>Chuẩn bị cho bài kiểm tra ở lớp</h2></div><div class="card study-banner"><div><h3>15 phút, tự kiểm tra một lượt.</h3><p>Nhận biết · đúng/sai · bài tính. Nộp bài để xem điểm và giải thích từng câu.</p></div>' +
+      '<div class="section-heading"><h2>Chuẩn bị cho bài kiểm tra thường xuyên</h2></div><div class="card study-banner"><div><h3>45 phút · 14 câu trắc nghiệm + 6 câu điền số.</h3><p>Mỗi câu 0,5 điểm. Nộp bài để xem lời giải, sơ đồ và mở đúng mục kiến thức cần ôn.</p></div>' +
       button("Vào kiểm tra nhanh", "#test") +
       "</div>" +
       '<div class="grid two" style="margin-top:18px"><a class="card" href="#sources"><h3>Tài liệu bạn đang học</h3><p>Đủ 9 trang đã gửi, câu hỏi có nhãn trang để đối chiếu với bản gốc.</p></a><a class="card" href="#review"><h3>Ôn đúng chỗ đang vướng</h3><p>' +
@@ -290,6 +302,72 @@
       .forEach((b) => b.setAttribute("aria-pressed", "false"));
     if (restoreFocus) active?.focus();
   }
+  function lessonOverview(id) {
+    const guide = G[id];
+    return (
+      '<section class="lesson-goals"><h2>Học xong, bạn làm được gì?</h2><ul>' +
+      guide.goals.map((s) => "<li>" + esc(s) + "</li>").join("") +
+      '</ul><details class="lesson-terms"><summary>Từ khóa cần nắm</summary><dl>' +
+      guide.terms
+        .map(
+          ([name, meaning]) =>
+            "<dt>" + esc(name) + "</dt><dd>" + esc(meaning) + "</dd>",
+        )
+        .join("") +
+      "</dl></details></section>"
+    );
+  }
+  function guidedPart(id, index) {
+    const guide = G[id].parts[index];
+    return (
+      '<div class="explain-block"><h3>Hiểu từng bước</h3><ol>' +
+      guide.explain.map((s) => "<li>" + esc(s) + "</li>").join("") +
+      '</ol></div><details class="worked-example" open><summary>Ví dụ có lời giải từng bước</summary><p>' +
+      esc(guide.worked.prompt) +
+      "</p><ol>" +
+      guide.worked.steps.map((s) => "<li>" + esc(s) + "</li>").join("") +
+      '</ol></details><div class="trap lesson-trap"><strong>Chỗ dễ nhầm</strong><p>' +
+      esc(guide.mistake) +
+      '</p></div><fieldset class="checkpoint"><legend>Tự thử 20 giây</legend><p>' +
+      esc(guide.checkpoint.question) +
+      '</p><div class="checkpoint-choices">' +
+      guide.checkpoint.choices
+        .map(
+          (s, i) =>
+            '<button data-action="checkpoint" data-id="' +
+            id +
+            '" data-part="' +
+            index +
+            '" data-choice="' +
+            i +
+            '" aria-pressed="false">' +
+            esc(s) +
+            "</button>",
+        )
+        .join("") +
+      '</div><p class="checkpoint-feedback" role="status" hidden></p></fieldset>'
+    );
+  }
+  function lessonLink(q, label = "Xem lại đúng mục kiến thức") {
+    const ref = q.lessonRef,
+      l = lessons.get(ref.lesson);
+    return (
+      '<a class="button small lesson-back" href="#learn/' +
+      ref.lesson +
+      "?part=" +
+      ref.part +
+      '">' +
+      esc(label) +
+      " · " +
+      esc(l.parts[ref.part].title) +
+      "</a>"
+    );
+  }
+  function focusLessonPart(index) {
+    const part = document.getElementById("part-" + index);
+    part?.scrollIntoView({ behavior: "instant", block: "start" });
+    part?.querySelector("h2").focus({ preventScroll: true });
+  }
   function learn(id) {
     if (!id)
       return (
@@ -319,6 +397,7 @@
       '<div class="reading-layout"><article><p class="lesson-intro">' +
       l.intro +
       "</p>" +
+      lessonOverview(l.id) +
       '<nav class="part-nav" aria-label="Các mục trong bài">' +
       l.parts
         .map(
@@ -345,9 +424,7 @@
             p.text +
             "</p>" +
             V.render(p.visual) +
-            '<div class="example-box"><strong>Nhìn qua một ví dụ</strong>' +
-            p.example +
-            "</div>" +
+            guidedPart(l.id, i) +
             lessonMedia(l, p, i) +
             "</section>",
         )
@@ -479,6 +556,7 @@
       (q.trap
         ? '<div class="trap"><strong>Chỗ dễ nhầm</strong>' + q.trap + "</div>"
         : "") +
+      lessonLink(q) +
       "</div>"
     );
   }
@@ -650,7 +728,7 @@
         '">' +
         (a.show ? "Ẩn lời giải" : "Xem lời giải") +
         "</button>" +
-        button("Ôn lại bài học", "#learn/" + q.topic) +
+        lessonLink(q, "Ôn lại bài học") +
         "</div>";
     }
     html +=
@@ -835,7 +913,7 @@
         : "")
     );
   }
-  const configs = {
+  const legacyConfigs = {
     quick: {
       title: "Ôn nhanh 10 phút",
       minutes: 10,
@@ -866,21 +944,45 @@
         "12 câu chọn đáp án × 0,5 + 8 ý đúng/sai × 0,25 + 4 câu ngắn × 0,5 điểm.",
     },
   };
+  const configs = {
+    regular45: {
+      title: "Kiểm tra thường xuyên · 45 phút",
+      minutes: 45,
+      mc: 14,
+      tf: 0,
+      num: 6,
+      weights: { mc: 0.5, tf: 0, num: 0.5 },
+      detail:
+        "14 câu trắc nghiệm một đáp án + 6 câu điền số trả lời ngắn. Mỗi câu 0,5 điểm, tổng 10 điểm.",
+      mcTopics: { basics: 3, synthesis: 3, plastics: 3, fibers: 3, rubber: 2 },
+      numGroups: [
+        "classification",
+        "repeatMass",
+        "degree",
+        "yield",
+        "composition",
+        "multistep",
+      ],
+    },
+  };
+  function quizConfig(kind) {
+    return configs[kind] || legacyConfigs[kind];
+  }
   function testHome() {
     const active = store.quiz && !store.quiz.submitted;
     return (
       heading(
-        "Một bài kiểm tra trước giờ lên lớp",
-        "Đề rút từ các câu hỏi của tài liệu và dạng bổ sung. Thang điểm hiển thị trước khi bắt đầu.",
+        "Kiểm tra thường xuyên · Polymer",
+        "45 phút, 20 câu. Luyện đúng cấu trúc 14 câu trắc nghiệm và 6 câu điền số trả lời ngắn.",
       ) +
       (active
         ? '<div class="card remember" style="margin-bottom:22px"><h3>Bạn có bài đang làm</h3><p>' +
           esc(store.quiz.title) +
-          '. Đồng hồ tiếp tục tính theo giờ bắt đầu, kể cả khi đóng trang.</p><div class="actions" style="margin-top:14px">' +
+          '. Bài được giữ theo cấu trúc tại thời điểm bắt đầu. Đồng hồ tiếp tục tính khi đóng trang.</p><div class="actions" style="margin-top:14px">' +
           button("Tiếp tục bài đang làm", "#exam", true) +
           "</div></div>"
         : "") +
-      '<div class="grid three">' +
+      '<div class="test-overview">' +
       Object.entries(configs)
         .map(
           ([id, c]) =>
@@ -890,15 +992,14 @@
             c.title +
             "</h3><p>" +
             c.detail +
-            '</p><p class="test-rules">Mỗi ý đúng/sai được tính điểm độc lập. Có thể xem lại các câu trước khi nộp.</p><div class="actions"><button class="button primary" data-action="start-test" data-id="' +
+            '</p><div class="table-scroll"><table class="exam-structure"><caption>Cấu trúc đề và cách tính điểm</caption><thead><tr><th scope="col">Phần</th><th scope="col">Số câu</th><th scope="col">Điểm</th></tr></thead><tbody><tr><td>Trắc nghiệm · chọn một đáp án</td><td>14</td><td>7</td></tr><tr><td>Điền số · trả lời ngắn</td><td>6</td><td>3</td></tr><tr><th scope="row">Tổng</th><td>20</td><td>10</td></tr></tbody></table></div><p class="test-rules">Câu 1–14 chọn A, B, C hoặc D. Câu 15–20 nhập một số; chấp nhận dấu phẩy hoặc dấu chấm thập phân. Đơn vị và yêu cầu làm tròn nằm trong từng câu.</p><div class="actions"><button class="button primary" data-action="start-test" data-id="' +
             id +
             '">' +
             (active ? "Bắt đầu bài mới" : "Bắt đầu làm bài") +
             "</button></div></article>",
         )
         .join("") +
-      "</div>" +
-      '<p class="source-links">Đây là các cấu trúc tự luyện cho kiểm tra thường xuyên do web biên soạn. Giáo viên có thể dùng cách chia điểm khác.</p>' +
+      '<aside class="card exam-prep"><h3>Chuẩn bị trước khi làm</h3><p>Đề chọn câu từ tài liệu đã gửi và các dạng bổ sung, bao quát đại cương, điều chế, chất dẻo, composite, tơ, cao su và keo dán.</p><h3>Chia 45 phút thế nào?</h3><ul><li>18 phút làm 14 câu trắc nghiệm.</li><li>22 phút làm 6 câu điền số.</li><li>5 phút kiểm tra đáp án, đơn vị và độ làm tròn.</li></ul><p>Sáu câu điền số gồm phân loại, khối lượng mắt xích, tính n, hiệu suất, thành phần vật liệu và chuyển hóa nhiều bước.</p><p>Đáp án được lưu khi làm. Hết giờ, bài tự nộp. Sau khi nộp, bạn xem được lời giải và mở đúng mục cần ôn.</p></aside></div>' +
       '<div class="section-heading"><h2>Các lần kiểm tra gần đây</h2>' +
       button("Xem tiến độ", "#settings") +
       "</div>" +
@@ -914,6 +1015,8 @@
     return array;
   }
   function startTest(kind) {
+    const config = configs[kind];
+    if (!config) return;
     if (
       store.quiz &&
       !store.quiz.submitted &&
@@ -922,19 +1025,48 @@
       )
     )
       return;
-    const config = configs[kind],
-      ids = [],
+    const ids = [],
       used = new Set();
-    for (const type of ["mc", "tf", "num"]) {
+    function pick(pool, target) {
       let count = 0;
-      for (const q of shuffle(
-        D.questions.filter((q) => q.type === type && q.id !== "DC-5"),
-      )) {
-        if (count === config[type]) break;
+      for (const q of shuffle(pool)) {
+        if (count === target) break;
         if (used.has(q.concept || q.id)) continue;
         used.add(q.concept || q.id);
         ids.push(q.id);
         count++;
+      }
+      return count === target;
+    }
+    for (const [topic, target] of Object.entries(config.mcTopics)) {
+      if (
+        !pick(
+          D.questions.filter(
+            (q) => q.type === "mc" && q.topic === topic && q.id !== "DC-5",
+          ),
+          target,
+        )
+      ) {
+        notify(
+          "Chưa đủ câu cho chủ đề này. Hãy tải lại trang để cập nhật ngân hàng.",
+        );
+        return;
+      }
+    }
+    const mcIds = shuffle(ids);
+    ids.length = 0;
+    ids.push(...mcIds);
+    for (const group of config.numGroups) {
+      if (
+        !pick(
+          D.questions.filter((q) => q.type === "num" && q.examGroup === group),
+          1,
+        )
+      ) {
+        notify(
+          "Chưa đủ dạng câu điền số. Hãy tải lại trang để cập nhật ngân hàng.",
+        );
+        return;
       }
     }
     const now = Date.now();
@@ -953,7 +1085,7 @@
     else location.hash = "exam";
   }
   function quizPoints(q, answer, kind) {
-    const w = configs[kind].weights[q.type];
+    const w = quizConfig(kind).weights[q.type];
     if (q.type === "tf")
       return (
         (q.items.filter((s, i) => answer?.[i] === s.answer).length * w) / 4
@@ -1004,11 +1136,11 @@
     if (!qz)
       return empty(
         "Bạn chưa bắt đầu bài kiểm tra",
-        "Chọn thời lượng phù hợp rồi bắt đầu.",
+        "Bắt đầu bài 45 phút gồm 14 câu trắc nghiệm và 6 câu điền số.",
         "#test",
         "Chọn bài kiểm tra",
       );
-    const config = configs[qz.kind];
+    const config = quizConfig(qz.kind);
     const answered = qz.ids.filter((id) =>
       answerComplete(questions.get(id), qz.answers[id]),
     ).length;
@@ -1026,12 +1158,35 @@
         button("Ôn câu cần sửa", "#review", true) +
         button("Chọn bài kiểm tra khác", "#test") +
         "</div></div>";
+      if (qz.kind === "regular45") {
+        const mcRight = qz.ids
+          .slice(0, 14)
+          .filter((id) => correct(questions.get(id), qz.answers[id])).length;
+        const numRight = qz.ids
+          .slice(14)
+          .filter((id) => correct(questions.get(id), qz.answers[id])).length;
+        top +=
+          '<p class="exam-breakdown">Trắc nghiệm đúng ' +
+          mcRight +
+          "/14 · Điền số đúng " +
+          numRight +
+          "/6</p>";
+      }
     }
     return (
       top +
       '<div class="quiz-layout"><section>' +
       qz.ids
-        .map((id, i) => questionHtml(questions.get(id), true, i + 1))
+        .map(
+          (id, i) =>
+            (qz.kind === "regular45" && [0, 14].includes(i)
+              ? '<h2 class="exam-section">' +
+                (i === 0
+                  ? "Phần I · 14 câu trắc nghiệm (7 điểm)"
+                  : "Phần II · 6 câu điền số (3 điểm)") +
+                "</h2>"
+              : "") + questionHtml(questions.get(id), true, i + 1),
+        )
         .join("") +
       '</section><aside class="quiz-aside"><div class="card"><div><p class="muted">' +
       (qz.submitted ? "Kết quả" : "Thời gian còn lại") +
@@ -1084,7 +1239,7 @@
             )
             .join("") +
           "</ul></div>"
-      : '<div class="card"><p class="muted">Chưa có bài kiểm tra đã nộp. Bạn có thể bắt đầu một bài 10 phút để tự kiểm tra.</p></div>';
+      : '<div class="card"><p class="muted">Chưa có bài kiểm tra đã nộp. Bắt đầu bài thường xuyên 45 phút để tự đánh giá.</p></div>';
   }
   function sources() {
     return (
@@ -1241,7 +1396,7 @@
       learn: "Bài học",
       practice: "Luyện tập",
       atlas: "Tra cứu polymer",
-      test: "Kiểm tra nhanh",
+      test: "Kiểm tra thường xuyên",
       exam: "Phòng kiểm tra",
       review: "Câu cần ôn",
       sources: "Video & tài liệu",
@@ -1251,6 +1406,9 @@
     document.title = names[page] + " · Polymer Hóa 12";
     status();
     V.mount(main);
+    if (page === "learn" && id && /^\d+$/.test(params.get("part") || "")) {
+      focusLessonPart(Number(params.get("part")));
+    }
     if (page === "exam" && store.quiz && !store.quiz.submitted) {
       const tick = () => {
         const remaining = store.quiz.end - Date.now();
@@ -1383,9 +1541,26 @@
         holder.replaceWith(videoFrame(id, 0, 0, video.title));
     }
     if (action === "lesson-part") {
-      const part = document.getElementById("part-" + id);
-      part?.scrollIntoView({ block: "start" });
-      part?.querySelector("h2").focus({ preventScroll: true });
+      focusLessonPart(id);
+    }
+    if (action === "checkpoint") {
+      const guide = G[id]?.parts[Number(b.dataset.part)]?.checkpoint;
+      const chosen = Number(b.dataset.choice),
+        box = b.closest(".checkpoint");
+      if (!guide || !box || !Number.isInteger(chosen) || !guide.choices[chosen])
+        return;
+      const right = chosen === guide.answer;
+      box.querySelectorAll("button").forEach((option) => {
+        const selected = option === b;
+        option.setAttribute("aria-pressed", String(selected));
+        option.classList.toggle("checkpoint-right", selected && right);
+        option.classList.toggle("checkpoint-wrong", selected && !right);
+      });
+      const feedback = box.querySelector(".checkpoint-feedback");
+      feedback.hidden = false;
+      feedback.className = "checkpoint-feedback " + (right ? "good" : "bad");
+      feedback.textContent =
+        (right ? "Đúng rồi. " : "Xem lại một chút. ") + guide.why;
     }
     if (action === "clip") {
       const lesson = lessons.get(id);
@@ -1408,7 +1583,7 @@
             part.title + " · " + clipRange(clip),
           ),
         );
-      stage.scrollIntoView({ block: "nearest" });
+      stage.scrollIntoView({ behavior: "instant", block: "nearest" });
     }
     if (action === "close-clip") closeLessonVideos(true);
     if (action === "export") {
@@ -1490,8 +1665,8 @@
       .catch(() => notify("Chưa đọc được tệp đã chọn."));
   });
   window.addEventListener("hashchange", () => {
-    render();
     window.scrollTo({ top: 0, behavior: "instant" });
+    render();
   });
   document.querySelector(".skip").addEventListener("click", (event) => {
     event.preventDefault();
